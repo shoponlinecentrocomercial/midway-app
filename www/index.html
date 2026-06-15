@@ -6,7 +6,6 @@
     <title>Batalla de Midway - Artillero AA</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="screen-orientation" content="landscape">
     <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIk1pZHdheSBBcnRpbGxlcm8iLAogICJzaG9ydF9uYW1lIjogIk1pZHdheSIsCiAgInN0YXJ0X3VybCI6ICIuLyIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiIzAwMDAwMCIsCiAgInRoZW1lX2NvbG9yIjogIiMwMDAwMDAiLAogICJpY29ucyI6IFtdCn0=">
     <style>
         * {
@@ -18,7 +17,6 @@
             -webkit-touch-callout: none;
             -webkit-tap-highlight-color: transparent;
         }
-
         body {
             background: #000;
             overflow: hidden;
@@ -30,10 +28,7 @@
             width: 100dvw;
             height: 100dvh;
         }
-
-        canvas {
-            display: block;
-        }
+        canvas { display: block; }
 
         #ui {
             position: absolute;
@@ -44,47 +39,41 @@
             padding: 8px;
             z-index: 5;
         }
-
         #hud {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
             color: #fff;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
         }
-
         #score {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
-            background: rgba(0, 0, 0, 0.6);
-            padding: 6px 12px;
+            background: rgba(0,0,0,0.6);
+            padding: 5px 10px;
             border-radius: 5px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(255,255,255,0.3);
         }
-
         #health-bar-container {
-            width: 160px;
-            height: 16px;
-            background: rgba(0, 0, 0, 0.6);
+            width: 140px;
+            height: 14px;
+            background: rgba(0,0,0,0.6);
             border: 2px solid #ff4444;
-            border-radius: 8px;
+            border-radius: 7px;
             overflow: hidden;
         }
-
         #health-bar {
             width: 100%;
             height: 100%;
             background: linear-gradient(90deg, #ff0000, #ff4444);
             transition: width 0.3s;
         }
-
         #health-label {
             color: #fff;
-            font-size: 9px;
+            font-size: 8px;
             text-align: center;
             margin-top: 1px;
         }
-
         #crosshair {
             position: absolute;
             top: 50%;
@@ -93,35 +82,29 @@
             pointer-events: none;
             z-index: 4;
         }
-
-        #crosshair svg {
-            width: 70px;
-            height: 70px;
-        }
-
+        #crosshair svg { width: 60px; height: 60px; }
         #message {
             position: absolute;
-            top: 35%;
+            top: 30%;
             left: 50%;
             transform: translate(-50%, -50%);
             color: #ffcc00;
-            font-size: 22px;
+            font-size: 20px;
             font-weight: bold;
             text-align: center;
-            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.9);
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.9);
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.3s;
             z-index: 6;
         }
-
         #game-over-screen {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.88);
+            background: rgba(0,0,0,0.88);
             display: none;
             flex-direction: column;
             justify-content: center;
@@ -129,48 +112,36 @@
             pointer-events: all;
             z-index: 10;
         }
-
         #game-over-screen h1 {
             color: #ff4444;
-            font-size: 36px;
+            font-size: 32px;
             margin-bottom: 10px;
             text-shadow: 0 0 20px #ff0000;
         }
-
-        #game-over-screen .final-score {
-            color: #fff;
-            font-size: 22px;
-            margin: 10px 0;
-        }
-
+        #game-over-screen .final-score { color: #fff; font-size: 20px; margin: 8px 0; }
         #game-over-screen .ranking {
             color: #ffcc00;
-            font-size: 13px;
-            margin: 12px 0;
+            font-size: 12px;
+            margin: 10px 0;
             text-align: center;
-            max-height: 160px;
+            max-height: 140px;
             overflow-y: auto;
             width: 90%;
         }
-
         #game-over-screen button {
             background: #ff4444;
             color: #fff;
             border: none;
-            padding: 14px 35px;
-            font-size: 18px;
-            border-radius: 30px;
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: 25px;
             cursor: pointer;
-            margin-top: 12px;
+            margin-top: 10px;
             font-family: 'Courier New', monospace;
             font-weight: bold;
             pointer-events: all;
         }
-
-        #game-over-screen button:active {
-            background: #cc0000;
-            transform: scale(0.95);
-        }
+        #game-over-screen button:active { background: #cc0000; transform: scale(0.95); }
 
         #splash-screen {
             position: absolute;
@@ -178,7 +149,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.93);
+            background: rgba(0,0,0,0.93);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -186,94 +157,57 @@
             pointer-events: all;
             z-index: 20;
         }
-
         #splash-screen h1 {
             color: #ffcc00;
-            font-size: 30px;
-            margin-bottom: 8px;
+            font-size: 28px;
+            margin-bottom: 6px;
             text-shadow: 0 0 30px #ff8800;
             text-align: center;
         }
-
-        #splash-screen .subtitle {
-            color: #ccc;
-            font-size: 12px;
-            margin-bottom: 22px;
-            text-align: center;
-        }
-
-        #splash-screen .instructions {
-            color: #aaa;
-            font-size: 11px;
-            text-align: center;
-            margin-bottom: 16px;
-            line-height: 1.6;
-        }
-
+        #splash-screen .subtitle { color: #ccc; font-size: 11px; margin-bottom: 20px; text-align: center; }
+        #splash-screen .instructions { color: #aaa; font-size: 10px; text-align: center; margin-bottom: 14px; line-height: 1.5; }
         #splash-screen button {
             background: #ff8800;
             color: #000;
             border: none;
-            padding: 15px 40px;
-            font-size: 19px;
-            border-radius: 30px;
+            padding: 14px 35px;
+            font-size: 17px;
+            border-radius: 25px;
             cursor: pointer;
             font-family: 'Courier New', monospace;
             font-weight: bold;
             pointer-events: all;
         }
-
-        #splash-screen button:active {
-            background: #ffaa00;
-            transform: scale(0.95);
-        }
-
+        #splash-screen button:active { background: #ffaa00; transform: scale(0.95); }
         #permission-request {
             position: absolute;
-            bottom: 20px;
+            bottom: 15px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(255, 136, 0, 0.9);
+            background: rgba(255,136,0,0.9);
             color: #000;
-            padding: 10px 22px;
-            border-radius: 25px;
-            font-size: 13px;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 12px;
             pointer-events: all;
             z-index: 25;
             display: none;
             cursor: pointer;
             font-weight: bold;
         }
-
         #gyro-debug {
             position: absolute;
-            bottom: 8px;
-            left: 8px;
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 9px;
+            bottom: 6px;
+            left: 6px;
+            color: rgba(255,255,255,0.6);
+            font-size: 8px;
             pointer-events: none;
             z-index: 3;
             display: none;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 3px 6px;
+            background: rgba(0,0,0,0.5);
+            padding: 2px 5px;
             border-radius: 3px;
-        }
-
-        #rotate-warning {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #ff8800;
-            font-size: 20px;
-            font-weight: bold;
-            text-align: center;
-            pointer-events: none;
-            z-index: 21;
-            display: none;
-            background: rgba(0, 0, 0, 0.8);
-            padding: 20px 30px;
-            border-radius: 15px;
+            font-family: monospace;
         }
     </style>
 </head>
@@ -282,40 +216,37 @@
         <div id="hud">
             <div id="score">PTS: 0</div>
             <div>
-                <div id="health-bar-container">
-                    <div id="health-bar"></div>
-                </div>
+                <div id="health-bar-container"><div id="health-bar"></div></div>
                 <div id="health-label">INTEGRIDAD DEL BUQUE</div>
             </div>
         </div>
     </div>
     <div id="crosshair">
         <svg viewBox="0 0 100 100">
-            <circle cx="50" cy="50" r="32" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="1.2" stroke-dasharray="6,3"/>
-            <line x1="50" y1="8" x2="50" y2="28" stroke="rgba(255,255,255,0.65)" stroke-width="1.2"/>
-            <line x1="50" y1="72" x2="50" y2="92" stroke="rgba(255,255,255,0.65)" stroke-width="1.2"/>
-            <line x1="8" y1="50" x2="28" y2="50" stroke="rgba(255,255,255,0.65)" stroke-width="1.2"/>
-            <line x1="72" y1="50" x2="92" y2="50" stroke="rgba(255,255,255,0.65)" stroke-width="1.2"/>
-            <circle cx="50" cy="50" r="2.5" fill="rgba(255,50,50,0.8)"/>
+            <circle cx="50" cy="50" r="30" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.2" stroke-dasharray="5,3"/>
+            <line x1="50" y1="10" x2="50" y2="30" stroke="rgba(255,255,255,0.6)" stroke-width="1.2"/>
+            <line x1="50" y1="70" x2="50" y2="90" stroke="rgba(255,255,255,0.6)" stroke-width="1.2"/>
+            <line x1="10" y1="50" x2="30" y2="50" stroke="rgba(255,255,255,0.6)" stroke-width="1.2"/>
+            <line x1="70" y1="50" x2="90" y2="50" stroke="rgba(255,255,255,0.6)" stroke-width="1.2"/>
+            <circle cx="50" cy="50" r="2" fill="rgba(255,50,50,0.8)"/>
         </svg>
     </div>
     <div id="message"></div>
     <div id="gyro-debug"></div>
-    <div id="rotate-warning">📱 GIRA EL MÓVIL<br>PARA USARLO EN HORIZONTAL</div>
 
     <div id="splash-screen">
         <h1>⚓ BATALLA DE MIDWAY</h1>
         <div class="subtitle">ARTILLERO ANTIAÉREO</div>
         <div class="instructions">
-            📱 USA EL MÓVIL EN <b>HORIZONTAL</b><br>
-            ⚖️ INCLINA laterales: GIRO 360°<br>
-            📐 CABECEA: SUBIR/BAJAR cañones<br>
+            🤲 SOSTÉN el móvil con dos manos<br>
+            🚗 VOLANTE: gira la torreta 360°<br>
+            ✈️ PALANCA: cabecea para elevar<br>
             👆 TOCA pantalla: DISPARAR
         </div>
         <button id="start-btn">¡A LA BATALLA!</button>
     </div>
 
-    <div id="permission-request">📳 Toca aquí para activar vibración</div>
+    <div id="permission-request">📳 Toca para activar vibración</div>
 
     <div id="game-over-screen">
         <h1>¡HUNDIDO!</h1>
@@ -325,32 +256,26 @@
     </div>
 
     <script type="importmap">
-        {
-            "imports": {
-                "three": "https://unpkg.com/three@0.157.0/build/three.module.js"
-            }
-        }
+        { "imports": { "three": "https://unpkg.com/three@0.157.0/build/three.module.js" } }
     </script>
 
     <script type="module">
         import * as THREE from 'three';
 
-        // ==================== SISTEMA DE AUDIO ====================
+        // ==================== AUDIO ====================
         class AudioSystem {
-            constructor() {
-                this.ctx = null;
+            constructor() { this.ctx = null;
                 this.initialized = false;
-                this.masterGain = null;
-            }
+                this.masterGain = null; }
             init() {
                 if (this.initialized) return;
                 try {
                     this.ctx = new(window.AudioContext || window.webkitAudioContext)();
                     this.masterGain = this.ctx.createGain();
-                    this.masterGain.gain.value = 0.45;
+                    this.masterGain.gain.value = 0.4;
                     this.masterGain.connect(this.ctx.destination);
                     this.initialized = true;
-                } catch (e) { console.warn('Audio no disponible:', e); }
+                } catch (e) {}
             }
             playGunshot() {
                 if (!this.initialized) return;
@@ -371,17 +296,17 @@
                 gain.connect(this.masterGain);
                 osc.start(now);
                 osc.stop(now + 0.18);
-                const bufferSize = this.ctx.sampleRate * 0.08;
-                const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-                const data = buffer.getChannelData(0);
-                for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.25));
+                const bufSize = this.ctx.sampleRate * 0.08;
+                const buf = this.ctx.createBuffer(1, bufSize, this.ctx.sampleRate);
+                const d = buf.getChannelData(0);
+                for (let i = 0; i < bufSize; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufSize * 0.25));
                 const noise = this.ctx.createBufferSource();
-                const noiseGain = this.ctx.createGain();
-                noise.buffer = buffer;
-                noiseGain.gain.setValueAtTime(0.5, now);
-                noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
-                noise.connect(noiseGain);
-                noiseGain.connect(this.masterGain);
+                const nGain = this.ctx.createGain();
+                noise.buffer = buf;
+                nGain.gain.setValueAtTime(0.5, now);
+                nGain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+                noise.connect(nGain);
+                nGain.connect(this.masterGain);
                 noise.start(now);
             }
             playExplosion() {
@@ -398,17 +323,17 @@
                 gain.connect(this.masterGain);
                 osc.start(now);
                 osc.stop(now + 1.2);
-                const bufferSize = this.ctx.sampleRate * 0.7;
-                const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-                const data = buffer.getChannelData(0);
-                for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.18));
+                const bufSize = this.ctx.sampleRate * 0.7;
+                const buf = this.ctx.createBuffer(1, bufSize, this.ctx.sampleRate);
+                const d = buf.getChannelData(0);
+                for (let i = 0; i < bufSize; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufSize * 0.18));
                 const noise = this.ctx.createBufferSource();
-                const noiseGain = this.ctx.createGain();
-                noise.buffer = buffer;
-                noiseGain.gain.setValueAtTime(0.7, now);
-                noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
-                noise.connect(noiseGain);
-                noiseGain.connect(this.masterGain);
+                const nGain = this.ctx.createGain();
+                noise.buffer = buf;
+                nGain.gain.setValueAtTime(0.7, now);
+                nGain.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
+                noise.connect(nGain);
+                nGain.connect(this.masterGain);
                 noise.start(now);
             }
             playHit() {
@@ -446,20 +371,18 @@
             }
         }
 
-        // ==================== SISTEMA DE VIBRACIÓN ====================
+        // ==================== VIBRACIÓN ====================
         class VibrationSystem {
             constructor() { this.enabled = false; }
-            requestPermission() {
-                if (navigator.vibrate) { navigator.vibrate(40);
-                    this.enabled = true; }
-            }
-            vibrate(pattern) { if (this.enabled && navigator.vibrate) navigator.vibrate(pattern); }
+            requestPermission() { if (navigator.vibrate) { navigator.vibrate(40);
+                    this.enabled = true; } }
+            vibrate(p) { if (this.enabled && navigator.vibrate) navigator.vibrate(p); }
             gunshotVibrate() { this.vibrate([20, 15, 20]); }
             explosionVibrate() { this.vibrate([80, 40, 80, 40, 150]); }
             hitVibrate() { this.vibrate([150, 80, 150]); }
         }
 
-        // ==================== JUEGO PRINCIPAL ====================
+        // ==================== JUEGO ====================
         class MidwayGame {
             constructor() {
                 this.audio = new AudioSystem();
@@ -472,14 +395,13 @@
                 this.spawnTimer = 0;
                 this.spawnInterval = 3.5;
 
-                // Giroscopio
-                this.gyroYaw = 0;
-                this.gyroPitch = 0;
+                // Giroscopio - valores normalizados
+                this.steerInput = 0; // Volante: negativo=izquierda, positivo=derecha
+                this.pitchInput = 0; // Cabeceo: negativo=bajar, positivo=subir
                 this.gyroAvailable = false;
                 this.calibrated = false;
-                this.calibrationRoll = 0;
-                this.calibrationPitch = 0;
-                this.isLandscape = false;
+                this.calibSteer = 0;
+                this.calibPitch = 0;
 
                 // Torreta
                 this.turretYaw = 0;
@@ -487,19 +409,15 @@
                 this.targetYaw = 0;
                 this.targetPitch = 0;
 
-                // Disparo
                 this.isFiring = false;
                 this.fireCooldown = 0;
                 this.fireRate = 0.1;
                 this.bullets = [];
                 this.muzzleFlash = 0;
-
-                // Entidades
                 this.planes = [];
                 this.explosions = [];
                 this.hitEffects = [];
 
-                // Three.js
                 this.scene = null;
                 this.camera = null;
                 this.renderer = null;
@@ -511,7 +429,6 @@
                 this.planeMeshes = [];
                 this.explosionParticles = [];
 
-                // DOM
                 this.scoreElement = document.getElementById('score');
                 this.healthBar = document.getElementById('health-bar');
                 this.messageElement = document.getElementById('message');
@@ -521,11 +438,10 @@
                 this.finalScoreElement = document.getElementById('final-score');
                 this.rankingElement = document.getElementById('ranking');
                 this.gyroDebug = document.getElementById('gyro-debug');
-                this.rotateWarning = document.getElementById('rotate-warning');
             }
 
             init() {
-                this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+                this.renderer = new THREE.WebGLRenderer({ antialias: true });
                 this.renderer.setSize(window.innerWidth, window.innerHeight);
                 this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
                 this.renderer.shadowMap.enabled = true;
@@ -535,26 +451,26 @@
                 document.body.appendChild(this.renderer.domElement);
 
                 this.scene = new THREE.Scene();
-                this.scene.background = new THREE.Color(0x5a8ab5);
-                this.scene.fog = new THREE.FogExp2(0x7aafd4, 0.0001);
+                // Cielo más claro para que se vea bien el horizonte
+                this.scene.background = new THREE.Color(0x7eb8da);
+                this.scene.fog = new THREE.FogExp2(0x8cc8e8, 0.00008);
 
                 this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.3, 400);
-                this.camera.position.set(0, 2.5, 3.8);
+                this.camera.position.set(0, 2.8, 3.5);
 
-                const ambientLight = new THREE.AmbientLight(0x7799bb, 0.7);
-                this.scene.add(ambientLight);
-                const sunLight = new THREE.DirectionalLight(0xffeedd, 3.5);
-                sunLight.position.set(60, 50, 30);
-                sunLight.castShadow = true;
-                sunLight.shadow.mapSize.width = 2048;
-                sunLight.shadow.mapSize.height = 2048;
-                sunLight.shadow.camera.near = 0.5;
-                sunLight.shadow.camera.far = 250;
-                sunLight.shadow.camera.left = -100;
-                sunLight.shadow.camera.right = 100;
-                sunLight.shadow.camera.top = 100;
-                sunLight.shadow.camera.bottom = -100;
-                this.scene.add(sunLight);
+                this.scene.add(new THREE.AmbientLight(0x8899bb, 0.8));
+                const sun = new THREE.DirectionalLight(0xffeedd, 3.5);
+                sun.position.set(60, 50, 30);
+                sun.castShadow = true;
+                sun.shadow.mapSize.width = 2048;
+                sun.shadow.mapSize.height = 2048;
+                sun.shadow.camera.near = 0.5;
+                sun.shadow.camera.far = 250;
+                sun.shadow.camera.left = -100;
+                sun.shadow.camera.right = 100;
+                sun.shadow.camera.top = 100;
+                sun.shadow.camera.bottom = -100;
+                this.scene.add(sun);
                 this.scene.add(new THREE.HemisphereLight(0x87ceeb, 0x334466, 0.5));
 
                 this.createOcean();
@@ -562,87 +478,50 @@
                 this.createTurret();
                 this.setupEventListeners();
                 this.setupGyroscope();
-                this.checkOrientation();
 
                 this.lastTime = performance.now();
                 this.animate();
             }
 
-            checkOrientation() {
-                const check = () => {
-                    const isLandscape = window.innerWidth > window.innerHeight;
-                    this.isLandscape = isLandscape;
-                    if (this.gameRunning) {
-                        if (!isLandscape) {
-                            this.rotateWarning.style.display = 'block';
-                        } else {
-                            this.rotateWarning.style.display = 'none';
-                        }
-                    }
-                };
-                window.addEventListener('resize', check);
-                window.addEventListener('orientationchange', () => setTimeout(check, 300));
-                check();
-            }
-
             createOcean() {
-                const oceanGeometry = new THREE.PlaneGeometry(400, 400, 120, 120);
-                const oceanMaterial = new THREE.MeshStandardMaterial({
-                    color: 0x1a3a5c,
-                    roughness: 0.25,
-                    metalness: 0.7,
-                });
-                this.ocean = new THREE.Mesh(oceanGeometry, oceanMaterial);
+                const geo = new THREE.PlaneGeometry(500, 500, 150, 150);
+                const mat = new THREE.MeshStandardMaterial({ color: 0x1a3a5c, roughness: 0.2, metalness: 0.75 });
+                this.ocean = new THREE.Mesh(geo, mat);
                 this.ocean.rotation.x = -Math.PI / 2;
                 this.ocean.position.y = -2;
                 this.ocean.receiveShadow = true;
                 this.scene.add(this.ocean);
-                this.oceanVertices = oceanGeometry.attributes.position.array.slice();
+                this.oceanVertices = geo.attributes.position.array.slice();
             }
 
             createShip() {
                 this.ship = new THREE.Group();
-                const deckGeom = new THREE.BoxGeometry(28, 1.2, 65);
-                const deckMat = new THREE.MeshStandardMaterial({ color: 0x5a5a5a, roughness: 0.6, metalness: 0.35 });
-                const deck = new THREE.Mesh(deckGeom, deckMat);
+
+                // SOLO cubierta plana, sin isla ni torre ni chimenea
+                const deck = new THREE.Mesh(
+                    new THREE.BoxGeometry(30, 1.2, 70),
+                    new THREE.MeshStandardMaterial({ color: 0x5a5a5a, roughness: 0.6, metalness: 0.35 })
+                );
                 deck.position.y = 1.2;
                 deck.castShadow = true;
                 deck.receiveShadow = true;
                 this.ship.add(deck);
 
-                for (let z = -30; z <= 30; z += 8) {
-                    const lineGeom = new THREE.BoxGeometry(26, 0.05, 0.3);
-                    const line = new THREE.Mesh(lineGeom, new THREE.MeshStandardMaterial({ color: 0xcccccc,
-                        roughness: 0.5 }));
+                // Líneas de cubierta
+                for (let z = -32; z <= 32; z += 8) {
+                    const line = new THREE.Mesh(
+                        new THREE.BoxGeometry(28, 0.05, 0.3),
+                        new THREE.MeshStandardMaterial({ color: 0xcccccc, roughness: 0.5 })
+                    );
                     line.position.set(0, 1.85, z);
                     this.ship.add(line);
                 }
 
-                const islandGeom = new THREE.BoxGeometry(5, 5.5, 11);
-                const island = new THREE.Mesh(islandGeom, new THREE.MeshStandardMaterial({ color: 0x4a4a4a,
-                    roughness: 0.55, metalness: 0.45 }));
-                island.position.set(9, 4.3, -4);
-                island.castShadow = true;
-                island.receiveShadow = true;
-                this.ship.add(island);
-
-                const towerGeom = new THREE.BoxGeometry(3.5, 3.5, 4.5);
-                const tower = new THREE.Mesh(towerGeom, new THREE.MeshStandardMaterial({ color: 0x555555, roughness: 0.45,
-                    metalness: 0.55 }));
-                tower.position.set(9, 7.8, -4);
-                tower.castShadow = true;
-                this.ship.add(tower);
-
-                const funnelGeom = new THREE.CylinderGeometry(1.3, 1.8, 7, 8);
-                const funnel = new THREE.Mesh(funnelGeom, new THREE.MeshStandardMaterial({ color: 0x383838,
-                    roughness: 0.45, metalness: 0.65 }));
-                funnel.position.set(5.5, 5.8, -7);
-                funnel.castShadow = true;
-                this.ship.add(funnel);
-
-                const hullGeom = new THREE.BoxGeometry(23, 3.5, 60);
-                const hull = new THREE.Mesh(hullGeom, new THREE.MeshStandardMaterial({ color: 0x883333, roughness: 0.7,
-                    metalness: 0.25 }));
+                // Casco bajo el agua
+                const hull = new THREE.Mesh(
+                    new THREE.BoxGeometry(25, 3.5, 65),
+                    new THREE.MeshStandardMaterial({ color: 0x883333, roughness: 0.7, metalness: 0.25 })
+                );
                 hull.position.y = -1.2;
                 this.ship.add(hull);
 
@@ -652,49 +531,47 @@
 
             createTurret() {
                 this.turretGroup = new THREE.Group();
-                this.turretGroup.position.set(0, 1.8, 3.5);
+                // Torreta en el centro de la cubierta, delante del jugador
+                this.turretGroup.position.set(0, 1.9, 5);
 
-                // Base giratoria (más baja y discreta)
-                const baseGeom = new THREE.CylinderGeometry(0.8, 1.0, 0.8, 20);
-                const base = new THREE.Mesh(baseGeom, new THREE.MeshStandardMaterial({ color: 0x5a5a5a, roughness: 0.4,
-                    metalness: 0.75 }));
+                // Base giratoria baja
+                const base = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.7, 0.9, 0.6, 20),
+                    new THREE.MeshStandardMaterial({ color: 0x5a5a5a, roughness: 0.4, metalness: 0.75 })
+                );
                 base.position.y = 0;
                 base.castShadow = true;
                 this.turretGroup.add(base);
 
-                // Sin escudo frontal - solo una barra horizontal de soporte baja
-                const supportGeom = new THREE.BoxGeometry(2.2, 0.2, 0.6);
-                const support = new THREE.Mesh(supportGeom, new THREE.MeshStandardMaterial({ color: 0x4a4a4a,
-                    roughness: 0.4, metalness: 0.7 }));
-                support.position.set(0, 0.3, -0.5);
-                this.turretGroup.add(support);
-
-                // Grupo de cañones (posición baja)
+                // Grupo de cañones (posición baja para que solo se vean puntas)
                 this.gunsGroup = new THREE.Group();
-                this.gunsGroup.position.set(0, 0.25, -0.7);
+                this.gunsGroup.position.set(0, 0.2, -0.5);
 
-                // Soporte de cañones pequeño
-                const mountGeom = new THREE.BoxGeometry(1.4, 0.3, 0.6);
-                const mount = new THREE.Mesh(mountGeom, new THREE.MeshStandardMaterial({ color: 0x555555, roughness: 0.4,
-                    metalness: 0.7 }));
+                // Soporte mínimo
+                const mount = new THREE.Mesh(
+                    new THREE.BoxGeometry(1.2, 0.25, 0.5),
+                    new THREE.MeshStandardMaterial({ color: 0x555555, roughness: 0.4, metalness: 0.7 })
+                );
                 this.gunsGroup.add(mount);
 
-                // Cañones largos que se ven en perspectiva desde atrás
+                // Dos cañones largos apuntando hacia adelante
                 for (let i = 0; i < 2; i++) {
-                    const barrelGeom = new THREE.CylinderGeometry(0.1, 0.15, 4.5, 8);
-                    const barrelMat = new THREE.MeshStandardMaterial({ color: 0x2a2a2a, roughness: 0.25, metalness: 0.9 });
-                    const barrel = new THREE.Mesh(barrelGeom, barrelMat);
+                    const barrel = new THREE.Mesh(
+                        new THREE.CylinderGeometry(0.08, 0.13, 4.0, 8),
+                        new THREE.MeshStandardMaterial({ color: 0x2a2a2a, roughness: 0.25, metalness: 0.9 })
+                    );
                     barrel.rotation.x = Math.PI / 2;
-                    barrel.position.set((i - 0.5) * 0.55, 0, -2.2);
+                    barrel.position.set((i - 0.5) * 0.5, 0, -2);
                     barrel.castShadow = true;
                     this.gunsGroup.add(barrel);
 
-                    // Bocacha
-                    const muzzleGeom = new THREE.CylinderGeometry(0.17, 0.14, 0.35, 8);
-                    const muzzle = new THREE.Mesh(muzzleGeom, new THREE.MeshStandardMaterial({ color: 0x1a1a1a,
-                        roughness: 0.2, metalness: 1.0 }));
+                    // Bocacha (punta del cañón)
+                    const muzzle = new THREE.Mesh(
+                        new THREE.CylinderGeometry(0.15, 0.12, 0.3, 8),
+                        new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.2, metalness: 1.0 })
+                    );
                     muzzle.rotation.x = Math.PI / 2;
-                    muzzle.position.set((i - 0.5) * 0.55, 0, -4.4);
+                    muzzle.position.set((i - 0.5) * 0.5, 0, -4.0);
                     this.gunsGroup.add(muzzle);
                 }
 
@@ -705,8 +582,8 @@
             setupEventListeners() {
                 document.addEventListener('pointerdown', (e) => {
                     if (!this.gameRunning) return;
-                    if (e.target.closest('#game-over-screen') || e.target.closest('#splash-screen') || e.target
-                        .closest('#permission-request')) return;
+                    if (e.target.closest('#game-over-screen') || e.target.closest('#splash-screen') ||
+                        e.target.closest('#permission-request')) return;
                     e.preventDefault();
                     this.isFiring = true;
                     this.audio.init();
@@ -717,12 +594,14 @@
                 document.addEventListener('gesturestart', (e) => e.preventDefault());
                 document.addEventListener('gesturechange', (e) => e.preventDefault());
                 document.addEventListener('gestureend', (e) => e.preventDefault());
+
                 document.getElementById('start-btn').addEventListener('click', () => this.startGame());
                 document.getElementById('restart-btn').addEventListener('click', () => this.restartGame());
                 document.getElementById('permission-request').addEventListener('click', () => {
                     this.vibration.requestPermission();
                     document.getElementById('permission-request').style.display = 'none';
                 });
+
                 window.addEventListener('resize', () => {
                     this.camera.aspect = window.innerWidth / window.innerHeight;
                     this.camera.updateProjectionMatrix();
@@ -731,76 +610,79 @@
             }
 
             setupGyroscope() {
-                if (typeof DeviceOrientationEvent !== 'undefined') {
-                    window.addEventListener('deviceorientation', (event) => {
-                        // En landscape (width > height):
-                        //   - El giro izquierda/derecha (volante) se mapea a beta (cabeceo del dispositivo)
-                        //   - La elevación (palanca avión) se mapea a gamma (inclinación lateral)
-                        // En portrait (height > width):
-                        //   - El giro izquierda/derecha se mapea a gamma
-                        //   - La elevación se mapea a beta
+                // ==========================================
+                // GESTO DE VOLANTE (independiente de orientación):
+                //   Mano derecha arriba + izquierda abajo = girar IZQUIERDA (steer negativo)
+                //   Mano derecha abajo + izquierda arriba = girar DERECHA (steer positivo)
+                //
+                // GESTO DE CABECEO:
+                //   Inclinar hacia ti (pantalla más cerca) = BAJAR cañones (pitch negativo)
+                //   Inclinar hacia afuera (pantalla más lejos) = SUBIR cañones (pitch positivo)
+                // ==========================================
 
-                        const alpha = event.alpha || 0;
-                        const beta = event.beta || 45;
-                        const gamma = event.gamma || 0;
+                let smoothSteer = 0;
+                let smoothPitch = 0;
 
-                        let rawYaw, rawPitch;
+                window.addEventListener('deviceorientation', (event) => {
+                    const beta = event.beta || 45;
+                    const gamma = event.gamma || 0;
 
-                        if (this.isLandscape) {
-                            // LANDSCAPE: el móvil está apaisado
-                            // beta controla el giro izquierda/derecha (como volante)
-                            // gamma controla la elevación (cabeceo)
-                            rawYaw = beta; // -180 a 180, queremos que sea sensible
-                            rawPitch = gamma; // -90 a 90
-                        } else {
-                            // PORTRAIT: el móvil está vertical
-                            // gamma controla el giro (como volante)
-                            // beta controla la elevación
-                            rawYaw = gamma;
-                            rawPitch = beta;
-                        }
+                    const isLandscape = window.innerWidth > window.innerHeight;
 
-                        if (!this.calibrated && this.gameRunning) {
-                            this.calibrationRoll = rawYaw;
-                            this.calibrationPitch = rawPitch;
-                            this.calibrated = true;
-                        }
+                    let rawSteer, rawPitch;
 
-                        if (this.calibrated) {
-                            let deltaYaw = rawYaw - this.calibrationRoll;
-                            // Normalizar
-                            if (deltaYaw > 180) deltaYaw -= 360;
-                            if (deltaYaw < -180) deltaYaw += 360;
-
-                            // Giro: deltaYaw positivo = girar derecha, negativo = izquierda
-                            // Sensibilidad para 360°: con 90° de giro del móvil damos ~180° de torreta
-                            this.gyroYaw = deltaYaw * 0.04;
-
-                            // Elevación: INVERTIDA (al cabecear hacia ti, los cañones bajan)
-                            let deltaPitch = rawPitch - this.calibrationPitch;
-                            if (this.isLandscape) {
-                                // En landscape: gamma positivo (lado derecho abajo) = cabeceo hacia afuera
-                                // gamma negativo (lado izq abajo) = cabeceo hacia ti
-                                // Queremos: cabeceo hacia ti (gamma negativo) = bajar cañones
-                                this.gyroPitch = deltaPitch * 0.03;
-                            } else {
-                                // En portrait: beta > 45 = inclinado hacia afuera, beta < 45 = hacia ti
-                                this.gyroPitch = -deltaPitch * 0.025;
-                            }
-                            this.gyroPitch = THREE.MathUtils.clamp(this.gyroPitch, -0.7, 0.4);
-                        }
-
-                        this.gyroAvailable = true;
-
-                        if (this.gameRunning) {
-                            this.gyroDebug.textContent =
-                                `Landscape:${this.isLandscape} | rawYaw:${rawYaw?.toFixed(1)} rawPitch:${rawPitch?.toFixed(1)} | Yaw:${this.gyroYaw.toFixed(2)} Pitch:${this.gyroPitch.toFixed(2)}`;
-                        }
-                    });
-
-                    if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-                        this._iosGyro = true;
+                    if (isLandscape) {
+                        // LANDSCAPE (apaisado):
+                        // Volante: beta negativa = mano derecha arriba = izquierda
+                        //          beta positiva = mano derecha abajo = derecha
+                        rawSteer = -beta;
+                        // Cabeceo: gamma positiva = inclinado hacia afuera = subir
+                        //          gamma negativa = inclinado hacia ti = bajar
+                        rawPitch = gamma;
+                    } else {
+                        // PORTRAIT (vertical):
+                        // Volante: gamma positiva = mano derecha abajo = derecha
+                        //          gamma negativa = mano derecha arriba = izquierda
+                        rawSteer = gamma;
+                        // Cabeceo: beta > 45 = inclinado hacia afuera = subir
+                        //          beta < 45 = inclinado hacia ti = bajar
+                        rawPitch = beta - 45;
                     }
+
+                    // Suavizado
+                    smoothSteer += (rawSteer - smoothSteer) * 0.35;
+                    smoothPitch += (rawPitch - smoothPitch) * 0.35;
+
+                    if (!this.calibrated && this.gameRunning) {
+                        this.calibSteer = smoothSteer;
+                        this.calibPitch = smoothPitch;
+                        this.calibrated = true;
+                    }
+
+                    if (this.calibrated) {
+                        let deltaSteer = smoothSteer - this.calibSteer;
+                        let deltaPitch = smoothPitch - this.calibPitch;
+
+                        // Zona muerta
+                        if (Math.abs(deltaSteer) < 1.5) deltaSteer = 0;
+                        if (Math.abs(deltaPitch) < 1.5) deltaPitch = 0;
+
+                        // Mapeo: 45° de giro = recorrido completo
+                        this.steerInput = THREE.MathUtils.clamp(deltaSteer / 40, -1.8, 1.8);
+                        // Mapeo: 30° de cabeceo = rango completo
+                        this.pitchInput = THREE.MathUtils.clamp(deltaPitch / 28, -0.7, 0.5);
+                    }
+
+                    this.gyroAvailable = true;
+
+                    if (this.gameRunning) {
+                        this.gyroDebug.textContent =
+                            `${isLandscape?'LAND':'PORT'} | steer:${this.steerInput.toFixed(2)} pitch:${this.pitchInput.toFixed(2)} | raw β:${beta.toFixed(0)} γ:${gamma.toFixed(0)}`;
+                    }
+                });
+
+                if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                    this._iosGyro = true;
                 }
                 this.setupTouchFallback();
             }
@@ -809,8 +691,8 @@
                 let touchActive = false;
                 let touchStartX = 0;
                 let touchStartY = 0;
-                let fallbackYaw = 0;
-                let fallbackPitch = 0;
+                let fbYaw = 0;
+                let fbPitch = 0;
 
                 document.addEventListener('touchstart', (e) => {
                     if (!this.gameRunning) return;
@@ -827,17 +709,17 @@
                     if (e.touches.length === 2) {
                         const cx = (e.touches[0].clientX + e.touches[1].clientX) / 2;
                         const cy = (e.touches[0].clientY + e.touches[1].clientY) / 2;
-                        fallbackYaw += (cx - touchStartX) * 0.005;
-                        fallbackPitch -= (cy - touchStartY) * 0.004;
-                        fallbackPitch = THREE.MathUtils.clamp(fallbackPitch, -0.7, 0.4);
+                        fbYaw += (cx - touchStartX) * 0.005;
+                        fbPitch += (cy - touchStartY) * 0.004;
+                        fbPitch = THREE.MathUtils.clamp(fbPitch, -0.7, 0.5);
                         touchStartX = cx;
                         touchStartY = cy;
                     }
                 });
 
                 document.addEventListener('touchend', () => { touchActive = false; });
-                this._fallbackYaw = () => fallbackYaw;
-                this._fallbackPitch = () => fallbackPitch;
+                this._fbYaw = () => fbYaw;
+                this._fbPitch = () => fbPitch;
             }
 
             async requestGyroPermission() {
@@ -845,21 +727,12 @@
                     try {
                         const permission = await DeviceOrientationEvent.requestPermission();
                         if (permission === 'granted') this.gyroAvailable = true;
-                    } catch (e) { console.warn('Permiso de giroscopio denegado:', e); }
-                }
-            }
-
-            forceLandscape() {
-                if (screen.orientation && screen.orientation.lock) {
-                    screen.orientation.lock('landscape-primary').catch(() => {
-                        screen.orientation.lock('landscape').catch(() => {});
-                    });
+                    } catch (e) {}
                 }
             }
 
             startGame() {
                 this.splashScreen.style.display = 'none';
-                this.forceLandscape();
                 this.audio.init();
 
                 if (this._iosGyro && typeof DeviceOrientationEvent.requestPermission === 'function') {
@@ -873,10 +746,6 @@
                     setTimeout(() => { document.getElementById('permission-request').style.display = 'none'; }, 4000);
                 }
                 this.gyroDebug.style.display = 'block';
-
-                if (!this.isLandscape) {
-                    this.rotateWarning.style.display = 'block';
-                }
             }
 
             beginGameplay() {
@@ -921,27 +790,24 @@
                 this.finalScoreElement.textContent = `Puntuación: ${this.score}`;
                 this.updateRanking();
                 this.gyroDebug.style.display = 'none';
-                this.rotateWarning.style.display = 'none';
             }
 
             updateRanking() {
-                let rankings = JSON.parse(localStorage.getItem('midway_rankings_v3') || '[]');
-                rankings.push({ score: this.score, time: Math.floor(this.gameTime), date: new Date()
-                        .toLocaleDateString() });
+                let rankings = JSON.parse(localStorage.getItem('midway_rankings_v4') || '[]');
+                rankings.push({ score: this.score, time: Math.floor(this.gameTime), date: new Date().toLocaleDateString() });
                 rankings.sort((a, b) => b.score - a.score);
                 rankings = rankings.slice(0, 10);
-                localStorage.setItem('midway_rankings_v3', JSON.stringify(rankings));
+                localStorage.setItem('midway_rankings_v4', JSON.stringify(rankings));
                 let html = '<h3>🏆 MEJORES ARTILLEROS</h3>';
-                rankings.forEach((r, i) => { html +=
-                        `<div>${i+1}. ${r.score} pts - ${r.time}s (${r.date})</div>`; });
+                rankings.forEach((r, i) => { html += `<div>${i+1}. ${r.score} pts - ${r.time}s (${r.date})</div>`; });
                 this.rankingElement.innerHTML = html;
             }
 
             showMessage(text, duration = 1500) {
                 this.messageElement.textContent = text;
                 this.messageElement.style.opacity = '1';
-                clearTimeout(this._messageTimeout);
-                this._messageTimeout = setTimeout(() => { this.messageElement.style.opacity = '0'; }, duration);
+                clearTimeout(this._msgTimeout);
+                this._msgTimeout = setTimeout(() => { this.messageElement.style.opacity = '0'; }, duration);
             }
 
             updateHUD() {
@@ -958,68 +824,70 @@
                 const weights = [0.5, 0.3, 0.2];
                 const rand = Math.random();
                 let type = types[0];
-                let cumulative = 0;
-                for (let i = 0; i < types.length; i++) { cumulative += weights[i]; if (rand <= cumulative) { type =
-                        types[i]; break; } }
+                let cum = 0;
+                for (let i = 0; i < types.length; i++) { cum += weights[i]; if (rand <= cum) { type = types[i]; break; } }
 
                 const angle = Math.random() * Math.PI * 2;
-                const distance = 35 + Math.random() * 35;
-                const height = 4 + Math.random() * 22;
+                const distance = 30 + Math.random() * 40;
+                const height = 3 + Math.random() * 25;
 
                 const plane = {
                     type,
                     position: new THREE.Vector3(Math.cos(angle) * distance, height, Math.sin(angle) * distance),
                     velocity: new THREE.Vector3(),
-                    speed: 7 + Math.random() * 6 + this.difficulty * 2.5,
+                    speed: 7 + Math.random() * 7 + this.difficulty * 2.5,
                     health: type === 'fighter' ? 2 : 3,
                     attackCooldown: 0,
                     alive: true,
                     group: null,
                 };
 
-                const dirToShip = new THREE.Vector3(0, 1.5, 0).sub(plane.position).normalize();
-                plane.velocity.copy(dirToShip.multiplyScalar(plane.speed));
-
+                const toShip = new THREE.Vector3(0, 1.5, 0).sub(plane.position).normalize();
+                plane.velocity.copy(toShip.multiplyScalar(plane.speed));
                 plane.group = new THREE.Group();
                 plane.group.position.copy(plane.position);
 
-                const fuseGeom = new THREE.ConeGeometry(0.35, 2.2, 6);
-                const fuse = new THREE.Mesh(fuseGeom, new THREE.MeshStandardMaterial({
-                    color: type === 'fighter' ? 0x5a6a4a : type === 'dive_bomber' ? 0x6a4a3a : 0x4a5a3a,
-                    roughness: 0.45,
-                    metalness: 0.4
-                }));
+                const fuse = new THREE.Mesh(
+                    new THREE.ConeGeometry(0.35, 2.2, 6),
+                    new THREE.MeshStandardMaterial({
+                        color: type === 'fighter' ? 0x5a6a4a : type === 'dive_bomber' ? 0x6a4a3a : 0x4a5a3a,
+                        roughness: 0.45, metalness: 0.4
+                    })
+                );
                 fuse.rotation.x = Math.PI / 2;
                 fuse.position.z = -0.9;
                 fuse.castShadow = true;
                 plane.group.add(fuse);
 
-                const wingGeom = new THREE.BoxGeometry(3.5, 0.08, 1);
-                const wing = new THREE.Mesh(wingGeom, new THREE.MeshStandardMaterial({ color: 0x4a4a3a, roughness: 0.55,
-                    metalness: 0.3 }));
+                const wing = new THREE.Mesh(
+                    new THREE.BoxGeometry(3.5, 0.08, 1),
+                    new THREE.MeshStandardMaterial({ color: 0x4a4a3a, roughness: 0.55, metalness: 0.3 })
+                );
                 wing.position.z = -0.7;
                 wing.castShadow = true;
                 plane.group.add(wing);
 
-                const tailGeom = new THREE.BoxGeometry(1.3, 0.25, 0.4);
-                const tail = new THREE.Mesh(tailGeom, new THREE.MeshStandardMaterial({ color: 0x4a4a3a, roughness: 0.55,
-                    metalness: 0.3 }));
+                const tail = new THREE.Mesh(
+                    new THREE.BoxGeometry(1.3, 0.25, 0.4),
+                    new THREE.MeshStandardMaterial({ color: 0x4a4a3a, roughness: 0.55, metalness: 0.3 })
+                );
                 tail.position.set(0, 0.15, 0.4);
                 plane.group.add(tail);
 
-                const propGeom = new THREE.BoxGeometry(0.08, 1.3, 0.08);
-                plane.propeller = new THREE.Mesh(propGeom, new THREE.MeshStandardMaterial({ color: 0x999999,
-                    roughness: 0.25, metalness: 0.8 }));
+                plane.propeller = new THREE.Mesh(
+                    new THREE.BoxGeometry(0.08, 1.3, 0.08),
+                    new THREE.MeshStandardMaterial({ color: 0x999999, roughness: 0.25, metalness: 0.8 })
+                );
                 plane.propeller.position.z = -2;
                 plane.group.add(plane.propeller);
 
-                const insignia = new THREE.Mesh(
+                const hinomaru = new THREE.Mesh(
                     new THREE.CircleGeometry(0.25, 16),
                     new THREE.MeshBasicMaterial({ color: 0xff0000, side: THREE.DoubleSide })
                 );
-                insignia.position.set(0, 0, -0.4);
-                insignia.rotation.y = Math.PI;
-                plane.group.add(insignia);
+                hinomaru.position.set(0, 0, -0.4);
+                hinomaru.rotation.y = Math.PI;
+                plane.group.add(hinomaru);
 
                 plane.group.lookAt(new THREE.Vector3().addVectors(plane.position, plane.velocity));
                 this.scene.add(plane.group);
@@ -1035,23 +903,26 @@
 
                 for (let i = 0; i < 2; i++) {
                     const offset = (i - 0.5) * 0.35;
-                    const barrelPos = new THREE.Vector3(offset, 0, -4.5);
-                    barrelPos.applyQuaternion(this.gunsGroup.getWorldQuaternion(new THREE.Quaternion()));
-                    barrelPos.add(this.gunsGroup.getWorldPosition(new THREE.Vector3()));
+                    const barrelTip = new THREE.Vector3(offset, 0, -4.0);
+                    barrelTip.applyQuaternion(this.gunsGroup.getWorldQuaternion(new THREE.Quaternion()));
+                    barrelTip.add(this.gunsGroup.getWorldPosition(new THREE.Vector3()));
 
-                    const spread = new THREE.Vector3((Math.random() - 0.5) * 0.04, (Math.random() - 0.5) * 0.04, (Math
-                        .random() - 0.5) * 0.04);
+                    const spread = new THREE.Vector3(
+                        (Math.random() - 0.5) * 0.04,
+                        (Math.random() - 0.5) * 0.04,
+                        (Math.random() - 0.5) * 0.04
+                    );
                     const finalDir = dir.clone().add(spread).normalize();
 
                     const bullet = {
-                        position: barrelPos.clone(),
+                        position: barrelTip.clone(),
                         velocity: finalDir.multiplyScalar(bulletSpeed),
                         life: 1.8,
                         tracer: null,
                     };
 
-                    const tracerGeom = new THREE.SphereGeometry(0.07, 4, 4);
-                    bullet.tracer = new THREE.Mesh(tracerGeom, new THREE.MeshBasicMaterial({ color: 0xffff44 }));
+                    const tGeom = new THREE.SphereGeometry(0.06, 4, 4);
+                    bullet.tracer = new THREE.Mesh(tGeom, new THREE.MeshBasicMaterial({ color: 0xffff44 }));
                     bullet.tracer.position.copy(bullet.position);
                     this.scene.add(bullet.tracer);
                     this.bulletMeshes.push(bullet.tracer);
@@ -1066,20 +937,24 @@
 
             createExplosion(position, size = 1) {
                 const particles = [];
-                const particleCount = Math.floor(25 * size);
-                for (let i = 0; i < particleCount; i++) {
-                    const geom = new THREE.SphereGeometry(0.12 * size, 4, 4);
-                    const particle = new THREE.Mesh(geom, new THREE.MeshBasicMaterial({
-                        color: new THREE.Color().setHSL(0.07 + Math.random() * 0.18, 1, 0.35 + Math.random() *
-                            0.55),
-                    }));
-                    particle.position.copy(position);
-                    particle.velocity = new THREE.Vector3((Math.random() - 0.5) * 12 * size, (Math.random() - 0.5) * 12 *
-                        size, (Math.random() - 0.5) * 12 * size);
-                    particle.life = 0.5 + Math.random() * 0.7;
-                    particle.age = 0;
-                    this.scene.add(particle);
-                    particles.push(particle);
+                const count = Math.floor(22 * size);
+                for (let i = 0; i < count; i++) {
+                    const p = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.1 * size, 4, 4),
+                        new THREE.MeshBasicMaterial({
+                            color: new THREE.Color().setHSL(0.07 + Math.random() * 0.18, 1, 0.35 + Math.random() * 0.55)
+                        })
+                    );
+                    p.position.copy(position);
+                    p.velocity = new THREE.Vector3(
+                        (Math.random() - 0.5) * 12 * size,
+                        (Math.random() - 0.5) * 12 * size,
+                        (Math.random() - 0.5) * 12 * size
+                    );
+                    p.life = 0.5 + Math.random() * 0.7;
+                    p.age = 0;
+                    this.scene.add(p);
+                    particles.push(p);
                 }
                 const light = new THREE.PointLight(0xff5500, 4 * size, 12 * size);
                 light.position.copy(position);
@@ -1123,28 +998,32 @@
                     }
                 }
 
-                let inputYaw = this.gyroYaw;
-                let inputPitch = this.gyroPitch;
+                // Input: giroscopio o fallback táctil
+                let steer = this.steerInput;
+                let pitch = this.pitchInput;
                 if (!this.gyroAvailable || !this.calibrated) {
-                    if (this._fallbackYaw) inputYaw = this._fallbackYaw();
-                    if (this._fallbackPitch) inputPitch = this._fallbackPitch();
+                    if (this._fbYaw) steer = this._fbYaw();
+                    if (this._fbPitch) pitch = this._fbPitch();
                 }
 
-                this.targetYaw = inputYaw;
-                this.targetPitch = inputPitch;
+                this.targetYaw = steer;
+                this.targetPitch = pitch;
+
+                // Suavizado de torreta
                 this.turretYaw += (this.targetYaw - this.turretYaw) * Math.min(delta * 6, 1);
                 this.turretPitch += (this.targetPitch - this.turretPitch) * Math.min(delta * 8, 1);
-                this.turretPitch = THREE.MathUtils.clamp(this.turretPitch, -0.7, 0.4);
+                this.turretPitch = THREE.MathUtils.clamp(this.turretPitch, -0.7, 0.5);
 
                 this.turretGroup.rotation.y = this.turretYaw;
                 this.gunsGroup.rotation.x = this.turretPitch;
 
-                // Cámara detrás de los cañones, mirando hacia adelante
-                const camOffset = new THREE.Vector3(0, 1.4, 1.2);
+                // Cámara en primera persona: detrás de los cañones mirando al horizonte
+                const camOffset = new THREE.Vector3(0, 1.5, 1.5);
                 camOffset.applyQuaternion(this.turretGroup.quaternion);
                 this.camera.position.copy(this.turretGroup.position.clone().add(camOffset));
 
-                const lookDir = new THREE.Vector3(0, 0.1, -20);
+                // Mirar hacia adelante (donde apuntan los cañones) con elevación
+                const lookDir = new THREE.Vector3(0, 0, -20);
                 lookDir.applyQuaternion(this.gunsGroup.getWorldQuaternion(new THREE.Quaternion()));
                 const lookTarget = this.gunsGroup.getWorldPosition(new THREE.Vector3()).add(lookDir);
                 this.camera.lookAt(lookTarget);
@@ -1152,20 +1031,19 @@
                 if (this.isFiring && this.fireCooldown <= 0) this.fireBullet();
 
                 this.scene.fog = this.muzzleFlash > 0 ?
-                    new THREE.FogExp2(new THREE.Color().lerpColors(new THREE.Color(0x7aafd4), new THREE.Color(0xffcc66),
-                        this.muzzleFlash / 0.05), 0.0001 + (this.muzzleFlash / 0.05) * 0.0003) :
-                    new THREE.FogExp2(0x7aafd4, 0.0001);
+                    new THREE.FogExp2(new THREE.Color().lerpColors(new THREE.Color(0x8cc8e8), new THREE.Color(0xffcc66),
+                        this.muzzleFlash / 0.05), 0.00008 + (this.muzzleFlash / 0.05) * 0.0002) :
+                    new THREE.FogExp2(0x8cc8e8, 0.00008);
 
                 // Balas
                 for (let i = this.bullets.length - 1; i >= 0; i--) {
-                    const bullet = this.bullets[i];
-                    bullet.position.add(bullet.velocity.clone().multiplyScalar(delta));
-                    bullet.life -= delta;
-                    bullet.tracer.position.copy(bullet.position);
-                    if (bullet.life <= 0 || bullet.position.y < -3 || Math.abs(bullet.position.x) > 70 || Math.abs(bullet
-                            .position.z) > 70) {
-                        this.scene.remove(bullet.tracer);
-                        const idx = this.bulletMeshes.indexOf(bullet.tracer);
+                    const b = this.bullets[i];
+                    b.position.add(b.velocity.clone().multiplyScalar(delta));
+                    b.life -= delta;
+                    b.tracer.position.copy(b.position);
+                    if (b.life <= 0 || b.position.y < -3 || Math.abs(b.position.x) > 80 || Math.abs(b.position.z) > 80) {
+                        this.scene.remove(b.tracer);
+                        const idx = this.bulletMeshes.indexOf(b.tracer);
                         if (idx > -1) this.bulletMeshes.splice(idx, 1);
                         this.bullets.splice(i, 1);
                         continue;
@@ -1173,15 +1051,15 @@
                     for (let j = this.planes.length - 1; j >= 0; j--) {
                         const plane = this.planes[j];
                         if (!plane.alive) continue;
-                        if (bullet.position.distanceTo(plane.group.position) < 2.2) {
+                        if (b.position.distanceTo(plane.group.position) < 2.2) {
                             plane.health--;
                             if (plane.health <= 0) { this.destroyPlane(j);
                                 this.score += 100;
                                 this.showMessage('¡DERRIBADO! +100', 1200); } else { this.showMessage('¡IMPACTO!',
                                 500);
                                 this.audio.playHit(); }
-                            this.scene.remove(bullet.tracer);
-                            const idx = this.bulletMeshes.indexOf(bullet.tracer);
+                            this.scene.remove(b.tracer);
+                            const idx = this.bulletMeshes.indexOf(b.tracer);
                             if (idx > -1) this.bulletMeshes.splice(idx, 1);
                             this.bullets.splice(i, 1);
                             break;
@@ -1198,29 +1076,38 @@
                     plane.group.lookAt(new THREE.Vector3().addVectors(plane.position, plane.velocity));
                     if (plane.propeller) plane.propeller.rotation.z += delta * 45;
                     plane.attackCooldown = Math.max(0, plane.attackCooldown - delta);
-                    const distToShip = plane.position.length();
-                    if (distToShip < 28 && plane.attackCooldown <= 0) {
-                        if (plane.type === 'fighter') { plane.attackCooldown = 1.8;
-                            this.damageShip(2 + Math.floor(this.difficulty / 2)); } else if (plane.type ===
-                            'dive_bomber' && plane.position.y > 7 && distToShip < 18) { plane.attackCooldown = 3.5;
+                    const dist = plane.position.length();
+                    if (dist < 28 && plane.attackCooldown <= 0) {
+                        if (plane.type === 'fighter') {
+                            plane.attackCooldown = 1.8;
+                            this.damageShip(2 + Math.floor(this.difficulty / 2));
+                        } else if (plane.type === 'dive_bomber' && plane.position.y > 7 && dist < 18) {
+                            plane.attackCooldown = 3.5;
                             plane.velocity.y = -18;
-                            setTimeout(() => { if (plane.alive && this.gameRunning) { this.damageShip(12 + this
-                                        .difficulty * 2);
-                                    this.createExplosion(new THREE.Vector3((Math.random() - 0.5) * 12, 1.5, (Math
-                                        .random() - 0.5) * 22), 0.7); } }, 700); } else if (plane.type ===
-                            'torpedo_bomber' && plane.position.y < 2.5 && distToShip < 22) { plane.attackCooldown = 5;
+                            setTimeout(() => {
+                                if (plane.alive && this.gameRunning) {
+                                    this.damageShip(12 + this.difficulty * 2);
+                                    this.createExplosion(new THREE.Vector3((Math.random() - 0.5) * 12, 1.5, (Math.random() -
+                                        0.5) * 22), 0.7);
+                                }
+                            }, 700);
+                        } else if (plane.type === 'torpedo_bomber' && plane.position.y < 2.5 && dist < 22) {
+                            plane.attackCooldown = 5;
                             this.damageShip(18 + this.difficulty * 3);
                             this.createExplosion(new THREE.Vector3(0, -0.5, (Math.random() - 0.5) * 18), 1.1);
-                            this.showMessage('¡TORPEDO! -' + (18 + this.difficulty * 3), 1500); }
+                            this.showMessage('¡TORPEDO! -' + (18 + this.difficulty * 3), 1500);
+                        }
                     }
-                    if (Math.abs(plane.position.x) > 65 || Math.abs(plane.position.z) > 65 || plane.position.y > 38 || plane
-                        .position.y < -6) this.removePlane(i);
+                    if (Math.abs(plane.position.x) > 70 || Math.abs(plane.position.z) > 70 || plane.position.y > 40 || plane
+                        .position.y < -8) this.removePlane(i);
                 }
 
                 if (Math.floor(this.gameTime) > Math.floor(this.gameTime - delta)) this.score += 10;
                 this.updateExplosions(delta);
-                for (let i = this.hitEffects.length - 1; i >= 0; i--) { this.hitEffects[i].timer -= delta; if (this
-                        .hitEffects[i].timer <= 0) this.hitEffects.splice(i, 1); }
+                for (let i = this.hitEffects.length - 1; i >= 0; i--) {
+                    this.hitEffects[i].timer -= delta;
+                    if (this.hitEffects[i].timer <= 0) this.hitEffects.splice(i, 1);
+                }
                 this.updateOcean(delta);
                 this.updateHUD();
             }
@@ -1230,8 +1117,8 @@
                 plane.alive = false;
                 this.createExplosion(plane.group.position.clone(), 0.65);
                 this.scene.remove(plane.group);
-                const meshIdx = this.planeMeshes.indexOf(plane);
-                if (meshIdx > -1) this.planeMeshes.splice(meshIdx, 1);
+                const idx = this.planeMeshes.indexOf(plane);
+                if (idx > -1) this.planeMeshes.splice(idx, 1);
                 this.planes.splice(index, 1);
             }
 
@@ -1239,29 +1126,34 @@
                 const plane = this.planes[index];
                 plane.alive = false;
                 this.scene.remove(plane.group);
-                const meshIdx = this.planeMeshes.indexOf(plane);
-                if (meshIdx > -1) this.planeMeshes.splice(meshIdx, 1);
+                const idx = this.planeMeshes.indexOf(plane);
+                if (idx > -1) this.planeMeshes.splice(idx, 1);
                 this.planes.splice(index, 1);
             }
 
             updateExplosions(delta) {
                 for (let i = this.explosionParticles.length - 1; i >= 0; i--) {
-                    const explosion = this.explosionParticles[i];
-                    explosion.age += delta;
-                    for (let j = explosion.particles.length - 1; j >= 0; j--) {
-                        const p = explosion.particles[j];
-                        if (p.isLight) { p.age += delta;
-                            p.intensity = 4 * (1 - p.age / p.life); if (p.age >= p.life) { this.scene.remove(p);
-                                explosion.particles.splice(j, 1); } } else { p.age += delta;
+                    const exp = this.explosionParticles[i];
+                    exp.age += delta;
+                    for (let j = exp.particles.length - 1; j >= 0; j--) {
+                        const p = exp.particles[j];
+                        if (p.isLight) {
+                            p.age += delta;
+                            p.intensity = 4 * (1 - p.age / p.life);
+                            if (p.age >= p.life) { this.scene.remove(p);
+                                exp.particles.splice(j, 1); }
+                        } else {
+                            p.age += delta;
                             p.position.add(p.velocity.clone().multiplyScalar(delta));
                             p.velocity.y += 1.5 * delta;
                             p.material.opacity = 1 - p.age / p.life;
                             p.material.transparent = true;
-                            p.scale.setScalar(Math.max(0.08, 1 - p.age / p.life)); if (p.age >= p.life) { this.scene
-                                    .remove(p);
-                                explosion.particles.splice(j, 1); } }
+                            p.scale.setScalar(Math.max(0.05, 1 - p.age / p.life));
+                            if (p.age >= p.life) { this.scene.remove(p);
+                                exp.particles.splice(j, 1); }
+                        }
                     }
-                    if (explosion.particles.length === 0) this.explosionParticles.splice(i, 1);
+                    if (exp.particles.length === 0) this.explosionParticles.splice(i, 1);
                 }
             }
 
@@ -1272,8 +1164,8 @@
                 for (let i = 0; i < positions.length; i += 3) {
                     const x = this.oceanVertices[i];
                     const y = this.oceanVertices[i + 1];
-                    positions[i + 2] = Math.sin(x * 0.25 + time) * Math.cos(y * 0.25 + time * 0.7) * 0.7 + Math.sin(x *
-                        0.12 + time * 1.2) * 0.35;
+                    positions[i + 2] = Math.sin(x * 0.2 + time) * Math.cos(y * 0.2 + time * 0.7) * 0.6 +
+                        Math.sin(x * 0.1 + time * 1.2) * 0.3;
                 }
                 this.ocean.geometry.attributes.position.needsUpdate = true;
             }
@@ -1302,9 +1194,9 @@
                 .catch(() => {});
         }
 
-        console.log('⚓ Batalla de Midway v3 - Controles corregidos');
-        console.log('📱 Landscape: Beta=giro | Gamma=elevación');
-        console.log('🎯 Cañones visibles solo en parte inferior');
+        console.log('⚓ Batalla de Midway v5 - Sin torre, cañones abajo, giroscopio unificado');
+        console.log('🚗 Volante = girar torreta | ✈️ Cabeceo = elevar cañones');
+        console.log('📱 Funciona en vertical y horizontal con el mismo gesto');
     </script>
 </body>
 </html>
