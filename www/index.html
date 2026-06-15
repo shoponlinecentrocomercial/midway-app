@@ -6,6 +6,7 @@
     <title>Batalla de Midway - Artillero AA</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="screen-orientation" content="landscape">
     <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIk1pZHdheSBBcnRpbGxlcm8iLAogICJzaG9ydF9uYW1lIjogIk1pZHdheSIsCiAgInN0YXJ0X3VybCI6ICIuLyIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiIzAwMDAwMCIsCiAgInRoZW1lX2NvbG9yIjogIiMwMDAwMDAiLAogICJpY29ucyI6IFtdCn0=">
     <style>
         * {
@@ -40,7 +41,8 @@
             left: 0;
             width: 100%;
             pointer-events: none;
-            padding: 10px;
+            padding: 8px;
+            z-index: 5;
         }
 
         #hud {
@@ -52,20 +54,20 @@
         }
 
         #score {
-            font-size: 22px;
+            font-size: 18px;
             font-weight: bold;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 8px 15px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 6px 12px;
             border-radius: 5px;
             border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
         #health-bar-container {
-            width: 200px;
-            height: 20px;
+            width: 160px;
+            height: 16px;
             background: rgba(0, 0, 0, 0.6);
             border: 2px solid #ff4444;
-            border-radius: 10px;
+            border-radius: 8px;
             overflow: hidden;
         }
 
@@ -78,9 +80,9 @@
 
         #health-label {
             color: #fff;
-            font-size: 11px;
+            font-size: 9px;
             text-align: center;
-            margin-top: 2px;
+            margin-top: 1px;
         }
 
         #crosshair {
@@ -88,57 +90,29 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 60px;
-            height: 60px;
             pointer-events: none;
+            z-index: 4;
         }
 
-        #crosshair::before,
-        #crosshair::after {
-            content: '';
-            position: absolute;
-            background: rgba(255, 255, 255, 0.7);
-        }
-
-        #crosshair::before {
-            width: 2px;
-            height: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        #crosshair::after {
-            height: 2px;
-            width: 100%;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-        #crosshair-ring {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 50px;
-            height: 50px;
-            border: 2px solid rgba(255, 255, 255, 0.5);
-            border-radius: 50%;
-            pointer-events: none;
+        #crosshair svg {
+            width: 80px;
+            height: 80px;
         }
 
         #message {
             position: absolute;
-            top: 50%;
+            top: 40%;
             left: 50%;
             transform: translate(-50%, -50%);
             color: #ffcc00;
-            font-size: 28px;
+            font-size: 24px;
             font-weight: bold;
             text-align: center;
             text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.9);
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.3s;
+            z-index: 6;
         }
 
         #game-over-screen {
@@ -158,35 +132,36 @@
 
         #game-over-screen h1 {
             color: #ff4444;
-            font-size: 42px;
+            font-size: 38px;
             margin-bottom: 10px;
             text-shadow: 0 0 20px #ff0000;
         }
 
         #game-over-screen .final-score {
             color: #fff;
-            font-size: 28px;
+            font-size: 24px;
             margin: 10px 0;
         }
 
         #game-over-screen .ranking {
             color: #ffcc00;
-            font-size: 16px;
+            font-size: 14px;
             margin: 15px 0;
             text-align: center;
-            max-height: 200px;
+            max-height: 180px;
             overflow-y: auto;
+            width: 90%;
         }
 
         #game-over-screen button {
             background: #ff4444;
             color: #fff;
             border: none;
-            padding: 15px 40px;
-            font-size: 20px;
+            padding: 14px 35px;
+            font-size: 18px;
             border-radius: 30px;
             cursor: pointer;
-            margin-top: 20px;
+            margin-top: 15px;
             font-family: 'Courier New', monospace;
             font-weight: bold;
             pointer-events: all;
@@ -203,7 +178,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.92);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -214,24 +189,24 @@
 
         #splash-screen h1 {
             color: #ffcc00;
-            font-size: 36px;
-            margin-bottom: 10px;
+            font-size: 32px;
+            margin-bottom: 8px;
             text-shadow: 0 0 30px #ff8800;
             text-align: center;
         }
 
         #splash-screen .subtitle {
             color: #ccc;
-            font-size: 14px;
-            margin-bottom: 30px;
+            font-size: 13px;
+            margin-bottom: 25px;
             text-align: center;
         }
 
         #splash-screen .instructions {
             color: #aaa;
-            font-size: 13px;
+            font-size: 12px;
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
             line-height: 1.6;
         }
 
@@ -239,8 +214,8 @@
             background: #ff8800;
             color: #000;
             border: none;
-            padding: 18px 50px;
-            font-size: 22px;
+            padding: 16px 45px;
+            font-size: 20px;
             border-radius: 30px;
             cursor: pointer;
             font-family: 'Courier New', monospace;
@@ -260,14 +235,25 @@
             transform: translateX(-50%);
             background: rgba(255, 136, 0, 0.9);
             color: #000;
-            padding: 12px 25px;
+            padding: 10px 22px;
             border-radius: 25px;
-            font-size: 14px;
+            font-size: 13px;
             pointer-events: all;
             z-index: 25;
             display: none;
             cursor: pointer;
             font-weight: bold;
+        }
+
+        #gyro-debug {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 10px;
+            pointer-events: none;
+            z-index: 3;
+            display: none;
         }
     </style>
 </head>
@@ -283,19 +269,28 @@
             </div>
         </div>
     </div>
-    <div id="crosshair"></div>
-    <div id="crosshair-ring"></div>
+    <div id="crosshair">
+        <svg viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="35" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="1.5" stroke-dasharray="8,4"/>
+            <line x1="50" y1="5" x2="50" y2="30" stroke="rgba(255,255,255,0.7)" stroke-width="1.5"/>
+            <line x1="50" y1="70" x2="50" y2="95" stroke="rgba(255,255,255,0.7)" stroke-width="1.5"/>
+            <line x1="5" y1="50" x2="30" y2="50" stroke="rgba(255,255,255,0.7)" stroke-width="1.5"/>
+            <line x1="70" y1="50" x2="95" y2="50" stroke="rgba(255,255,255,0.7)" stroke-width="1.5"/>
+            <circle cx="50" cy="50" r="3" fill="rgba(255,0,0,0.8)"/>
+        </svg>
+    </div>
     <div id="message"></div>
+    <div id="gyro-debug"></div>
 
     <div id="splash-screen">
         <h1>⚓ BATALLA DE MIDWAY</h1>
         <div class="subtitle">ARTILLERO ANTIAÉREO</div>
         <div class="instructions">
-            🎯 GIRA el móvil como volante (izq/der)<br>
-            📐 INCLINA para apuntar arriba/abajo<br>
-            👆 TOCA la pantalla para DISPARAR<br>
-            💥 Derriba aviones enemigos<br>
-            🛡️ Protege el buque
+            📱 MÓVIL EN HORIZONTAL (APAISADO)<br>
+            ⚖️ INCLINA laterales: GIRO 360° torreta<br>
+            📐 CABECEA arriba/abajo: ELEVAR cañones<br>
+            👆 TOCA pantalla: DISPARAR<br>
+            🛡️ ¡Protege el buque!
         </div>
         <button id="start-btn">¡A LA BATALLA!</button>
     </div>
@@ -333,7 +328,7 @@
                 try {
                     this.ctx = new(window.AudioContext || window.webkitAudioContext)();
                     this.masterGain = this.ctx.createGain();
-                    this.masterGain.gain.value = 0.5;
+                    this.masterGain.gain.value = 0.45;
                     this.masterGain.connect(this.ctx.destination);
                     this.initialized = true;
                 } catch (e) {
@@ -344,40 +339,40 @@
             playGunshot() {
                 if (!this.initialized) return;
                 const now = this.ctx.currentTime;
+                // Disparo más grave y potente (.50 cal)
                 const osc = this.ctx.createOscillator();
                 const gain = this.ctx.createGain();
                 const filter = this.ctx.createBiquadFilter();
 
                 osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(150, now);
-                osc.frequency.exponentialRampToValueAtTime(30, now + 0.15);
+                osc.frequency.setValueAtTime(180, now);
+                osc.frequency.exponentialRampToValueAtTime(25, now + 0.12);
 
                 filter.type = 'lowpass';
-                filter.frequency.setValueAtTime(800, now);
-                filter.frequency.exponentialRampToValueAtTime(100, now + 0.15);
+                filter.frequency.setValueAtTime(600, now);
+                filter.frequency.exponentialRampToValueAtTime(80, now + 0.12);
 
-                gain.gain.setValueAtTime(0.8, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+                gain.gain.setValueAtTime(0.7, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
 
                 osc.connect(filter);
                 filter.connect(gain);
                 gain.connect(this.masterGain);
-
                 osc.start(now);
-                osc.stop(now + 0.2);
+                osc.stop(now + 0.18);
 
-                // Ruido de impacto
-                const bufferSize = this.ctx.sampleRate * 0.1;
+                // Ruido
+                const bufferSize = this.ctx.sampleRate * 0.08;
                 const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
                 const data = buffer.getChannelData(0);
                 for (let i = 0; i < bufferSize; i++) {
-                    data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.3));
+                    data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.25));
                 }
                 const noise = this.ctx.createBufferSource();
                 const noiseGain = this.ctx.createGain();
                 noise.buffer = buffer;
-                noiseGain.gain.setValueAtTime(0.6, now);
-                noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+                noiseGain.gain.setValueAtTime(0.5, now);
+                noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
                 noise.connect(noiseGain);
                 noiseGain.connect(this.masterGain);
                 noise.start(now);
@@ -390,29 +385,28 @@
                 const gain = this.ctx.createGain();
 
                 osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(200, now);
-                osc.frequency.exponentialRampToValueAtTime(10, now + 0.8);
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.exponentialRampToValueAtTime(8, now + 1.0);
 
-                gain.gain.setValueAtTime(1.0, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 1.0);
+                gain.gain.setValueAtTime(0.9, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
 
                 osc.connect(gain);
                 gain.connect(this.masterGain);
                 osc.start(now);
-                osc.stop(now + 1.0);
+                osc.stop(now + 1.2);
 
-                // Ruido explosivo
-                const bufferSize = this.ctx.sampleRate * 0.8;
+                const bufferSize = this.ctx.sampleRate * 0.7;
                 const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
                 const data = buffer.getChannelData(0);
                 for (let i = 0; i < bufferSize; i++) {
-                    data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.2));
+                    data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.18));
                 }
                 const noise = this.ctx.createBufferSource();
                 const noiseGain = this.ctx.createGain();
                 noise.buffer = buffer;
-                noiseGain.gain.setValueAtTime(0.8, now);
-                noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+                noiseGain.gain.setValueAtTime(0.7, now);
+                noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
                 noise.connect(noiseGain);
                 noiseGain.connect(this.masterGain);
                 noise.start(now);
@@ -425,37 +419,35 @@
                 const gain = this.ctx.createGain();
 
                 osc.type = 'square';
-                osc.frequency.setValueAtTime(400, now);
-                osc.frequency.exponentialRampToValueAtTime(50, now + 0.3);
+                osc.frequency.setValueAtTime(350, now);
+                osc.frequency.exponentialRampToValueAtTime(40, now + 0.35);
 
-                gain.gain.setValueAtTime(0.5, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+                gain.gain.setValueAtTime(0.45, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
 
                 osc.connect(gain);
                 gain.connect(this.masterGain);
                 osc.start(now);
-                osc.stop(now + 0.4);
+                osc.stop(now + 0.45);
             }
 
             playAlarm() {
                 if (!this.initialized) return;
                 const now = this.ctx.currentTime;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(600, now);
-                osc.frequency.setValueAtTime(800, now + 0.3);
-                osc.frequency.setValueAtTime(600, now + 0.6);
-                osc.frequency.setValueAtTime(800, now + 0.9);
-
-                gain.gain.setValueAtTime(0.3, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
-
-                osc.connect(gain);
-                gain.connect(this.masterGain);
-                osc.start(now);
-                osc.stop(now + 1.2);
+                for (let i = 0; i < 3; i++) {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'sine';
+                    const t = now + i * 0.4;
+                    osc.frequency.setValueAtTime(550, t);
+                    osc.frequency.setValueAtTime(750, t + 0.2);
+                    gain.gain.setValueAtTime(0.25, t);
+                    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
+                    osc.connect(gain);
+                    gain.connect(this.masterGain);
+                    osc.start(t);
+                    osc.stop(t + 0.4);
+                }
             }
         }
 
@@ -467,7 +459,7 @@
 
             requestPermission() {
                 if (navigator.vibrate) {
-                    navigator.vibrate(50);
+                    navigator.vibrate(40);
                     this.enabled = true;
                 }
             }
@@ -479,15 +471,15 @@
             }
 
             gunshotVibrate() {
-                this.vibrate([30, 20, 30]);
+                this.vibrate([20, 15, 20]);
             }
 
             explosionVibrate() {
-                this.vibrate([100, 50, 100, 50, 200]);
+                this.vibrate([80, 40, 80, 40, 150]);
             }
 
             hitVibrate() {
-                this.vibrate([200, 100, 200]);
+                this.vibrate([150, 80, 150]);
             }
         }
 
@@ -505,30 +497,29 @@
                 this.spawnTimer = 0;
                 this.spawnInterval = 3.0;
 
-                // Estado del giroscopio
-                this.gyroYaw = 0; // izquierda/derecha (alpha)
-                this.gyroPitch = 0; // arriba/abajo (beta)
+                // Giroscopio CORREGIDO
+                this.gyroYaw = 0; // Giro torreta - eje GAMMA (roll, inclinación lateral)
+                this.gyroPitch = 0; // Elevación cañones - eje BETA (cabeceo)
                 this.gyroAvailable = false;
-                this.initialAlpha = null;
-                this.initialBeta = null;
+                this.calibrated = false;
+                this.calibrationGamma = 0;
+                this.calibrationBeta = 45;
 
                 // Torreta
-                this.turretYaw = 0;
-                this.turretPitch = 0;
+                this.turretYaw = 0; // Ángulo actual de la torreta (radianes, 0 = mirando al frente)
+                this.turretPitch = 0; // Elevación actual de los cañones
                 this.targetYaw = 0;
                 this.targetPitch = 0;
 
                 // Disparo
                 this.isFiring = false;
                 this.fireCooldown = 0;
-                this.fireRate = 0.12;
+                this.fireRate = 0.1;
                 this.bullets = [];
                 this.muzzleFlash = 0;
 
-                // Aviones enemigos
+                // Aviones
                 this.planes = [];
-
-                // Efectos
                 this.explosions = [];
                 this.hitEffects = [];
 
@@ -538,6 +529,7 @@
                 this.renderer = null;
                 this.turretGroup = null;
                 this.gunsGroup = null;
+                this.barrelGroup = null;
                 this.ocean = null;
                 this.ship = null;
                 this.bulletMeshes = [];
@@ -553,147 +545,124 @@
                 this.permissionRequest = document.getElementById('permission-request');
                 this.finalScoreElement = document.getElementById('final-score');
                 this.rankingElement = document.getElementById('ranking');
+                this.gyroDebug = document.getElementById('gyro-debug');
             }
 
             init() {
-                // Configurar Three.js
                 this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
                 this.renderer.setSize(window.innerWidth, window.innerHeight);
                 this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
                 this.renderer.shadowMap.enabled = true;
                 this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
                 this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-                this.renderer.toneMappingExposure = 1.2;
+                this.renderer.toneMappingExposure = 1.1;
                 document.body.appendChild(this.renderer.domElement);
 
                 this.scene = new THREE.Scene();
-                this.scene.background = new THREE.Color(0x3a6b8f);
-                this.scene.fog = new THREE.FogExp2(0x6b9ec4, 0.00015);
+                this.scene.background = new THREE.Color(0x5a8ab5);
+                this.scene.fog = new THREE.FogExp2(0x7aafd4, 0.00012);
 
-                // Cámara
-                this.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.5, 500);
-                this.camera.position.set(0, 3, 0);
-                this.camera.lookAt(0, 2, -10);
+                // Cámara en primera persona desde la torreta
+                this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.3, 400);
+                this.camera.position.set(0, 2.8, 3.5);
 
                 // Luces
-                const ambientLight = new THREE.AmbientLight(0x6688aa, 0.8);
+                const ambientLight = new THREE.AmbientLight(0x7799bb, 0.7);
                 this.scene.add(ambientLight);
 
-                const sunLight = new THREE.DirectionalLight(0xffeedd, 3.0);
-                sunLight.position.set(50, 40, 20);
+                const sunLight = new THREE.DirectionalLight(0xffeedd, 3.5);
+                sunLight.position.set(60, 50, 30);
                 sunLight.castShadow = true;
                 sunLight.shadow.mapSize.width = 2048;
                 sunLight.shadow.mapSize.height = 2048;
                 sunLight.shadow.camera.near = 0.5;
-                sunLight.shadow.camera.far = 200;
-                sunLight.shadow.camera.left = -80;
-                sunLight.shadow.camera.right = 80;
-                sunLight.shadow.camera.top = 80;
-                sunLight.shadow.camera.bottom = -80;
+                sunLight.shadow.camera.far = 250;
+                sunLight.shadow.camera.left = -100;
+                sunLight.shadow.camera.right = 100;
+                sunLight.shadow.camera.top = 100;
+                sunLight.shadow.camera.bottom = -100;
                 this.scene.add(sunLight);
 
-                const hemisphereLight = new THREE.HemisphereLight(0x87ceeb, 0x224466, 0.6);
-                this.scene.add(hemisphereLight);
+                const hemiLight = new THREE.HemisphereLight(0x87ceeb, 0x334466, 0.5);
+                this.scene.add(hemiLight);
 
-                // Océano
                 this.createOcean();
-
-                // Barco
                 this.createShip();
-
-                // Torreta
                 this.createTurret();
-
-                // Event listeners
                 this.setupEventListeners();
                 this.setupGyroscope();
 
-                // Iniciar loop
                 this.lastTime = performance.now();
                 this.animate();
             }
 
             createOcean() {
-                const oceanGeometry = new THREE.PlaneGeometry(300, 300, 100, 100);
+                const oceanGeometry = new THREE.PlaneGeometry(400, 400, 120, 120);
                 const oceanMaterial = new THREE.MeshStandardMaterial({
                     color: 0x1a3a5c,
-                    roughness: 0.3,
-                    metalness: 0.6,
+                    roughness: 0.25,
+                    metalness: 0.7,
                     flatShading: false,
                 });
-
                 this.ocean = new THREE.Mesh(oceanGeometry, oceanMaterial);
                 this.ocean.rotation.x = -Math.PI / 2;
-                this.ocean.position.y = -1.5;
+                this.ocean.position.y = -2;
                 this.ocean.receiveShadow = true;
                 this.scene.add(this.ocean);
-
-                // Ondas animadas
                 this.oceanVertices = oceanGeometry.attributes.position.array.slice();
             }
 
             createShip() {
                 this.ship = new THREE.Group();
 
-                // Cubierta del portaaviones
-                const deckGeometry = new THREE.BoxGeometry(30, 1.5, 70);
-                const deckMaterial = new THREE.MeshStandardMaterial({
-                    color: 0x555555,
-                    roughness: 0.7,
-                    metalness: 0.3,
-                });
-                const deck = new THREE.Mesh(deckGeometry, deckMaterial);
-                deck.position.y = 1;
+                // Cubierta de vuelo
+                const deckGeom = new THREE.BoxGeometry(28, 1.2, 65);
+                const deckMat = new THREE.MeshStandardMaterial({ color: 0x5a5a5a, roughness: 0.6, metalness: 0.35 });
+                const deck = new THREE.Mesh(deckGeom, deckMat);
+                deck.position.y = 1.2;
                 deck.castShadow = true;
                 deck.receiveShadow = true;
                 this.ship.add(deck);
 
-                // Isla del portaaviones
-                const islandGeometry = new THREE.BoxGeometry(5, 6, 12);
-                const islandMaterial = new THREE.MeshStandardMaterial({
-                    color: 0x444444,
-                    roughness: 0.6,
-                    metalness: 0.4,
-                });
-                const island = new THREE.Mesh(islandGeometry, islandMaterial);
-                island.position.set(10, 4.5, -5);
+                // Líneas de cubierta
+                for (let z = -30; z <= 30; z += 8) {
+                    const lineGeom = new THREE.BoxGeometry(26, 0.05, 0.3);
+                    const lineMat = new THREE.MeshStandardMaterial({ color: 0xcccccc, roughness: 0.5 });
+                    const line = new THREE.Mesh(lineGeom, lineMat);
+                    line.position.set(0, 1.85, z);
+                    this.ship.add(line);
+                }
+
+                // Isla
+                const islandGeom = new THREE.BoxGeometry(5, 5.5, 11);
+                const islandMat = new THREE.MeshStandardMaterial({ color: 0x4a4a4a, roughness: 0.55, metalness: 0.45 });
+                const island = new THREE.Mesh(islandGeom, islandMat);
+                island.position.set(9, 4.3, -4);
                 island.castShadow = true;
                 island.receiveShadow = true;
                 this.ship.add(island);
 
-                // Torre de control
-                const towerGeometry = new THREE.BoxGeometry(3, 3, 4);
-                const towerMaterial = new THREE.MeshStandardMaterial({
-                    color: 0x555555,
-                    roughness: 0.5,
-                    metalness: 0.5,
-                });
-                const tower = new THREE.Mesh(towerGeometry, towerMaterial);
-                tower.position.set(10, 8, -5);
+                // Torre
+                const towerGeom = new THREE.BoxGeometry(3.5, 3.5, 4.5);
+                const towerMat = new THREE.MeshStandardMaterial({ color: 0x555555, roughness: 0.45, metalness: 0.55 });
+                const tower = new THREE.Mesh(towerGeom, towerMat);
+                tower.position.set(9, 7.8, -4);
                 tower.castShadow = true;
                 this.ship.add(tower);
 
                 // Chimenea
-                const funnelGeometry = new THREE.CylinderGeometry(1.5, 2, 8, 8);
-                const funnelMaterial = new THREE.MeshStandardMaterial({
-                    color: 0x333333,
-                    roughness: 0.5,
-                    metalness: 0.6,
-                });
-                const funnel = new THREE.Mesh(funnelGeometry, funnelMaterial);
-                funnel.position.set(6, 6, -8);
+                const funnelGeom = new THREE.CylinderGeometry(1.3, 1.8, 7, 8);
+                const funnelMat = new THREE.MeshStandardMaterial({ color: 0x383838, roughness: 0.45, metalness: 0.65 });
+                const funnel = new THREE.Mesh(funnelGeom, funnelMat);
+                funnel.position.set(5.5, 5.8, -7);
                 funnel.castShadow = true;
                 this.ship.add(funnel);
 
-                // Casco (bajo el agua)
-                const hullGeometry = new THREE.BoxGeometry(25, 4, 65);
-                const hullMaterial = new THREE.MeshStandardMaterial({
-                    color: 0x772222,
-                    roughness: 0.8,
-                    metalness: 0.2,
-                });
-                const hull = new THREE.Mesh(hullGeometry, hullMaterial);
-                hull.position.y = -1.5;
+                // Casco
+                const hullGeom = new THREE.BoxGeometry(23, 3.5, 60);
+                const hullMat = new THREE.MeshStandardMaterial({ color: 0x883333, roughness: 0.7, metalness: 0.25 });
+                const hull = new THREE.Mesh(hullGeom, hullMat);
+                hull.position.y = -1.2;
                 this.ship.add(hull);
 
                 this.ship.position.set(0, 0, 0);
@@ -701,97 +670,92 @@
             }
 
             createTurret() {
+                // La torreta está frente al jugador
                 this.turretGroup = new THREE.Group();
-                this.turretGroup.position.set(0, 2.5, 5);
+                this.turretGroup.position.set(0, 2.0, 3.8);
 
-                // Base de la torreta
-                const baseGeometry = new THREE.CylinderGeometry(1, 1.5, 1.5, 16);
-                const baseMaterial = new THREE.MeshStandardMaterial({
-                    color: 0x555555,
-                    roughness: 0.5,
-                    metalness: 0.7,
-                });
-                const base = new THREE.Mesh(baseGeometry, baseMaterial);
+                // Base giratoria
+                const baseGeom = new THREE.CylinderGeometry(0.9, 1.2, 1.2, 20);
+                const baseMat = new THREE.MeshStandardMaterial({ color: 0x5a5a5a, roughness: 0.4, metalness: 0.75 });
+                const base = new THREE.Mesh(baseGeom, baseMat);
                 base.position.y = 0;
                 base.castShadow = true;
                 this.turretGroup.add(base);
 
-                // Escudo blindado
-                const shieldGeometry = new THREE.BoxGeometry(2.5, 1.2, 1.5);
-                const shieldMaterial = new THREE.MeshStandardMaterial({
-                    color: 0x444444,
-                    roughness: 0.4,
-                    metalness: 0.8,
-                });
-                const shield = new THREE.Mesh(shieldGeometry, shieldMaterial);
-                shield.position.set(0, 0.5, -0.5);
+                // Escudo blindado frontal
+                const shieldGeom = new THREE.BoxGeometry(2.8, 1.4, 1.8);
+                const shieldMat = new THREE.MeshStandardMaterial({ color: 0x4a4a4a, roughness: 0.35, metalness: 0.8 });
+                const shield = new THREE.Mesh(shieldGeom, shieldMat);
+                shield.position.set(0, 0.7, -1);
                 shield.castShadow = true;
                 this.turretGroup.add(shield);
 
-                // Grupo de cañones (se inclina)
+                // Asiento del artillero (referencia visual)
+                const seatGeom = new THREE.BoxGeometry(1.2, 0.4, 1);
+                const seatMat = new THREE.MeshStandardMaterial({ color: 0x664422, roughness: 0.7 });
+                const seat = new THREE.Mesh(seatGeom, seatMat);
+                seat.position.set(0, -0.2, 1.2);
+                this.turretGroup.add(seat);
+
+                // Respaldo
+                const backGeom = new THREE.BoxGeometry(1.2, 1.5, 0.2);
+                const back = new THREE.Mesh(backGeom, seatMat);
+                back.position.set(0, 0.6, 1.6);
+                this.turretGroup.add(back);
+
+                // Grupo de cañones (se eleva)
                 this.gunsGroup = new THREE.Group();
-                this.gunsGroup.position.set(0, 1.2, 0);
+                this.gunsGroup.position.set(0, 0.9, -0.8);
 
-                // Cañón izquierdo
-                const barrelGeom = new THREE.CylinderGeometry(0.15, 0.2, 4, 8);
-                const barrelMat = new THREE.MeshStandardMaterial({
-                    color: 0x333333,
-                    roughness: 0.3,
-                    metalness: 0.9,
-                });
-                const barrel1 = new THREE.Mesh(barrelGeom, barrelMat);
-                barrel1.rotation.x = Math.PI / 2;
-                barrel1.position.set(-0.5, 0, -2);
-                barrel1.castShadow = true;
-                this.gunsGroup.add(barrel1);
+                // Soporte de cañones
+                const mountGeom = new THREE.BoxGeometry(1.6, 0.5, 0.8);
+                const mount = new THREE.Mesh(mountGeom, new THREE.MeshStandardMaterial({
+                    color: 0x555555,
+                    roughness: 0.4,
+                    metalness: 0.7
+                }));
+                this.gunsGroup.add(mount);
 
-                const barrel2 = new THREE.Mesh(barrelGeom, barrelMat);
-                barrel2.rotation.x = Math.PI / 2;
-                barrel2.position.set(0.5, 0, -2);
-                barrel2.castShadow = true;
-                this.gunsGroup.add(barrel2);
+                // Cañones (apuntando hacia adelante = -Z)
+                this.barrelGroup = new THREE.Group();
+                for (let i = 0; i < 2; i++) {
+                    const barrelGeom = new THREE.CylinderGeometry(0.12, 0.18, 3.5, 8);
+                    const barrelMat = new THREE.MeshStandardMaterial({ color: 0x2a2a2a, roughness: 0.25, metalness: 0.9 });
+                    const barrel = new THREE.Mesh(barrelGeom, barrelMat);
+                    barrel.rotation.x = Math.PI / 2;
+                    barrel.position.set((i - 0.5) * 0.6, 0, -1.8);
+                    barrel.castShadow = true;
+                    this.barrelGroup.add(barrel);
 
-                // Bocachas
-                const muzzleGeom = new THREE.CylinderGeometry(0.22, 0.18, 0.5, 8);
-                const muzzleMat = new THREE.MeshStandardMaterial({
-                    color: 0x222222,
-                    roughness: 0.2,
-                    metalness: 1.0,
-                });
-                const muzzle1 = new THREE.Mesh(muzzleGeom, muzzleMat);
-                muzzle1.rotation.x = Math.PI / 2;
-                muzzle1.position.set(-0.5, 0, -4);
-                this.gunsGroup.add(muzzle1);
-
-                const muzzle2 = new THREE.Mesh(muzzleGeom, muzzleMat);
-                muzzle2.rotation.x = Math.PI / 2;
-                muzzle2.position.set(0.5, 0, -4);
-                this.gunsGroup.add(muzzle2);
-
+                    // Bocacha
+                    const muzzleGeom = new THREE.CylinderGeometry(0.2, 0.16, 0.4, 8);
+                    const muzzle = new THREE.Mesh(muzzleGeom, new THREE.MeshStandardMaterial({
+                        color: 0x1a1a1a,
+                        roughness: 0.2,
+                        metalness: 1.0
+                    }));
+                    muzzle.rotation.x = Math.PI / 2;
+                    muzzle.position.set((i - 0.5) * 0.6, 0, -3.55);
+                    this.barrelGroup.add(muzzle);
+                }
+                this.gunsGroup.add(this.barrelGroup);
                 this.turretGroup.add(this.gunsGroup);
                 this.scene.add(this.turretGroup);
             }
 
             setupEventListeners() {
-                // Disparo al tocar pantalla
                 document.addEventListener('pointerdown', (e) => {
                     if (!this.gameRunning) return;
-                    if (e.target.closest('#game-over-screen') || e.target.closest('#splash-screen')) return;
+                    if (e.target.closest('#game-over-screen') || e.target.closest('#splash-screen') || e.target
+                        .closest('#permission-request')) return;
                     e.preventDefault();
                     this.isFiring = true;
                     this.audio.init();
-                    this.vibration.requestPermission();
                 });
 
-                document.addEventListener('pointerup', (e) => {
-                    this.isFiring = false;
-                });
+                document.addEventListener('pointerup', () => { this.isFiring = false; });
+                document.addEventListener('pointerleave', () => { this.isFiring = false; });
 
-                document.addEventListener('pointerleave', () => {
-                    this.isFiring = false;
-                });
-
-                // Evitar scroll y zoom
                 document.addEventListener('touchmove', (e) => {
                     if (this.gameRunning) e.preventDefault();
                 }, { passive: false });
@@ -800,7 +764,6 @@
                 document.addEventListener('gesturechange', (e) => e.preventDefault());
                 document.addEventListener('gestureend', (e) => e.preventDefault());
 
-                // Botones
                 document.getElementById('start-btn').addEventListener('click', () => this.startGame());
                 document.getElementById('restart-btn').addEventListener('click', () => this.restartGame());
                 document.getElementById('permission-request').addEventListener('click', () => {
@@ -808,7 +771,6 @@
                     document.getElementById('permission-request').style.display = 'none';
                 });
 
-                // Redimensionar
                 window.addEventListener('resize', () => {
                     this.camera.aspect = window.innerWidth / window.innerHeight;
                     this.camera.updateProjectionMatrix();
@@ -819,35 +781,99 @@
             setupGyroscope() {
                 if (typeof DeviceOrientationEvent !== 'undefined') {
                     window.addEventListener('deviceorientation', (event) => {
-                        if (this.initialAlpha === null && event.alpha !== null) {
-                            this.initialAlpha = event.alpha;
-                            this.initialBeta = event.beta || 45;
-                            this.gyroAvailable = true;
+                        // gamma: inclinación lateral (-90 a 90) → giro torreta
+                        // beta: cabeceo (-180 a 180) → elevación cañones
+                        const gamma = event.gamma || 0; // -90 a 90
+                        const beta = event.beta || 45; // -180 a 180
+
+                        if (!this.calibrated && this.gameRunning) {
+                            this.calibrationGamma = gamma;
+                            this.calibrationBeta = beta;
+                            this.calibrated = true;
                         }
 
-                        if (event.alpha !== null) {
-                            let alpha = event.alpha;
-                            let beta = event.beta || 45;
+                        if (this.calibrated) {
+                            // Gamma: diferencia respecto a calibración → giro torreta
+                            let deltaGamma = gamma - this.calibrationGamma;
+                            // Normalizar a -180..180
+                            if (deltaGamma > 180) deltaGamma -= 360;
+                            if (deltaGamma < -180) deltaGamma += 360;
+                            // Mapear: inclinar izq abajo (gamma positivo si móvil horizontal) = girar izquierda
+                            // Queremos que bajar lado izquierdo (gamma negativo en landscape?) gire a izquierda
+                            // En landscape con la parte superior apuntando a la derecha:
+                            //   gamma positivo = lado derecho más bajo → girar derecha
+                            //   gamma negativo = lado izquierdo más bajo → girar izquierda
+                            this.gyroYaw = deltaGamma * 0.035; // sensibilidad para giro 360°
 
-                            // Calibrar giro (volante)
-                            let deltaAlpha = alpha - this.initialAlpha;
-                            if (deltaAlpha > 180) deltaAlpha -= 360;
-                            if (deltaAlpha < -180) deltaAlpha += 360;
-                            this.gyroYaw = THREE.MathUtils.clamp(deltaAlpha / 90, -1.5, 1.5);
+                            // Beta: cabeceo → elevación cañones
+                            // beta = 90 cuando está vertical (parte superior arriba)
+                            // beta < 45 = inclinado hacia ti (inferior más cerca) → bajar cañones
+                            // beta > 45 = inclinado hacia afuera (superior más cerca) → subir cañones
+                            const pitchDelta = beta - this.calibrationBeta;
+                            this.gyroPitch = -pitchDelta * 0.025; // negativo = bajar al inclinar hacia ti
 
-                            // Cabeceo (palanca de avión)
-                            let pitch = (beta - 45) / 45;
-                            this.gyroPitch = THREE.MathUtils.clamp(pitch, -0.8, 0.5);
+                            // Limitar elevación
+                            this.gyroPitch = THREE.MathUtils.clamp(this.gyroPitch, -0.7, 0.4);
+                        }
+
+                        this.gyroAvailable = true;
+
+                        // Debug
+                        if (this.gameRunning) {
+                            this.gyroDebug.textContent =
+                                `γ:${gamma.toFixed(1)}° β:${beta.toFixed(1)}° | Yaw:${this.gyroYaw.toFixed(2)} Pitch:${this.gyroPitch.toFixed(2)}`;
                         }
                     });
 
-                    // Solicitar permiso en iOS
+                    // iOS 13+
                     if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-                        document.getElementById('splash-screen').querySelector('.instructions').innerHTML +=
-                            '<br><br>📱 <b>iOS:</b> Toca "A LA BATALLA" y permite el sensor';
                         this._iosGyro = true;
+                        document.getElementById('splash-screen').querySelector('.instructions').innerHTML +=
+                            '<br><br>📱 <b>iOS:</b> Permite el sensor al iniciar';
                     }
                 }
+
+                // Fallback táctil
+                this.setupTouchFallback();
+            }
+
+            setupTouchFallback() {
+                let touchActive = false;
+                let touchStartX = 0;
+                let touchStartY = 0;
+                let fallbackYaw = 0;
+                let fallbackPitch = 0;
+
+                document.addEventListener('touchstart', (e) => {
+                    if (!this.gameRunning) return;
+                    if (e.target.closest('#game-over-screen') || e.target.closest('#splash-screen')) return;
+                    if (e.touches.length === 2) {
+                        touchActive = true;
+                        touchStartX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+                        touchStartY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+                    }
+                });
+
+                document.addEventListener('touchmove', (e) => {
+                    if (!touchActive || !this.gameRunning) return;
+                    if (e.touches.length === 2) {
+                        const cx = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+                        const cy = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+                        fallbackYaw += (cx - touchStartX) * 0.005;
+                        fallbackPitch -= (cy - touchStartY) * 0.004;
+                        fallbackPitch = THREE.MathUtils.clamp(fallbackPitch, -0.7, 0.4);
+                        touchStartX = cx;
+                        touchStartY = cy;
+                    }
+                });
+
+                document.addEventListener('touchend', () => {
+                    touchActive = false;
+                });
+
+                // Usar fallback si no hay giroscopio
+                this._fallbackYaw = () => fallbackYaw;
+                this._fallbackPitch = () => fallbackPitch;
             }
 
             async requestGyroPermission() {
@@ -858,49 +884,30 @@
                             this.gyroAvailable = true;
                         }
                     } catch (e) {
-                        console.warn('Permiso de giroscopio denegado');
-                        // Modo fallback: controles táctiles simples
-                        this.setupTouchFallback();
+                        console.warn('Permiso de giroscopio denegado:', e);
                     }
                 }
-            }
-
-            setupTouchFallback() {
-                let touchX = 0,
-                    touchY = 0;
-                document.addEventListener('touchmove', (e) => {
-                    if (!this.gameRunning) return;
-                    touchX = (e.touches[0].clientX / window.innerWidth - 0.5) * 2;
-                    touchY = (e.touches[0].clientY / window.innerHeight - 0.5) * 2;
-                    this.gyroYaw = touchX * 1.5;
-                    this.gyroPitch = -touchY * 0.5;
-                });
-                document.addEventListener('touchend', () => {
-                    this.gyroYaw *= 0.9;
-                    this.gyroPitch *= 0.9;
-                });
             }
 
             startGame() {
                 this.splashScreen.style.display = 'none';
                 this.audio.init();
-                this.vibration.requestPermission();
 
                 if (this._iosGyro && typeof DeviceOrientationEvent.requestPermission === 'function') {
-                    this.requestGyroPermission().then(() => {
-                        this.beginGameplay();
-                    });
+                    this.requestGyroPermission().then(() => this.beginGameplay());
                 } else {
                     this.beginGameplay();
                 }
 
-                // Mostrar solicitud de permiso de vibración
                 if (!this.vibration.enabled && navigator.vibrate) {
                     document.getElementById('permission-request').style.display = 'block';
                     setTimeout(() => {
                         document.getElementById('permission-request').style.display = 'none';
                     }, 4000);
                 }
+
+                // Mostrar debug
+                this.gyroDebug.style.display = 'block';
             }
 
             beginGameplay() {
@@ -909,7 +916,7 @@
                 this.gameTime = 0;
                 this.difficulty = 1;
                 this.spawnTimer = 0;
-                this.spawnInterval = 3.0;
+                this.spawnInterval = 3.5;
                 this.bullets = [];
                 this.planes = [];
                 this.explosions = [];
@@ -923,6 +930,9 @@
                 this.isFiring = false;
                 this.fireCooldown = 0;
                 this.muzzleFlash = 0;
+                this.turretYaw = 0;
+                this.turretPitch = 0;
+                this.calibrated = false;
                 this.gameRunning = true;
                 this.gameOverScreen.style.display = 'none';
                 this.updateHUD();
@@ -943,10 +953,11 @@
                 this.gameOverScreen.style.display = 'flex';
                 this.finalScoreElement.textContent = `Puntuación: ${this.score}`;
                 this.updateRanking();
+                this.gyroDebug.style.display = 'none';
             }
 
             updateRanking() {
-                let rankings = JSON.parse(localStorage.getItem('midway_rankings') || '[]');
+                let rankings = JSON.parse(localStorage.getItem('midway_rankings_v2') || '[]');
                 rankings.push({
                     score: this.score,
                     time: Math.floor(this.gameTime),
@@ -954,12 +965,11 @@
                 });
                 rankings.sort((a, b) => b.score - a.score);
                 rankings = rankings.slice(0, 10);
-                localStorage.setItem('midway_rankings', JSON.stringify(rankings));
+                localStorage.setItem('midway_rankings_v2', JSON.stringify(rankings));
 
                 let html = '<h3>🏆 MEJORES ARTILLEROS</h3>';
                 rankings.forEach((r, i) => {
-                    html +=
-                        `<div>${i+1}. ${r.score} pts - ${r.time}s (${r.date})</div>`;
+                    html += `<div>${i+1}. ${r.score} pts - ${r.time}s (${r.date})</div>`;
                 });
                 this.rankingElement.innerHTML = html;
             }
@@ -993,95 +1003,73 @@
                 let cumulative = 0;
                 for (let i = 0; i < types.length; i++) {
                     cumulative += weights[i];
-                    if (rand <= cumulative) {
-                        type = types[i];
-                        break;
-                    }
+                    if (rand <= cumulative) { type = types[i]; break; }
                 }
 
-                // Posición aleatoria en el horizonte
                 const angle = Math.random() * Math.PI * 2;
-                const distance = 40 + Math.random() * 30;
-                const height = 5 + Math.random() * 20;
+                const distance = 35 + Math.random() * 35;
+                const height = 4 + Math.random() * 22;
 
                 const plane = {
-                    type: type,
-                    position: new THREE.Vector3(
-                        Math.cos(angle) * distance,
-                        height,
-                        Math.sin(angle) * distance
-                    ),
+                    type,
+                    position: new THREE.Vector3(Math.cos(angle) * distance, height, Math.sin(angle) * distance),
                     velocity: new THREE.Vector3(),
-                    speed: 8 + Math.random() * 5 + this.difficulty * 2,
+                    speed: 7 + Math.random() * 6 + this.difficulty * 2.5,
                     health: type === 'fighter' ? 2 : 3,
-                    attackTimer: 0,
                     attackCooldown: 0,
                     alive: true,
                     group: null,
-                    mesh: null,
                 };
 
-                // Dirección hacia el barco
-                const dirToShip = new THREE.Vector3(0, 2, 0).sub(plane.position).normalize();
+                const dirToShip = new THREE.Vector3(0, 1.5, 0).sub(plane.position).normalize();
                 plane.velocity.copy(dirToShip.multiplyScalar(plane.speed));
 
-                // Crear mesh del avión
                 plane.group = new THREE.Group();
                 plane.group.position.copy(plane.position);
 
                 // Fuselaje
-                const fuseGeom = new THREE.ConeGeometry(0.4, 2.5, 6);
+                const fuseGeom = new THREE.ConeGeometry(0.35, 2.2, 6);
                 const fuseMat = new THREE.MeshStandardMaterial({
-                    color: type === 'fighter' ? 0x556644 : type === 'dive_bomber' ? 0x664433 : 0x445533,
-                    roughness: 0.5,
-                    metalness: 0.4,
+                    color: type === 'fighter' ? 0x5a6a4a : type === 'dive_bomber' ? 0x6a4a3a : 0x4a5a3a,
+                    roughness: 0.45,
+                    metalness: 0.4
                 });
                 const fuse = new THREE.Mesh(fuseGeom, fuseMat);
                 fuse.rotation.x = Math.PI / 2;
-                fuse.position.z = -1;
+                fuse.position.z = -0.9;
                 fuse.castShadow = true;
                 plane.group.add(fuse);
 
                 // Alas
-                const wingGeom = new THREE.BoxGeometry(4, 0.1, 1.2);
-                const wingMat = new THREE.MeshStandardMaterial({
-                    color: 0x444433,
-                    roughness: 0.6,
-                    metalness: 0.3,
-                });
+                const wingGeom = new THREE.BoxGeometry(3.5, 0.08, 1);
+                const wingMat = new THREE.MeshStandardMaterial({ color: 0x4a4a3a, roughness: 0.55, metalness: 0.3 });
                 const wing = new THREE.Mesh(wingGeom, wingMat);
-                wing.position.z = -0.8;
+                wing.position.z = -0.7;
                 wing.castShadow = true;
                 plane.group.add(wing);
 
                 // Cola
-                const tailGeom = new THREE.BoxGeometry(1.5, 0.3, 0.5);
+                const tailGeom = new THREE.BoxGeometry(1.3, 0.25, 0.4);
                 const tail = new THREE.Mesh(tailGeom, wingMat);
-                tail.position.set(0, 0.2, 0.5);
+                tail.position.set(0, 0.15, 0.4);
                 plane.group.add(tail);
 
                 // Hélice
-                const propGeom = new THREE.BoxGeometry(0.1, 1.5, 0.1);
-                const propMat = new THREE.MeshStandardMaterial({
-                    color: 0x888888,
-                    roughness: 0.3,
-                    metalness: 0.8,
-                });
+                const propGeom = new THREE.BoxGeometry(0.08, 1.3, 0.08);
+                const propMat = new THREE.MeshStandardMaterial({ color: 0x999999, roughness: 0.25, metalness: 0.8 });
                 plane.propeller = new THREE.Mesh(propGeom, propMat);
-                plane.propeller.position.z = -2.2;
+                plane.propeller.position.z = -2;
                 plane.group.add(plane.propeller);
 
-                // Insignia japonesa (círculo rojo)
-                const insigniaGeom = new THREE.CircleGeometry(0.3, 16);
+                // Hinomaru
+                const insigniaGeom = new THREE.CircleGeometry(0.25, 16);
                 const insigniaMat = new THREE.MeshBasicMaterial({ color: 0xff0000, side: THREE.DoubleSide });
                 const insignia = new THREE.Mesh(insigniaGeom, insigniaMat);
-                insignia.position.set(0, 0, -0.5);
+                insignia.position.set(0, 0, -0.4);
                 insignia.rotation.y = Math.PI;
                 plane.group.add(insignia);
 
                 plane.group.lookAt(new THREE.Vector3().addVectors(plane.position, plane.velocity));
-                plane.mesh = plane.group;
-
                 this.scene.add(plane.group);
                 this.planes.push(plane);
                 this.planeMeshes.push(plane);
@@ -1089,82 +1077,75 @@
 
             fireBullet() {
                 if (this.fireCooldown > 0) return;
+                const bulletSpeed = 55;
 
-                const bulletSpeed = 60;
-                const spread = 0.03;
+                // Dirección de disparo basada en la torreta
+                const dir = new THREE.Vector3(0, 0, -1);
+                dir.applyQuaternion(this.gunsGroup.getWorldQuaternion(new THREE.Quaternion()));
 
                 for (let i = 0; i < 2; i++) {
-                    const offset = (i - 0.5) * 0.3;
-                    const direction = new THREE.Vector3(
-                        Math.sin(this.turretYaw) * Math.cos(this.turretPitch) + (Math.random() - 0.5) * spread,
-                        Math.sin(this.turretPitch) + (Math.random() - 0.5) * spread,
-                        -Math.cos(this.turretYaw) * Math.cos(this.turretPitch) + (Math.random() - 0.5) * spread
-                    ).normalize();
+                    const offset = (i - 0.5) * 0.35;
+                    const barrelPos = new THREE.Vector3(offset, 0, -3.5);
+                    barrelPos.applyQuaternion(this.gunsGroup.getWorldQuaternion(new THREE.Quaternion()));
+                    barrelPos.add(this.gunsGroup.getWorldPosition(new THREE.Vector3()));
+
+                    const spread = new THREE.Vector3((Math.random() - 0.5) * 0.04, (Math.random() - 0.5) * 0.04, (
+                        Math.random() - 0.5) * 0.04);
+                    const finalDir = dir.clone().add(spread).normalize();
 
                     const bullet = {
-                        position: new THREE.Vector3(0, 2.5, 5).add(
-                            new THREE.Vector3(offset * Math.cos(this.turretYaw), 0, offset * Math.sin(
-                                this.turretYaw))
-                        ),
-                        velocity: direction.multiplyScalar(bulletSpeed),
-                        life: 1.5,
+                        position: barrelPos.clone(),
+                        velocity: finalDir.multiplyScalar(bulletSpeed),
+                        life: 1.8,
                         tracer: null,
                     };
 
-                    // Crear trazador
-                    const tracerGeom = new THREE.SphereGeometry(0.08, 4, 4);
+                    const tracerGeom = new THREE.SphereGeometry(0.07, 4, 4);
                     const tracerMat = new THREE.MeshBasicMaterial({ color: 0xffff44 });
                     bullet.tracer = new THREE.Mesh(tracerGeom, tracerMat);
                     bullet.tracer.position.copy(bullet.position);
                     this.scene.add(bullet.tracer);
                     this.bulletMeshes.push(bullet.tracer);
-
                     this.bullets.push(bullet);
                 }
 
                 this.fireCooldown = this.fireRate;
-                this.muzzleFlash = 0.06;
+                this.muzzleFlash = 0.05;
                 this.audio.playGunshot();
                 this.vibration.gunshotVibrate();
             }
 
             createExplosion(position, size = 1) {
                 const particles = [];
-                const particleCount = Math.floor(30 * size);
+                const particleCount = Math.floor(25 * size);
 
                 for (let i = 0; i < particleCount; i++) {
-                    const geom = new THREE.SphereGeometry(0.15 * size, 4, 4);
+                    const geom = new THREE.SphereGeometry(0.12 * size, 4, 4);
                     const mat = new THREE.MeshBasicMaterial({
-                        color: new THREE.Color().setHSL(0.08 + Math.random() * 0.15, 1, 0.4 + Math.random() * 0.5),
+                        color: new THREE.Color().setHSL(0.07 + Math.random() * 0.18, 1, 0.35 + Math.random() * 0.55),
                     });
                     const particle = new THREE.Mesh(geom, mat);
                     particle.position.copy(position);
                     particle.velocity = new THREE.Vector3(
-                        (Math.random() - 0.5) * 15 * size,
-                        (Math.random() - 0.5) * 15 * size,
-                        (Math.random() - 0.5) * 15 * size
+                        (Math.random() - 0.5) * 12 * size,
+                        (Math.random() - 0.5) * 12 * size,
+                        (Math.random() - 0.5) * 12 * size
                     );
-                    particle.life = 0.6 + Math.random() * 0.8;
+                    particle.life = 0.5 + Math.random() * 0.7;
                     particle.age = 0;
                     this.scene.add(particle);
                     particles.push(particle);
                 }
 
-                // Luz de explosión
-                const light = new THREE.PointLight(0xff6600, 5 * size, 15 * size);
+                const light = new THREE.PointLight(0xff5500, 4 * size, 12 * size);
                 light.position.copy(position);
                 this.scene.add(light);
-                particles.push(light);
-                light.life = 0.3;
+                light.life = 0.25;
                 light.age = 0;
                 light.isLight = true;
+                particles.push(light);
 
-                this.explosionParticles.push({
-                    particles: particles,
-                    age: 0,
-                    life: 1.0,
-                });
-
+                this.explosionParticles.push({ particles, age: 0, life: 0.9 });
                 this.audio.playExplosion();
                 this.vibration.explosionVibrate();
             }
@@ -1181,17 +1162,11 @@
                 this.vibration.hitVibrate();
                 this.showMessage('¡IMPACTO! -' + amount, 1000);
                 this.updateHUD();
-
-                // Efecto visual en el barco
-                this.hitEffects.push({
-                    timer: 0.5,
-                    intensity: amount / 20,
-                });
+                this.hitEffects.push({ timer: 0.4, intensity: amount / 20 });
             }
 
             update(delta) {
                 if (!this.gameRunning) {
-                    // Seguir animando aunque no esté corriendo
                     this.updateOcean(delta);
                     this.updateExplosions(delta);
                     return;
@@ -1201,61 +1176,77 @@
                 this.fireCooldown = Math.max(0, this.fireCooldown - delta);
                 this.muzzleFlash = Math.max(0, this.muzzleFlash - delta);
 
-                // Dificultad creciente
+                // Dificultad
                 this.difficulty = 1 + Math.floor(this.gameTime / 30);
-                this.spawnInterval = Math.max(0.8, 3.0 - this.difficulty * 0.3);
+                this.spawnInterval = Math.max(0.7, 3.5 - this.difficulty * 0.35);
 
-                // Spawn de aviones
+                // Spawn
                 this.spawnTimer += delta;
                 if (this.spawnTimer >= this.spawnInterval) {
                     this.spawnTimer = 0;
                     this.spawnPlane();
-                    if (this.difficulty >= 3 && Math.random() < 0.4) {
-                        setTimeout(() => {
-                            if (this.gameRunning) this.spawnPlane();
-                        }, Math.random() * 1000);
+                    if (this.difficulty >= 3 && Math.random() < 0.5) {
+                        setTimeout(() => { if (this.gameRunning) this.spawnPlane(); }, Math.random() * 800);
                     }
                 }
 
-                // Actualizar torreta
-                this.targetYaw = this.gyroYaw;
-                this.targetPitch = this.gyroPitch;
-                this.turretYaw += (this.targetYaw - this.turretYaw) * Math.min(delta * 8, 1);
-                this.turretPitch += (this.targetPitch - this.turretPitch) * Math.min(delta * 8, 1);
-                this.turretPitch = THREE.MathUtils.clamp(this.turretPitch, -0.6, 0.3);
+                // Actualizar torreta desde giroscopio (o fallback)
+                let inputYaw = this.gyroYaw;
+                let inputPitch = this.gyroPitch;
 
+                if (!this.gyroAvailable || !this.calibrated) {
+                    if (this._fallbackYaw) inputYaw = this._fallbackYaw();
+                    if (this._fallbackPitch) inputPitch = this._fallbackPitch();
+                }
+
+                this.targetYaw = inputYaw;
+                this.targetPitch = inputPitch;
+
+                // Suavizado
+                this.turretYaw += (this.targetYaw - this.turretYaw) * Math.min(delta * 6, 1);
+                this.turretPitch += (this.targetPitch - this.turretPitch) * Math.min(delta * 8, 1);
+                this.turretPitch = THREE.MathUtils.clamp(this.turretPitch, -0.7, 0.4);
+
+                // Aplicar rotación a la torreta
                 this.turretGroup.rotation.y = this.turretYaw;
                 this.gunsGroup.rotation.x = this.turretPitch;
 
-                // Disparar si se mantiene pulsado
+                // Actualizar cámara (primera persona desde detrás de los cañones)
+                const camOffset = new THREE.Vector3(0, 1.0, 0.5);
+                camOffset.applyQuaternion(this.turretGroup.quaternion);
+                const camPos = this.turretGroup.position.clone().add(camOffset);
+                this.camera.position.copy(camPos);
+
+                const lookDir = new THREE.Vector3(0, 0, -15);
+                lookDir.applyQuaternion(this.gunsGroup.getWorldQuaternion(new THREE.Quaternion()));
+                const lookTarget = this.gunsGroup.getWorldPosition(new THREE.Vector3()).add(lookDir);
+                this.camera.lookAt(lookTarget);
+
+                // Disparo
                 if (this.isFiring && this.fireCooldown <= 0) {
                     this.fireBullet();
                 }
 
                 // Muzzle flash
                 if (this.muzzleFlash > 0) {
-                    const flashIntensity = this.muzzleFlash / 0.06;
+                    const fi = this.muzzleFlash / 0.05;
                     this.scene.fog = new THREE.FogExp2(
-                        new THREE.Color().lerpColors(
-                            new THREE.Color(0x6b9ec4),
-                            new THREE.Color(0xffaa44),
-                            flashIntensity
-                        ),
-                        0.00015 + flashIntensity * 0.0003
+                        new THREE.Color().lerpColors(new THREE.Color(0x7aafd4), new THREE.Color(0xffcc66), fi),
+                        0.00012 + fi * 0.0003
                     );
                 } else {
-                    this.scene.fog = new THREE.FogExp2(0x6b9ec4, 0.00015);
+                    this.scene.fog = new THREE.FogExp2(0x7aafd4, 0.00012);
                 }
 
-                // Actualizar balas
+                // Balas
                 for (let i = this.bullets.length - 1; i >= 0; i--) {
                     const bullet = this.bullets[i];
                     bullet.position.add(bullet.velocity.clone().multiplyScalar(delta));
                     bullet.life -= delta;
                     bullet.tracer.position.copy(bullet.position);
 
-                    if (bullet.life <= 0 || bullet.position.y < -2 || Math.abs(bullet.position.x) > 60 || Math.abs(
-                            bullet.position.z) > 60) {
+                    if (bullet.life <= 0 || bullet.position.y < -3 || Math.abs(bullet.position.x) > 70 || Math.abs(
+                            bullet.position.z) > 70) {
                         this.scene.remove(bullet.tracer);
                         const idx = this.bulletMeshes.indexOf(bullet.tracer);
                         if (idx > -1) this.bulletMeshes.splice(idx, 1);
@@ -1263,19 +1254,17 @@
                         continue;
                     }
 
-                    // Colisión con aviones
                     for (let j = this.planes.length - 1; j >= 0; j--) {
                         const plane = this.planes[j];
                         if (!plane.alive) continue;
-                        const dist = bullet.position.distanceTo(plane.group.position);
-                        if (dist < 2.5) {
+                        if (bullet.position.distanceTo(plane.group.position) < 2.2) {
                             plane.health--;
                             if (plane.health <= 0) {
                                 this.destroyPlane(j);
                                 this.score += 100;
                                 this.showMessage('¡DERRIBADO! +100', 1200);
                             } else {
-                                this.showMessage('¡IMPACTO!', 600);
+                                this.showMessage('¡IMPACTO!', 500);
                                 this.audio.playHit();
                             }
                             this.scene.remove(bullet.tracer);
@@ -1287,101 +1276,66 @@
                     }
                 }
 
-                // Actualizar aviones
+                // Aviones
                 for (let i = this.planes.length - 1; i >= 0; i--) {
                     const plane = this.planes[i];
                     if (!plane.alive) continue;
 
                     plane.position.add(plane.velocity.clone().multiplyScalar(delta));
                     plane.group.position.copy(plane.position);
+                    plane.group.lookAt(new THREE.Vector3().addVectors(plane.position, plane.velocity));
+                    if (plane.propeller) plane.propeller.rotation.z += delta * 45;
 
-                    // Orientar hacia la dirección de vuelo
-                    const lookTarget = new THREE.Vector3().addVectors(plane.position, plane.velocity);
-                    plane.group.lookAt(lookTarget);
-
-                    // Rotar hélice
-                    if (plane.propeller) {
-                        plane.propeller.rotation.z += delta * 40;
-                    }
-
-                    // IA de ataque
                     plane.attackCooldown = Math.max(0, plane.attackCooldown - delta);
-
                     const distToShip = plane.position.length();
-                    if (distToShip < 30 && plane.attackCooldown <= 0) {
+
+                    if (distToShip < 28 && plane.attackCooldown <= 0) {
                         if (plane.type === 'fighter') {
-                            // Ametrallamiento
-                            plane.attackCooldown = 1.5;
-                            this.damageShip(3 + Math.floor(this.difficulty / 2));
-                        } else if (plane.type === 'dive_bomber' && plane.position.y > 8 && distToShip < 20) {
-                            // Bombardeo en picado
-                            plane.attackCooldown = 3;
-                            plane.velocity.y = -15;
+                            plane.attackCooldown = 1.8;
+                            this.damageShip(2 + Math.floor(this.difficulty / 2));
+                        } else if (plane.type === 'dive_bomber' && plane.position.y > 7 && distToShip < 18) {
+                            plane.attackCooldown = 3.5;
+                            plane.velocity.y = -18;
                             setTimeout(() => {
                                 if (plane.alive && this.gameRunning) {
-                                    this.damageShip(15 + this.difficulty * 2);
-                                    this.createExplosion(
-                                        new THREE.Vector3(
-                                            (Math.random() - 0.5) * 10,
-                                            1.5,
-                                            (Math.random() - 0.5) * 20
-                                        ),
-                                        0.8
-                                    );
+                                    this.damageShip(12 + this.difficulty * 2);
+                                    this.createExplosion(new THREE.Vector3((Math.random() - 0.5) * 12,
+                                        1.5, (Math.random() - 0.5) * 22), 0.7);
                                 }
-                            }, 800);
-                        } else if (plane.type === 'torpedo_bomber' && plane.position.y < 3 && distToShip < 25) {
-                            // Torpedo
+                            }, 700);
+                        } else if (plane.type === 'torpedo_bomber' && plane.position.y < 2.5 && distToShip < 22) {
                             plane.attackCooldown = 5;
-                            this.damageShip(20 + this.difficulty * 3);
-                            this.createExplosion(
-                                new THREE.Vector3(0, 0, (Math.random() - 0.5) * 15),
-                                1.2
-                            );
-                            this.showMessage('¡TORPEDO! -' + (20 + this.difficulty * 3), 1500);
+                            this.damageShip(18 + this.difficulty * 3);
+                            this.createExplosion(new THREE.Vector3(0, -0.5, (Math.random() - 0.5) * 18), 1.1);
+                            this.showMessage('¡TORPEDO! -' + (18 + this.difficulty * 3), 1500);
                         }
                     }
 
-                    // Si el avión se aleja demasiado, respawnear
-                    if (Math.abs(plane.position.x) > 60 || Math.abs(plane.position.z) > 60 || plane.position.y > 35 ||
-                        plane.position.y < -5) {
+                    if (Math.abs(plane.position.x) > 65 || Math.abs(plane.position.z) > 65 || plane.position.y > 38 ||
+                        plane.position.y < -6) {
                         this.removePlane(i);
                     }
                 }
 
-                // Puntuación por tiempo
                 if (Math.floor(this.gameTime) > Math.floor(this.gameTime - delta)) {
                     this.score += 10;
                 }
 
-                // Actualizar explosiones
                 this.updateExplosions(delta);
 
-                // Actualizar efectos de impacto en barco
                 for (let i = this.hitEffects.length - 1; i >= 0; i--) {
                     this.hitEffects[i].timer -= delta;
-                    if (this.hitEffects[i].timer <= 0) {
-                        this.hitEffects.splice(i, 1);
-                    }
+                    if (this.hitEffects[i].timer <= 0) this.hitEffects.splice(i, 1);
                 }
 
-                // Actualizar océano
                 this.updateOcean(delta);
-
-                // Actualizar HUD
                 this.updateHUD();
-
-                // Aplicar shake de cámara por impactos
-                const totalShake = this.hitEffects.reduce((sum, e) => sum + e.intensity * (e.timer / 0.5), 0);
-                const shakeX = (Math.random() - 0.5) * totalShake * 0.5;
-                const shakeY = (Math.random() - 0.5) * totalShake * 0.3;
-                this.camera.position.set(shakeX, 3 + shakeY, 0);
             }
 
             destroyPlane(index) {
                 const plane = this.planes[index];
                 plane.alive = false;
-                this.createExplosion(plane.group.position.clone(), 0.7);
+                this.createExplosion(plane.group.position.clone(), 0.65);
                 this.scene.remove(plane.group);
                 const meshIdx = this.planeMeshes.indexOf(plane);
                 if (meshIdx > -1) this.planeMeshes.splice(meshIdx, 1);
@@ -1401,12 +1355,11 @@
                 for (let i = this.explosionParticles.length - 1; i >= 0; i--) {
                     const explosion = this.explosionParticles[i];
                     explosion.age += delta;
-
                     for (let j = explosion.particles.length - 1; j >= 0; j--) {
                         const p = explosion.particles[j];
                         if (p.isLight) {
                             p.age += delta;
-                            p.intensity = 5 * (1 - p.age / p.life);
+                            p.intensity = 4 * (1 - p.age / p.life);
                             if (p.age >= p.life) {
                                 this.scene.remove(p);
                                 explosion.particles.splice(j, 1);
@@ -1414,22 +1367,17 @@
                         } else {
                             p.age += delta;
                             p.position.add(p.velocity.clone().multiplyScalar(delta));
-                            p.velocity.y += 2 * delta; // Gravedad
+                            p.velocity.y += 1.5 * delta;
                             p.material.opacity = 1 - p.age / p.life;
                             p.material.transparent = true;
-                            const scale = 1 - p.age / p.life;
-                            p.scale.setScalar(Math.max(0.1, scale));
-
+                            p.scale.setScalar(Math.max(0.08, 1 - p.age / p.life));
                             if (p.age >= p.life) {
                                 this.scene.remove(p);
                                 explosion.particles.splice(j, 1);
                             }
                         }
                     }
-
-                    if (explosion.particles.length === 0) {
-                        this.explosionParticles.splice(i, 1);
-                    }
+                    if (explosion.particles.length === 0) this.explosionParticles.splice(i, 1);
                 }
             }
 
@@ -1437,33 +1385,21 @@
                 if (!this.ocean || !this.oceanVertices) return;
                 const positions = this.ocean.geometry.attributes.position.array;
                 const time = performance.now() * 0.001;
-
                 for (let i = 0; i < positions.length; i += 3) {
                     const x = this.oceanVertices[i];
                     const y = this.oceanVertices[i + 1];
-                    positions[i + 2] = Math.sin(x * 0.3 + time) * Math.cos(y * 0.3 + time * 0.7) * 0.8 +
-                        Math.sin(x * 0.15 + time * 1.3) * 0.4;
+                    positions[i + 2] = Math.sin(x * 0.25 + time) * Math.cos(y * 0.25 + time * 0.7) * 0.7 +
+                        Math.sin(x * 0.12 + time * 1.2) * 0.35;
                 }
                 this.ocean.geometry.attributes.position.needsUpdate = true;
             }
 
             animate() {
                 requestAnimationFrame(() => this.animate());
-
                 const now = performance.now();
                 const delta = Math.min((now - this.lastTime) / 1000, 0.1);
                 this.lastTime = now;
-
                 this.update(delta);
-
-                // Actualizar cámara para seguir torreta
-                if (this.gameRunning || this.planes.length > 0) {
-                    const camTarget = new THREE.Vector3(0, 2.5, 5);
-                    camTarget.applyQuaternion(this.turretGroup.quaternion);
-                    camTarget.add(this.turretGroup.position);
-                    this.camera.lookAt(camTarget.x, camTarget.y + 1, camTarget.z - 8);
-                }
-
                 this.renderer.render(this.scene, this.camera);
             }
         }
@@ -1472,27 +1408,19 @@
         const game = new MidwayGame();
         game.init();
 
-        // Service Worker para PWA
         if ('serviceWorker' in navigator) {
             const swCode = `
-            self.addEventListener('install', (e) => {
-              self.skipWaiting();
-            });
-            self.addEventListener('activate', (e) => {
-              e.waitUntil(clients.claim());
-            });
-            self.addEventListener('fetch', (e) => {
-              e.respondWith(fetch(e.request));
-            });
+            self.addEventListener('install', (e) => { self.skipWaiting(); });
+            self.addEventListener('activate', (e) => { e.waitUntil(clients.claim()); });
+            self.addEventListener('fetch', (e) => { e.respondWith(fetch(e.request)); });
           `;
             const blob = new Blob([swCode], { type: 'application/javascript' });
-            const swUrl = URL.createObjectURL(blob);
-            navigator.serviceWorker.register(swUrl).catch(() => {});
+            navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
         }
 
-        console.log('⚓ Batalla de Midway - Artillero AA listo');
-        console.log('🎯 Apunta con el giroscopio, toca para disparar');
-        console.log('💥 ¡Defiende el buque!');
+        console.log('⚓ Batalla de Midway v2 - Artillero AA');
+        console.log('📱 Móvil en HORIZONTAL | Gamma = giro torreta | Beta = elevación');
+        console.log('⚖️ Inclina laterales para girar 360° | 📐 Cabecea para elevar cañones');
     </script>
 </body>
 </html>
