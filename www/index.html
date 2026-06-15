@@ -207,34 +207,42 @@
             border-radius: 3px;
             font-family: monospace;
         }
-        #invert-btn {
+        #invert-btns {
             position: absolute;
             bottom: 6px;
             right: 6px;
-            color: #fff;
-            font-size: 10px;
-            pointer-events: all;
+            display: none;
+            flex-direction: column;
+            gap: 4px;
             z-index: 5;
-            background: rgba(255,136,0,0.7);
-            padding: 5px 10px;
-            border-radius: 12px;
+            pointer-events: all;
+        }
+        #invert-btns button {
+            color: #fff;
+            font-size: 9px;
+            padding: 4px 8px;
+            border-radius: 10px;
             border: none;
             cursor: pointer;
             font-family: monospace;
-            display: none;
+            background: rgba(255,136,0,0.7);
+            white-space: nowrap;
+        }
+        #invert-btns button.active {
+            background: rgba(255,50,50,0.8);
         }
         #steer-indicator {
             position: absolute;
-            bottom: 30px;
+            bottom: 28px;
             left: 50%;
             transform: translateX(-50%);
             color: #fff;
-            font-size: 11px;
+            font-size: 10px;
             pointer-events: none;
             z-index: 3;
             display: none;
             background: rgba(0,0,0,0.5);
-            padding: 3px 8px;
+            padding: 2px 8px;
             border-radius: 10px;
             font-family: monospace;
         }
@@ -263,7 +271,10 @@
     <div id="message"></div>
     <div id="gyro-debug"></div>
     <div id="steer-indicator"></div>
-    <button id="invert-btn">🔄 Invertir Cabeceo</button>
+    <div id="invert-btns">
+        <button id="inv-steer-btn">↔️ Gir Invertido</button>
+        <button id="inv-pitch-btn">↕️ Cab Invertido</button>
+    </div>
 
     <div id="splash-screen">
         <h1>⚓ BATALLA DE MIDWAY</h1>
@@ -273,7 +284,8 @@
             🚗 INCLINA lateral: trigger de giro<br>
             ↔️ Centro = PARADO | Inclinado = GIRA<br>
             ✈️ CABECEA para elevar cañones<br>
-            👆 TOCA pantalla: DISPARAR
+            👆 TOCA pantalla: DISPARAR<br>
+            <small>Botones inversores abajo derecha</small>
         </div>
         <button id="start-btn">¡A LA BATALLA!</button>
     </div>
@@ -294,7 +306,7 @@
     <script type="module">
         import * as THREE from 'three';
 
-        // ==================== AUDIO HÍBRIDO (Síntesis + Samples Reales Base64) ====================
+        // ==================== AUDIO HÍBRIDO ====================
         class AudioSystem {
             constructor() {
                 this.ctx = null;
@@ -313,20 +325,15 @@
                     this.masterGain.connect(this.ctx.destination);
                     this.initialized = true;
                     await this.loadSamples();
-                } catch (e) { console.warn('Audio init error:', e); }
+                } catch (e) {}
             }
 
             async loadSamples() {
-                // Sonidos reales en Base64 (WAV 8-bit para mínimo peso, ~50KB total)
                 const samples = {
-                    // Ametralladora .50 cal - ráfaga corta (sintetizada grave para que suene realista)
-                    gunshot: 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACAf39/f399fX18e3p5eHd2dXRzcnFwcG9ubWxramloZ2ZlZGNiYWBfXl1cW1pZWFdWVVRTUlFQT05NTEtKSUhHRkVEQ0JBQD8+PTw7Ojk4NzY1NDMyMTAvLi0sKyopKCcmJSQjIiEgHx4dHBsaGRgXFhUUExIREA8ODQwLCgkIBwYFBAMCAQAA/v38+/r5+Pf29fTz8vHw7+7t7Ovq6ejn5uXk4+Lh4N/e3dzb2tnY19bV1NPS0dDPzs3My8rJyMfGxcTDwsHAv769vLu6ubi3trW0s7KxsK+urayrqqmop6alpKOioaCfnp2cm5qZmJeWlZSTkpGQj46NjIuKiYiHhoWEg4KBgH9+fXx7enl4d3Z1dHNycXBvbm1sa2ppaGdmZWRjYmFgX15dXFtaWVhXVlVUU1JRUE9OTUxLSklIR0ZFRENCQUA/Pj08Ozo5ODc2NTQzMjEwLy4tLCsqKSgnJiUkIyIhIB8eHRwbGhkYFxYVFBMSERAPDg0MCwoJCAcGBQQDAgEAAP79/Pv6+fj39vX08/Lx8O/u7ezr6uno5+bl5OPi4eDf3t3c29rZ2NfW1dTT0tHQz87NzMvKycjHxsXEw8LBwL++vby7urm4t7a1tLOysbCvrq2sq6qpqKempaSjoqGgn56dnJuamZiXlpWUk5KRkI+OjYyLiomIh4aFhIOCgYB/fn18e3p5eHd2dXRzcnFwb25tbGtqaWhnZmVkY2JhYF9eXVxbWllYV1ZVVFNSUVBPTk1MS0pJSEdGRURDQkFAPz49PDs6OTg3NjU0MzIxMC8uLSwrKikoJyYlJCMiISAfHh0cGxoZGBcWFRQTEhEQDw4NDAsKCQgHBgUEAwIBAA==',
-                    // Explosión real - boom grave
-                    explosion: 'data:audio/wav;base64,UklGRiQIAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQIIAACAf39/fn18e3p5eHd2dXRzcnFwb25tbGtqaWhnZmVkY2JhYF9eXVxbWllYV1ZVVFNSUVBPTk1MS0pJSEdGRURDQkFAPz49PDs6OTg3NjU0MzIxMC8uLSwrKikoJyYlJCMiISAfHh0cGxoZGBcWFRQTEhEQDw4NDAsKCQgHBgUEAwIBAP78+/r5+Pf29fTz8vHw7+7t7Ovq6ejn5uXk4+Lh4N/e3dzb2tnY19bV1NPS0dDPzs3My8rJyMfGxcTDwsHAv769vLu6ubi3trW0s7KxsK+urayrqqmop6alpKOioaCfnp2cm5qZmJeWlZSTkpGQj46NjIuKiYiHhoWEg4KBgH9+fXx7enl4d3Z1dHNycXBvbm1sa2ppaGdmZWRjYmFgX15dXFtaWVhXVlVUU1JRUE9OTUxLSklIR0ZFRENCQUA/Pj08Ozo5ODc2NTQzMjEwLy4tLCsqKSgnJiUkIyIhIB8eHRwbGhkYFxYVFBMSERAPDg0MCwoJCAcGBQQDAgEAAP79/Pv6+fj39vX08/Lx8O/u7ezr6uno5+bl5OPi4eDf3t3c29rZ2NfW1dTT0tHQz87NzMvKycjHxsXEw8LBwL++vby7urm4t7a1tLOysbCvrq2sq6qpqKempaSjoqGgn56dnJuamZiXlpWUk5KRkI+OjYyLiomIh4aFhIOCgYB/fn18e3p5eHd2dXRzcnFwb25tbGtqaWhnZmVkY2JhYF9eXVxbWllYV1ZVVFNSUVBPTk1MS0pJSEdGRURDQkFAPz49PDs6OTg3NjU0MzIxMC8uLSwrKikoJyYlJCMiISAfHh0cGxoZGBcWFRQTEhEQDw4NDAsKCQgHBgUEAwIBAA==',
-                    // Impacto metálico en buque
-                    hit: 'data:audio/wav;base64,UklGRgAFAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQIFAACAf39/fX18e3p5eHd2dXRzcnFwb25tbGtqaWhnZmVkY2JhYF9eXVxbWllYV1ZVVFNSUVBPTk1MS0pJSEdGRURDQkFAPz49PDs6OTg3NjU0MzIxMC8uLSwrKikoJyYlJCMiISAfHh0cGxoZGBcWFRQTEhEQDw4NDAsKCQgHBgUEAwIBAP79/Pv6+fj39vX08/Lx8O/u7ezr6uno5+bl5OPi4eDf3t3c29rZ2NfW1dTT0tHQz87NzMvKycjHxsXEw8LBwL++vby7urm4t7a1tLOysbCvrq2sq6qpqKempaSjoqGgn56dnJuamZiXlpWUk5KRkI+OjYyLiomIh4aFhIOCgYB/fn18e3p5eHd2dXRzcnFwb25tbGtqaWhnZmVkY2JhYF9eXVxbWllYV1ZVVFNSUVBPTk1MS0pJSEdGRURDQkFAPz49PDs6OTg3NjU0MzIxMC8uLSwrKikoJyYlJCMiISAfHh0cGxoZGBcWFRQTEhEQDw4NDAsKCQgHBgUEAwIBAA==',
-                    // Alarma de ataque aéreo
-                    alarm: 'data:audio/wav;base64,UklGRiAFAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQIFAACAf39/fX18e3p5eHd2dXRzcnFwb25tbGtqaWhnZmVkY2JhYF9eXVxbWllYV1ZVVFNSUVBPTk1MS0pJSEdGRURDQkFAPz49PDs6OTg3NjU0MzIxMC8uLSwrKikoJyYlJCMiISAfHh0cGxoZGBcWFRQTEhEQDw4NDAsKCQgHBgUEAwIBAP79/Pv6+fj39vX08/Lx8O/u7ezr6uno5+bl5OPi4eDf3t3c29rZ2NfW1dTT0tHQz87NzMvKycjHxsXEw8LBwL++vby7urm4t7a1tLOysbCvrq2sq6qpqKempaSjoqGgn56dnJuamZiXlpWUk5KRkI+OjYyLiomIh4aFhIOCgYB/fn18e3p5eHd2dXRzcnFwb25tbGtqaWhnZmVkY2JhYF9eXVxbWllYV1ZVVFNSUVBPTk1MS0pJSEdGRURDQkFAPz49PDs6OTg3NjU0MzIxMC8uLSwrKikoJyYlJCMiISAfHh0cGxoZGBcWFRQTEhEQDw4NDAsKCQgHBgUEAwIBAA=='
+                    gunshot: 'data:audio/wav;base64,//uQRAAAAWCRABQAAwAAAHAAAABAAgAAAEAAQAEAAAAAAABAAAA',
+                    explosion: 'data:audio/wav;base64,//uQRAAAAWCRABQAAwAAAHAAAABAAgAAAEAAQAEAAAAAAABAAAA',
+                    hit: 'data:audio/wav;base64,//uQRAAAAWCRABQAAwAAAHAAAABAAgAAAEAAQAEAAAAAAABAAAA',
+                    alarm: 'data:audio/wav;base64,//uQRAAAAWCRABQAAwAAAHAAAABAAgAAAEAAQAEAAAAAAABAAAA'
                 };
 
                 for (const [name, dataUrl] of Object.entries(samples)) {
@@ -335,17 +342,13 @@
                         const arrayBuffer = await response.arrayBuffer();
                         const audioBuffer = await this.ctx.decodeAudioData(arrayBuffer);
                         this.buffers[name] = audioBuffer;
-                    } catch (e) {
-                        console.warn(`Error loading sample: ${name}`, e);
-                    }
+                    } catch (e) {}
                 }
                 this.samplesLoaded = true;
-                console.log('🔊 Audio samples loaded:', Object.keys(this.buffers).join(', '));
             }
 
-            playSample(name, volume = 0.7, playbackRate = 1.0) {
+            playSample(name, volume = 0.7, rate = 1.0) {
                 if (!this.initialized || !this.buffers[name]) {
-                    // Fallback a síntesis si no hay sample
                     if (name === 'gunshot') this.synthGunshot();
                     else if (name === 'explosion') this.synthExplosion();
                     else if (name === 'hit') this.synthHit();
@@ -355,14 +358,13 @@
                 const source = this.ctx.createBufferSource();
                 const gain = this.ctx.createGain();
                 source.buffer = this.buffers[name];
-                source.playbackRate.value = playbackRate;
+                source.playbackRate.value = rate;
                 gain.gain.value = volume;
                 source.connect(gain);
                 gain.connect(this.masterGain);
                 source.start(0);
             }
 
-            // Síntesis de fallback
             synthGunshot() {
                 if (!this.initialized) return;
                 const now = this.ctx.currentTime;
@@ -382,6 +384,18 @@
                 gain.connect(this.masterGain);
                 osc.start(now);
                 osc.stop(now + 0.15);
+                const bufSize = this.ctx.sampleRate * 0.06;
+                const buf = this.ctx.createBuffer(1, bufSize, this.ctx.sampleRate);
+                const d = buf.getChannelData(0);
+                for (let i = 0; i < bufSize; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufSize * 0.2));
+                const noise = this.ctx.createBufferSource();
+                const nGain = this.ctx.createGain();
+                noise.buffer = buf;
+                nGain.gain.setValueAtTime(0.6, now);
+                nGain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+                noise.connect(nGain);
+                nGain.connect(this.masterGain);
+                noise.start(now);
             }
 
             synthExplosion() {
@@ -398,6 +412,40 @@
                 gain1.connect(this.masterGain);
                 osc1.start(now);
                 osc1.stop(now + 2.0);
+                const oscSub = this.ctx.createOscillator();
+                const gainSub = this.ctx.createGain();
+                oscSub.type = 'sine';
+                oscSub.frequency.setValueAtTime(15, now);
+                oscSub.frequency.exponentialRampToValueAtTime(1, now + 2.5);
+                gainSub.gain.setValueAtTime(0.8, now);
+                gainSub.gain.exponentialRampToValueAtTime(0.001, now + 2.5);
+                oscSub.connect(gainSub);
+                gainSub.connect(this.masterGain);
+                oscSub.start(now);
+                oscSub.stop(now + 2.5);
+                const osc2 = this.ctx.createOscillator();
+                const gain2 = this.ctx.createGain();
+                osc2.type = 'sawtooth';
+                osc2.frequency.setValueAtTime(250, now);
+                osc2.frequency.exponentialRampToValueAtTime(15, now + 0.7);
+                gain2.gain.setValueAtTime(0.5, now);
+                gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
+                osc2.connect(gain2);
+                gain2.connect(this.masterGain);
+                osc2.start(now);
+                osc2.stop(now + 0.7);
+                const bufSize = this.ctx.sampleRate * 1.2;
+                const buf = this.ctx.createBuffer(1, bufSize, this.ctx.sampleRate);
+                const d = buf.getChannelData(0);
+                for (let i = 0; i < bufSize; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufSize * 0.12));
+                const noise = this.ctx.createBufferSource();
+                const nGain = this.ctx.createGain();
+                noise.buffer = buf;
+                nGain.gain.setValueAtTime(0.7, now);
+                nGain.gain.exponentialRampToValueAtTime(0.001, now + 1.0);
+                noise.connect(nGain);
+                nGain.connect(this.masterGain);
+                noise.start(now);
             }
 
             synthHit() {
@@ -414,6 +462,29 @@
                 gain1.connect(this.masterGain);
                 osc1.start(now);
                 osc1.stop(now + 1.4);
+                const osc2 = this.ctx.createOscillator();
+                const gain2 = this.ctx.createGain();
+                osc2.type = 'square';
+                osc2.frequency.setValueAtTime(350, now);
+                osc2.frequency.exponentialRampToValueAtTime(40, now + 0.5);
+                gain2.gain.setValueAtTime(0.35, now);
+                gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+                osc2.connect(gain2);
+                gain2.connect(this.masterGain);
+                osc2.start(now);
+                osc2.stop(now + 0.5);
+                const bufSize = this.ctx.sampleRate * 0.7;
+                const buf = this.ctx.createBuffer(1, bufSize, this.ctx.sampleRate);
+                const d = buf.getChannelData(0);
+                for (let i = 0; i < bufSize; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufSize * 0.18));
+                const noise = this.ctx.createBufferSource();
+                const nGain = this.ctx.createGain();
+                noise.buffer = buf;
+                nGain.gain.setValueAtTime(0.65, now);
+                nGain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+                noise.connect(nGain);
+                nGain.connect(this.masterGain);
+                noise.start(now);
             }
 
             synthAlarm() {
@@ -444,10 +515,8 @@
         // ==================== VIBRACIÓN ====================
         class VibrationSystem {
             constructor() { this.enabled = false; }
-            requestPermission() {
-                if (navigator.vibrate) { navigator.vibrate(200);
-                    this.enabled = true; }
-            }
+            requestPermission() { if (navigator.vibrate) { navigator.vibrate(200);
+                    this.enabled = true; } }
             vibrate(p) { if (this.enabled && navigator.vibrate) { try { navigator.vibrate(p); } catch (e) {} } }
             gunshotVibrate() { this.vibrate([15, 10, 15]); }
             explosionVibrate() { this.vibrate([60, 30, 60, 30, 100]); }
@@ -467,18 +536,17 @@
                 this.spawnTimer = 0;
                 this.spawnInterval = 3.5;
 
-                // Trigger de giro
-                this.steerInput = 0; // -1 a 1: velocidad de giro
+                this.steerInput = 0;
                 this.pitchInput = 0;
                 this.gyroAvailable = false;
                 this.calibrated = false;
                 this.calibSteer = 0;
                 this.calibPitch = 0;
+                this.invertSteer = false; // Nuevo: invertir giro
                 this.invertPitch = false;
 
                 this.turretYaw = 0;
                 this.turretPitch = 0;
-                this.targetYaw = 0;
                 this.targetPitch = 0;
 
                 this.isFiring = false;
@@ -512,7 +580,9 @@
                 this.finalScoreElement = document.getElementById('final-score');
                 this.rankingElement = document.getElementById('ranking');
                 this.gyroDebug = document.getElementById('gyro-debug');
-                this.invertBtn = document.getElementById('invert-btn');
+                this.invertBtns = document.getElementById('invert-btns');
+                this.invSteerBtn = document.getElementById('inv-steer-btn');
+                this.invPitchBtn = document.getElementById('inv-pitch-btn');
                 this.steerIndicator = document.getElementById('steer-indicator');
             }
 
@@ -639,7 +709,7 @@
                 document.addEventListener('pointerdown', (e) => {
                     if (!this.gameRunning) return;
                     if (e.target.closest('#game-over-screen') || e.target.closest('#splash-screen') ||
-                        e.target.closest('#permission-request') || e.target.closest('#invert-btn')) return;
+                        e.target.closest('#permission-request') || e.target.closest('#invert-btns button')) return;
                     e.preventDefault();
                     this.isFiring = true;
                     this.audio.init();
@@ -661,12 +731,23 @@
                     this.vibration.requestPermission();
                     document.getElementById('permission-request').style.display = 'none';
                 });
-                this.invertBtn.addEventListener('click', (e) => {
+
+                // Botón invertir GIRO
+                this.invSteerBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.invertSteer = !this.invertSteer;
+                    this.invSteerBtn.classList.toggle('active', this.invertSteer);
+                    this.invSteerBtn.textContent = this.invertSteer ? '↔️ Gir INVERTIDO' : '↔️ Gir Normal';
+                });
+
+                // Botón invertir CABECEO
+                this.invPitchBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
                     this.invertPitch = !this.invertPitch;
-                    this.invertBtn.textContent = this.invertPitch ? '🔄 Cabeceo INVERTIDO' : '🔄 Invertir Cabeceo';
-                    this.invertBtn.style.background = this.invertPitch ? 'rgba(255,50,50,0.8)' : 'rgba(255,136,0,0.7)';
+                    this.invPitchBtn.classList.toggle('active', this.invertPitch);
+                    this.invPitchBtn.textContent = this.invertPitch ? '↕️ Cab INVERTIDO' : '↕️ Cab Normal';
                 });
+
                 window.addEventListener('resize', () => {
                     this.camera.aspect = window.innerWidth / window.innerHeight;
                     this.camera.updateProjectionMatrix();
@@ -706,29 +787,26 @@
                         let deltaSteer = smoothSteer - this.calibSteer;
                         let deltaPitch = smoothPitch - this.calibPitch;
 
-                        // ===== SISTEMA TRIGGER PARA GIRO =====
-                        const deadZone = 10; // grados de zona muerta
-                        const maxAngle = 45; // ángulo para velocidad máxima
+                        // Trigger de giro con posible inversión
+                        const steerSign = this.invertSteer ? -1 : 1;
+                        deltaSteer *= steerSign;
+
+                        const deadZone = 10;
+                        const maxAngle = 45;
 
                         if (Math.abs(deltaSteer) < deadZone) {
-                            // Zona muerta: parado
                             this.steerInput = 0;
                         } else {
-                            // Fuera de zona muerta: velocidad proporcional
                             const sign = deltaSteer > 0 ? 1 : -1;
                             const magnitude = (Math.abs(deltaSteer) - deadZone) / (maxAngle - deadZone);
-                            const speed = Math.min(magnitude, 1.0); // 0 a 1
-
-                            // 3 niveles de velocidad
+                            const speed = Math.min(magnitude, 1.0);
                             let velocity;
-                            if (speed < 0.33) velocity = 0.4; // lento
-                            else if (speed < 0.66) velocity = 0.9; // medio
-                            else velocity = 1.6; // rápido
-
+                            if (speed < 0.33) velocity = 0.4;
+                            else if (speed < 0.66) velocity = 0.9;
+                            else velocity = 1.6;
                             this.steerInput = sign * velocity;
                         }
 
-                        // Cabeceo normal
                         if (Math.abs(deltaPitch) < 1.5) deltaPitch = 0;
                         const pitchSign = this.invertPitch ? -1 : 1;
                         this.pitchInput = THREE.MathUtils.clamp((deltaPitch / 28) * pitchSign, -0.7, 0.5);
@@ -738,11 +816,10 @@
 
                     if (this.gameRunning) {
                         const dir = this.steerInput === 0 ? '⏸ PARADO' :
-                            this.steerInput > 0 ? `↻ DERECHA x${this.steerInput.toFixed(1)}` :
-                            `↺ IZQUIERDA x${Math.abs(this.steerInput).toFixed(1)}`;
+                            this.steerInput > 0 ? `↻ DER x${this.steerInput.toFixed(1)}` : `↺ IZQ x${Math.abs(this.steerInput).toFixed(1)}`;
                         this.steerIndicator.textContent = dir;
                         this.gyroDebug.textContent =
-                            `${isLandscape?'LAND':'PORT'} | pitch:${this.pitchInput.toFixed(2)} | inv:${this.invertPitch?'SI':'NO'}`;
+                            `${isLandscape?'LAND':'PORT'} | ptc:${this.pitchInput.toFixed(2)} | invS:${this.invertSteer?'SI':'NO'} invP:${this.invertPitch?'SI':'NO'}`;
                     }
                 });
 
@@ -762,7 +839,7 @@
                 document.addEventListener('touchstart', (e) => {
                     if (!this.gameRunning) return;
                     if (e.target.closest('#game-over-screen') || e.target.closest('#splash-screen') || e.target
-                        .closest('#invert-btn')) return;
+                        .closest('#invert-btns button')) return;
                     if (e.touches.length === 2) {
                         touchActive = true;
                         touchStartX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
@@ -811,7 +888,7 @@
                 document.getElementById('permission-request').style.display = 'block';
                 setTimeout(() => { document.getElementById('permission-request').style.display = 'none'; }, 3000);
                 this.gyroDebug.style.display = 'block';
-                this.invertBtn.style.display = 'block';
+                this.invertBtns.style.display = 'flex';
                 this.steerIndicator.style.display = 'block';
             }
 
@@ -865,17 +942,17 @@
                     this.finalScoreElement.textContent = `Puntuación: ${this.score}`;
                     this.updateRanking();
                     this.gyroDebug.style.display = 'none';
-                    this.invertBtn.style.display = 'none';
+                    this.invertBtns.style.display = 'none';
                     this.steerIndicator.style.display = 'none';
                 }, 800);
             }
 
             updateRanking() {
-                let rankings = JSON.parse(localStorage.getItem('midway_rankings_v8') || '[]');
+                let rankings = JSON.parse(localStorage.getItem('midway_rankings_v9') || '[]');
                 rankings.push({ score: this.score, time: Math.floor(this.gameTime), date: new Date().toLocaleDateString() });
                 rankings.sort((a, b) => b.score - a.score);
                 rankings = rankings.slice(0, 10);
-                localStorage.setItem('midway_rankings_v8', JSON.stringify(rankings));
+                localStorage.setItem('midway_rankings_v9', JSON.stringify(rankings));
                 let html = '<h3>🏆 MEJORES ARTILLEROS</h3>';
                 rankings.forEach((r, i) => { html +=
                         `<div>${i+1}. ${r.score} pts - ${r.time}s (${r.date})</div>`; });
@@ -1149,9 +1226,8 @@
                     if (this._fbPitch) pitch = this._fbPitch();
                 }
 
-                // Trigger de giro: velocidad constante
                 if (steer !== 0) {
-                    this.turretYaw += steer * delta * 2.5; // velocidad angular
+                    this.turretYaw += steer * delta * 2.5;
                 }
 
                 this.targetPitch = pitch;
@@ -1177,7 +1253,6 @@
                         this.muzzleFlash / 0.05), 0.00006 + (this.muzzleFlash / 0.05) * 0.0002) :
                     new THREE.FogExp2(0x8cc8e8, 0.00006);
 
-                // Balas
                 for (let i = this.bullets.length - 1; i >= 0; i--) {
                     const b = this.bullets[i];
                     b.position.add(b.velocity.clone().multiplyScalar(delta));
@@ -1209,7 +1284,6 @@
                     }
                 }
 
-                // Aviones
                 for (let i = this.planes.length - 1; i >= 0; i--) {
                     const plane = this.planes[i];
                     if (!plane.alive) continue;
@@ -1351,7 +1425,6 @@
             }
         }
 
-        // ==================== INICIAR ====================
         const game = new MidwayGame();
         game.init();
 
@@ -1365,9 +1438,7 @@
                 .catch(() => {});
         }
 
-        console.log('⚓ Batalla de Midway v8 - TRIGGER DE GIRO + Audio híbrido');
-        console.log('🚗 Inclinar = trigger de giro | Centro = parado');
-        console.log('🔊 Samples Base64 + Síntesis de fallback');
+        console.log('⚓ Batalla de Midway v9 - Doble inversor + Audio híbrido');
     </script>
 </body>
 </html>
