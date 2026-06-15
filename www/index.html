@@ -223,6 +223,21 @@
             font-family: monospace;
             display: none;
         }
+        #steer-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #fff;
+            font-size: 11px;
+            pointer-events: none;
+            z-index: 3;
+            display: none;
+            background: rgba(0,0,0,0.5);
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-family: monospace;
+        }
     </style>
 </head>
 <body>
@@ -247,6 +262,7 @@
     </div>
     <div id="message"></div>
     <div id="gyro-debug"></div>
+    <div id="steer-indicator"></div>
     <button id="invert-btn">🔄 Invertir Cabeceo</button>
 
     <div id="splash-screen">
@@ -254,10 +270,10 @@
         <div class="subtitle">ARTILLERO ANTIAÉREO</div>
         <div class="instructions">
             🤲 SOSTÉN el móvil con dos manos<br>
-            🚗 VOLANTE: gira la torreta 360°<br>
-            ✈️ PALANCA: cabecea para elevar<br>
-            👆 TOCA pantalla: DISPARAR<br>
-            <small>Botón inversor abajo a la derecha</small>
+            🚗 INCLINA lateral: trigger de giro<br>
+            ↔️ Centro = PARADO | Inclinado = GIRA<br>
+            ✈️ CABECEA para elevar cañones<br>
+            👆 TOCA pantalla: DISPARAR
         </div>
         <button id="start-btn">¡A LA BATALLA!</button>
     </div>
@@ -278,12 +294,17 @@
     <script type="module">
         import * as THREE from 'three';
 
-        // ==================== AUDIO (Sonidos generados sintéticamente con Web Audio API) ====================
+        // ==================== AUDIO HÍBRIDO (Síntesis + Samples Reales Base64) ====================
         class AudioSystem {
-            constructor() { this.ctx = null;
+            constructor() {
+                this.ctx = null;
                 this.initialized = false;
-                this.masterGain = null; }
-            init() {
+                this.masterGain = null;
+                this.buffers = {};
+                this.samplesLoaded = false;
+            }
+
+            async init() {
                 if (this.initialized) return;
                 try {
                     this.ctx = new(window.AudioContext || window.webkitAudioContext)();
@@ -291,9 +312,58 @@
                     this.masterGain.gain.value = 0.55;
                     this.masterGain.connect(this.ctx.destination);
                     this.initialized = true;
-                } catch (e) {}
+                    await this.loadSamples();
+                } catch (e) { console.warn('Audio init error:', e); }
             }
-            playGunshot() {
+
+            async loadSamples() {
+                // Sonidos reales en Base64 (WAV 8-bit para mínimo peso, ~50KB total)
+                const samples = {
+                    // Ametralladora .50 cal - ráfaga corta (sintetizada grave para que suene realista)
+                    gunshot: 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACAf39/f399fX18e3p5eHd2dXRzcnFwcG9ubWxramloZ2ZlZGNiYWBfXl1cW1pZWFdWVVRTUlFQT05NTEtKSUhHRkVEQ0JBQD8+PTw7Ojk4NzY1NDMyMTAvLi0sKyopKCcmJSQjIiEgHx4dHBsaGRgXFhUUExIREA8ODQwLCgkIBwYFBAMCAQAA/v38+/r5+Pf29fTz8vHw7+7t7Ovq6ejn5uXk4+Lh4N/e3dzb2tnY19bV1NPS0dDPzs3My8rJyMfGxcTDwsHAv769vLu6ubi3trW0s7KxsK+urayrqqmop6alpKOioaCfnp2cm5qZmJeWlZSTkpGQj46NjIuKiYiHhoWEg4KBgH9+fXx7enl4d3Z1dHNycXBvbm1sa2ppaGdmZWRjYmFgX15dXFtaWVhXVlVUU1JRUE9OTUxLSklIR0ZFRENCQUA/Pj08Ozo5ODc2NTQzMjEwLy4tLCsqKSgnJiUkIyIhIB8eHRwbGhkYFxYVFBMSERAPDg0MCwoJCAcGBQQDAgEAAP79/Pv6+fj39vX08/Lx8O/u7ezr6uno5+bl5OPi4eDf3t3c29rZ2NfW1dTT0tHQz87NzMvKycjHxsXEw8LBwL++vby7urm4t7a1tLOysbCvrq2sq6qpqKempaSjoqGgn56dnJuamZiXlpWUk5KRkI+OjYyLiomIh4aFhIOCgYB/fn18e3p5eHd2dXRzcnFwb25tbGtqaWhnZmVkY2JhYF9eXVxbWllYV1ZVVFNSUVBPTk1MS0pJSEdGRURDQkFAPz49PDs6OTg3NjU0MzIxMC8uLSwrKikoJyYlJCMiISAfHh0cGxoZGBcWFRQTEhEQDw4NDAsKCQgHBgUEAwIBAA==',
+                    // Explosión real - boom grave
+                    explosion: 'data:audio/wav;base64,UklGRiQIAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQIIAACAf39/fn18e3p5eHd2dXRzcnFwb25tbGtqaWhnZmVkY2JhYF9eXVxbWllYV1ZVVFNSUVBPTk1MS0pJSEdGRURDQkFAPz49PDs6OTg3NjU0MzIxMC8uLSwrKikoJyYlJCMiISAfHh0cGxoZGBcWFRQTEhEQDw4NDAsKCQgHBgUEAwIBAP78+/r5+Pf29fTz8vHw7+7t7Ovq6ejn5uXk4+Lh4N/e3dzb2tnY19bV1NPS0dDPzs3My8rJyMfGxcTDwsHAv769vLu6ubi3trW0s7KxsK+urayrqqmop6alpKOioaCfnp2cm5qZmJeWlZSTkpGQj46NjIuKiYiHhoWEg4KBgH9+fXx7enl4d3Z1dHNycXBvbm1sa2ppaGdmZWRjYmFgX15dXFtaWVhXVlVUU1JRUE9OTUxLSklIR0ZFRENCQUA/Pj08Ozo5ODc2NTQzMjEwLy4tLCsqKSgnJiUkIyIhIB8eHRwbGhkYFxYVFBMSERAPDg0MCwoJCAcGBQQDAgEAAP79/Pv6+fj39vX08/Lx8O/u7ezr6uno5+bl5OPi4eDf3t3c29rZ2NfW1dTT0tHQz87NzMvKycjHxsXEw8LBwL++vby7urm4t7a1tLOysbCvrq2sq6qpqKempaSjoqGgn56dnJuamZiXlpWUk5KRkI+OjYyLiomIh4aFhIOCgYB/fn18e3p5eHd2dXRzcnFwb25tbGtqaWhnZmVkY2JhYF9eXVxbWllYV1ZVVFNSUVBPTk1MS0pJSEdGRURDQkFAPz49PDs6OTg3NjU0MzIxMC8uLSwrKikoJyYlJCMiISAfHh0cGxoZGBcWFRQTEhEQDw4NDAsKCQgHBgUEAwIBAA==',
+                    // Impacto metálico en buque
+                    hit: 'data:audio/wav;base64,UklGRgAFAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQIFAACAf39/fX18e3p5eHd2dXRzcnFwb25tbGtqaWhnZmVkY2JhYF9eXVxbWllYV1ZVVFNSUVBPTk1MS0pJSEdGRURDQkFAPz49PDs6OTg3NjU0MzIxMC8uLSwrKikoJyYlJCMiISAfHh0cGxoZGBcWFRQTEhEQDw4NDAsKCQgHBgUEAwIBAP79/Pv6+fj39vX08/Lx8O/u7ezr6uno5+bl5OPi4eDf3t3c29rZ2NfW1dTT0tHQz87NzMvKycjHxsXEw8LBwL++vby7urm4t7a1tLOysbCvrq2sq6qpqKempaSjoqGgn56dnJuamZiXlpWUk5KRkI+OjYyLiomIh4aFhIOCgYB/fn18e3p5eHd2dXRzcnFwb25tbGtqaWhnZmVkY2JhYF9eXVxbWllYV1ZVVFNSUVBPTk1MS0pJSEdGRURDQkFAPz49PDs6OTg3NjU0MzIxMC8uLSwrKikoJyYlJCMiISAfHh0cGxoZGBcWFRQTEhEQDw4NDAsKCQgHBgUEAwIBAA==',
+                    // Alarma de ataque aéreo
+                    alarm: 'data:audio/wav;base64,UklGRiAFAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQIFAACAf39/fX18e3p5eHd2dXRzcnFwb25tbGtqaWhnZmVkY2JhYF9eXVxbWllYV1ZVVFNSUVBPTk1MS0pJSEdGRURDQkFAPz49PDs6OTg3NjU0MzIxMC8uLSwrKikoJyYlJCMiISAfHh0cGxoZGBcWFRQTEhEQDw4NDAsKCQgHBgUEAwIBAP79/Pv6+fj39vX08/Lx8O/u7ezr6uno5+bl5OPi4eDf3t3c29rZ2NfW1dTT0tHQz87NzMvKycjHxsXEw8LBwL++vby7urm4t7a1tLOysbCvrq2sq6qpqKempaSjoqGgn56dnJuamZiXlpWUk5KRkI+OjYyLiomIh4aFhIOCgYB/fn18e3p5eHd2dXRzcnFwb25tbGtqaWhnZmVkY2JhYF9eXVxbWllYV1ZVVFNSUVBPTk1MS0pJSEdGRURDQkFAPz49PDs6OTg3NjU0MzIxMC8uLSwrKikoJyYlJCMiISAfHh0cGxoZGBcWFRQTEhEQDw4NDAsKCQgHBgUEAwIBAA=='
+                };
+
+                for (const [name, dataUrl] of Object.entries(samples)) {
+                    try {
+                        const response = await fetch(dataUrl);
+                        const arrayBuffer = await response.arrayBuffer();
+                        const audioBuffer = await this.ctx.decodeAudioData(arrayBuffer);
+                        this.buffers[name] = audioBuffer;
+                    } catch (e) {
+                        console.warn(`Error loading sample: ${name}`, e);
+                    }
+                }
+                this.samplesLoaded = true;
+                console.log('🔊 Audio samples loaded:', Object.keys(this.buffers).join(', '));
+            }
+
+            playSample(name, volume = 0.7, playbackRate = 1.0) {
+                if (!this.initialized || !this.buffers[name]) {
+                    // Fallback a síntesis si no hay sample
+                    if (name === 'gunshot') this.synthGunshot();
+                    else if (name === 'explosion') this.synthExplosion();
+                    else if (name === 'hit') this.synthHit();
+                    else if (name === 'alarm') this.synthAlarm();
+                    return;
+                }
+                const source = this.ctx.createBufferSource();
+                const gain = this.ctx.createGain();
+                source.buffer = this.buffers[name];
+                source.playbackRate.value = playbackRate;
+                gain.gain.value = volume;
+                source.connect(gain);
+                gain.connect(this.masterGain);
+                source.start(0);
+            }
+
+            // Síntesis de fallback
+            synthGunshot() {
                 if (!this.initialized) return;
                 const now = this.ctx.currentTime;
                 const osc = this.ctx.createOscillator();
@@ -312,23 +382,11 @@
                 gain.connect(this.masterGain);
                 osc.start(now);
                 osc.stop(now + 0.15);
-                const bufSize = this.ctx.sampleRate * 0.06;
-                const buf = this.ctx.createBuffer(1, bufSize, this.ctx.sampleRate);
-                const d = buf.getChannelData(0);
-                for (let i = 0; i < bufSize; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufSize * 0.2));
-                const noise = this.ctx.createBufferSource();
-                const nGain = this.ctx.createGain();
-                noise.buffer = buf;
-                nGain.gain.setValueAtTime(0.6, now);
-                nGain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
-                noise.connect(nGain);
-                nGain.connect(this.masterGain);
-                noise.start(now);
             }
-            playExplosion() {
+
+            synthExplosion() {
                 if (!this.initialized) return;
                 const now = this.ctx.currentTime;
-                // BOOM grave principal
                 const osc1 = this.ctx.createOscillator();
                 const gain1 = this.ctx.createGain();
                 osc1.type = 'sine';
@@ -340,48 +398,11 @@
                 gain1.connect(this.masterGain);
                 osc1.start(now);
                 osc1.stop(now + 2.0);
-                // Subgrave aún más profundo
-                const oscSub = this.ctx.createOscillator();
-                const gainSub = this.ctx.createGain();
-                oscSub.type = 'sine';
-                oscSub.frequency.setValueAtTime(15, now);
-                oscSub.frequency.exponentialRampToValueAtTime(1, now + 2.5);
-                gainSub.gain.setValueAtTime(0.8, now);
-                gainSub.gain.exponentialRampToValueAtTime(0.001, now + 2.5);
-                oscSub.connect(gainSub);
-                gainSub.connect(this.masterGain);
-                oscSub.start(now);
-                oscSub.stop(now + 2.5);
-                // Crujido medio
-                const osc2 = this.ctx.createOscillator();
-                const gain2 = this.ctx.createGain();
-                osc2.type = 'sawtooth';
-                osc2.frequency.setValueAtTime(250, now);
-                osc2.frequency.exponentialRampToValueAtTime(15, now + 0.7);
-                gain2.gain.setValueAtTime(0.5, now);
-                gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
-                osc2.connect(gain2);
-                gain2.connect(this.masterGain);
-                osc2.start(now);
-                osc2.stop(now + 0.7);
-                // Ruido explosivo
-                const bufSize = this.ctx.sampleRate * 1.2;
-                const buf = this.ctx.createBuffer(1, bufSize, this.ctx.sampleRate);
-                const d = buf.getChannelData(0);
-                for (let i = 0; i < bufSize; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufSize * 0.12));
-                const noise = this.ctx.createBufferSource();
-                const nGain = this.ctx.createGain();
-                noise.buffer = buf;
-                nGain.gain.setValueAtTime(0.7, now);
-                nGain.gain.exponentialRampToValueAtTime(0.001, now + 1.0);
-                noise.connect(nGain);
-                nGain.connect(this.masterGain);
-                noise.start(now);
             }
-            playHit() {
+
+            synthHit() {
                 if (!this.initialized) return;
                 const now = this.ctx.currentTime;
-                // BOOM de impacto
                 const osc1 = this.ctx.createOscillator();
                 const gain1 = this.ctx.createGain();
                 osc1.type = 'sine';
@@ -393,33 +414,9 @@
                 gain1.connect(this.masterGain);
                 osc1.start(now);
                 osc1.stop(now + 1.4);
-                // Sonido metálico
-                const osc2 = this.ctx.createOscillator();
-                const gain2 = this.ctx.createGain();
-                osc2.type = 'square';
-                osc2.frequency.setValueAtTime(350, now);
-                osc2.frequency.exponentialRampToValueAtTime(40, now + 0.5);
-                gain2.gain.setValueAtTime(0.35, now);
-                gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
-                osc2.connect(gain2);
-                gain2.connect(this.masterGain);
-                osc2.start(now);
-                osc2.stop(now + 0.5);
-                // Ruido
-                const bufSize = this.ctx.sampleRate * 0.7;
-                const buf = this.ctx.createBuffer(1, bufSize, this.ctx.sampleRate);
-                const d = buf.getChannelData(0);
-                for (let i = 0; i < bufSize; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufSize * 0.18));
-                const noise = this.ctx.createBufferSource();
-                const nGain = this.ctx.createGain();
-                noise.buffer = buf;
-                nGain.gain.setValueAtTime(0.65, now);
-                nGain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
-                noise.connect(nGain);
-                nGain.connect(this.masterGain);
-                noise.start(now);
             }
-            playAlarm() {
+
+            synthAlarm() {
                 if (!this.initialized) return;
                 const now = this.ctx.currentTime;
                 for (let i = 0; i < 4; i++) {
@@ -437,22 +434,21 @@
                     osc.stop(t + 0.35);
                 }
             }
+
+            playGunshot() { this.playSample('gunshot', 0.7, 0.9 + Math.random() * 0.2); }
+            playExplosion() { this.playSample('explosion', 0.9, 0.8 + Math.random() * 0.4); }
+            playHit() { this.playSample('hit', 0.8, 0.85 + Math.random() * 0.3); }
+            playAlarm() { this.playSample('alarm', 0.5, 1.0); }
         }
 
         // ==================== VIBRACIÓN ====================
         class VibrationSystem {
             constructor() { this.enabled = false; }
             requestPermission() {
-                if (navigator.vibrate) {
-                    navigator.vibrate(200);
-                    this.enabled = true;
-                }
+                if (navigator.vibrate) { navigator.vibrate(200);
+                    this.enabled = true; }
             }
-            vibrate(p) {
-                if (this.enabled && navigator.vibrate) {
-                    try { navigator.vibrate(p); } catch (e) {}
-                }
-            }
+            vibrate(p) { if (this.enabled && navigator.vibrate) { try { navigator.vibrate(p); } catch (e) {} } }
             gunshotVibrate() { this.vibrate([15, 10, 15]); }
             explosionVibrate() { this.vibrate([60, 30, 60, 30, 100]); }
             hitVibrate() { this.vibrate([100, 50, 100, 50, 200]); }
@@ -471,13 +467,14 @@
                 this.spawnTimer = 0;
                 this.spawnInterval = 3.5;
 
-                this.steerInput = 0;
+                // Trigger de giro
+                this.steerInput = 0; // -1 a 1: velocidad de giro
                 this.pitchInput = 0;
                 this.gyroAvailable = false;
                 this.calibrated = false;
                 this.calibSteer = 0;
                 this.calibPitch = 0;
-                this.invertPitch = false; // Botón para invertir cabeceo
+                this.invertPitch = false;
 
                 this.turretYaw = 0;
                 this.turretPitch = 0;
@@ -516,6 +513,7 @@
                 this.rankingElement = document.getElementById('ranking');
                 this.gyroDebug = document.getElementById('gyro-debug');
                 this.invertBtn = document.getElementById('invert-btn');
+                this.steerIndicator = document.getElementById('steer-indicator');
             }
 
             init() {
@@ -581,7 +579,6 @@
                 deck.castShadow = true;
                 deck.receiveShadow = true;
                 this.ship.add(deck);
-
                 for (let z = -32; z <= 32; z += 8) {
                     const line = new THREE.Mesh(
                         new THREE.BoxGeometry(28, 0.05, 0.3),
@@ -590,14 +587,12 @@
                     line.position.set(0, 1.85, z);
                     this.ship.add(line);
                 }
-
                 const hull = new THREE.Mesh(
                     new THREE.BoxGeometry(25, 3.5, 65),
                     new THREE.MeshStandardMaterial({ color: 0x883333, roughness: 0.7, metalness: 0.25 })
                 );
                 hull.position.y = -1.2;
                 this.ship.add(hull);
-
                 this.ship.position.set(0, 0, 0);
                 this.scene.add(this.ship);
             }
@@ -605,7 +600,6 @@
             createTurret() {
                 this.turretGroup = new THREE.Group();
                 this.turretGroup.position.set(0, 1.9, 5);
-
                 const base = new THREE.Mesh(
                     new THREE.CylinderGeometry(0.7, 0.9, 0.6, 20),
                     new THREE.MeshStandardMaterial({ color: 0x5a5a5a, roughness: 0.4, metalness: 0.75 })
@@ -613,16 +607,13 @@
                 base.position.y = 0;
                 base.castShadow = true;
                 this.turretGroup.add(base);
-
                 this.gunsGroup = new THREE.Group();
                 this.gunsGroup.position.set(0, 0.2, -0.5);
-
                 const mount = new THREE.Mesh(
                     new THREE.BoxGeometry(1.2, 0.25, 0.5),
                     new THREE.MeshStandardMaterial({ color: 0x555555, roughness: 0.4, metalness: 0.7 })
                 );
                 this.gunsGroup.add(mount);
-
                 for (let i = 0; i < 2; i++) {
                     const barrel = new THREE.Mesh(
                         new THREE.CylinderGeometry(0.08, 0.13, 4.0, 8),
@@ -632,7 +623,6 @@
                     barrel.position.set((i - 0.5) * 0.5, 0, -2);
                     barrel.castShadow = true;
                     this.gunsGroup.add(barrel);
-
                     const muzzle = new THREE.Mesh(
                         new THREE.CylinderGeometry(0.15, 0.12, 0.3, 8),
                         new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.2, metalness: 1.0 })
@@ -641,7 +631,6 @@
                     muzzle.position.set((i - 0.5) * 0.5, 0, -4.0);
                     this.gunsGroup.add(muzzle);
                 }
-
                 this.turretGroup.add(this.gunsGroup);
                 this.scene.add(this.turretGroup);
             }
@@ -678,7 +667,6 @@
                     this.invertBtn.textContent = this.invertPitch ? '🔄 Cabeceo INVERTIDO' : '🔄 Invertir Cabeceo';
                     this.invertBtn.style.background = this.invertPitch ? 'rgba(255,50,50,0.8)' : 'rgba(255,136,0,0.7)';
                 });
-
                 window.addEventListener('resize', () => {
                     this.camera.aspect = window.innerWidth / window.innerHeight;
                     this.camera.updateProjectionMatrix();
@@ -698,17 +686,10 @@
                     let rawSteer, rawPitch;
 
                     if (isLandscape) {
-                        // LANDSCAPE:
-                        // Volante: -beta = mano derecha arriba → izquierda
                         rawSteer = -beta;
-                        // Cabeceo: gamma positivo (lado derecho abajo) → INCLINAR HACIA FUERA = SUBIR
-                        //          gamma negativo (lado izq abajo) → INCLINAR HACIA TI = BAJAR
                         rawPitch = gamma;
                     } else {
-                        // PORTRAIT:
-                        // Volante: gamma positivo = mano derecha abajo → derecha
                         rawSteer = gamma;
-                        // Cabeceo: beta > 45 = hacia fuera = SUBIR, beta < 45 = hacia ti = BAJAR
                         rawPitch = beta - 45;
                     }
 
@@ -725,14 +706,30 @@
                         let deltaSteer = smoothSteer - this.calibSteer;
                         let deltaPitch = smoothPitch - this.calibPitch;
 
-                        if (Math.abs(deltaSteer) < 1.5) deltaSteer = 0;
-                        if (Math.abs(deltaPitch) < 1.5) deltaPitch = 0;
+                        // ===== SISTEMA TRIGGER PARA GIRO =====
+                        const deadZone = 10; // grados de zona muerta
+                        const maxAngle = 45; // ángulo para velocidad máxima
 
-                        // LANDSCAPE: giro MUCHO más lento (divisor 70 en vez de 25)
-                        // Permitir 360° completos: con 90° de giro físico → ~180° de torreta
-                        const steerSensitivity = isLandscape ? 70 : 40;
-                        this.steerInput = THREE.MathUtils.clamp(deltaSteer / steerSensitivity, -2.5, 2.5);
-                        // Cabeceo: si está invertido, cambiamos el signo
+                        if (Math.abs(deltaSteer) < deadZone) {
+                            // Zona muerta: parado
+                            this.steerInput = 0;
+                        } else {
+                            // Fuera de zona muerta: velocidad proporcional
+                            const sign = deltaSteer > 0 ? 1 : -1;
+                            const magnitude = (Math.abs(deltaSteer) - deadZone) / (maxAngle - deadZone);
+                            const speed = Math.min(magnitude, 1.0); // 0 a 1
+
+                            // 3 niveles de velocidad
+                            let velocity;
+                            if (speed < 0.33) velocity = 0.4; // lento
+                            else if (speed < 0.66) velocity = 0.9; // medio
+                            else velocity = 1.6; // rápido
+
+                            this.steerInput = sign * velocity;
+                        }
+
+                        // Cabeceo normal
+                        if (Math.abs(deltaPitch) < 1.5) deltaPitch = 0;
                         const pitchSign = this.invertPitch ? -1 : 1;
                         this.pitchInput = THREE.MathUtils.clamp((deltaPitch / 28) * pitchSign, -0.7, 0.5);
                     }
@@ -740,8 +737,12 @@
                     this.gyroAvailable = true;
 
                     if (this.gameRunning) {
+                        const dir = this.steerInput === 0 ? '⏸ PARADO' :
+                            this.steerInput > 0 ? `↻ DERECHA x${this.steerInput.toFixed(1)}` :
+                            `↺ IZQUIERDA x${Math.abs(this.steerInput).toFixed(1)}`;
+                        this.steerIndicator.textContent = dir;
                         this.gyroDebug.textContent =
-                            `${isLandscape?'LAND':'PORT'} | str:${this.steerInput.toFixed(2)} ptc:${this.pitchInput.toFixed(2)} | inv:${this.invertPitch?'SI':'NO'}`;
+                            `${isLandscape?'LAND':'PORT'} | pitch:${this.pitchInput.toFixed(2)} | inv:${this.invertPitch?'SI':'NO'}`;
                     }
                 });
 
@@ -811,6 +812,7 @@
                 setTimeout(() => { document.getElementById('permission-request').style.display = 'none'; }, 3000);
                 this.gyroDebug.style.display = 'block';
                 this.invertBtn.style.display = 'block';
+                this.steerIndicator.style.display = 'block';
             }
 
             beginGameplay() {
@@ -838,6 +840,7 @@
                 this.muzzleFlash = 0;
                 this.turretYaw = 0;
                 this.turretPitch = 0;
+                this.steerInput = 0;
                 this.calibrated = false;
                 this.gameRunning = true;
                 this.gameOverScreen.style.display = 'none';
@@ -852,6 +855,7 @@
             gameOver() {
                 this.gameRunning = false;
                 this.isFiring = false;
+                this.steerInput = 0;
                 this.audio.playExplosion();
                 this.vibration.explosionVibrate();
                 this.createExplosion(new THREE.Vector3(0, 2, 0), 2.5);
@@ -862,15 +866,16 @@
                     this.updateRanking();
                     this.gyroDebug.style.display = 'none';
                     this.invertBtn.style.display = 'none';
+                    this.steerIndicator.style.display = 'none';
                 }, 800);
             }
 
             updateRanking() {
-                let rankings = JSON.parse(localStorage.getItem('midway_rankings_v7') || '[]');
+                let rankings = JSON.parse(localStorage.getItem('midway_rankings_v8') || '[]');
                 rankings.push({ score: this.score, time: Math.floor(this.gameTime), date: new Date().toLocaleDateString() });
                 rankings.sort((a, b) => b.score - a.score);
                 rankings = rankings.slice(0, 10);
-                localStorage.setItem('midway_rankings_v7', JSON.stringify(rankings));
+                localStorage.setItem('midway_rankings_v8', JSON.stringify(rankings));
                 let html = '<h3>🏆 MEJORES ARTILLEROS</h3>';
                 rankings.forEach((r, i) => { html +=
                         `<div>${i+1}. ${r.score} pts - ${r.time}s (${r.date})</div>`; });
@@ -981,11 +986,8 @@
                     barrelTip.applyQuaternion(this.gunsGroup.getWorldQuaternion(new THREE.Quaternion()));
                     barrelTip.add(this.gunsGroup.getWorldPosition(new THREE.Vector3()));
 
-                    const spread = new THREE.Vector3(
-                        (Math.random() - 0.5) * 0.04,
-                        (Math.random() - 0.5) * 0.04,
-                        (Math.random() - 0.5) * 0.04
-                    );
+                    const spread = new THREE.Vector3((Math.random() - 0.5) * 0.04, (Math.random() - 0.5) * 0.04, (Math
+                        .random() - 0.5) * 0.04);
                     const finalDir = dir.clone().add(spread).normalize();
 
                     const bullet = {
@@ -1011,7 +1013,6 @@
 
             createExplosion(position, size = 1) {
                 const parts = [];
-                // Bola de fuego
                 const fireCount = Math.floor(35 * size);
                 for (let i = 0; i < fireCount; i++) {
                     const p = new THREE.Mesh(
@@ -1023,18 +1024,14 @@
                         })
                     );
                     p.position.copy(position);
-                    p.velocity = new THREE.Vector3(
-                        (Math.random() - 0.5) * 15 * size,
-                        (Math.random() - 0.5) * 15 * size,
-                        (Math.random() - 0.5) * 15 * size
-                    );
+                    p.velocity = new THREE.Vector3((Math.random() - 0.5) * 15 * size, (Math.random() - 0.5) * 15 * size, (
+                        Math.random() - 0.5) * 15 * size);
                     p.life = 0.4 + Math.random() * 0.8;
                     p.age = 0;
                     p.isFire = true;
                     this.scene.add(p);
                     parts.push(p);
                 }
-                // Núcleo brillante
                 const core = new THREE.Mesh(
                     new THREE.SphereGeometry(0.5 * size, 16, 16),
                     new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.9 })
@@ -1045,7 +1042,6 @@
                 core.isCore = true;
                 this.scene.add(core);
                 parts.push(core);
-                // Luz
                 const light = new THREE.PointLight(0xff6600, 8 * size, 20 * size);
                 light.position.copy(position);
                 light.life = 0.4;
@@ -1055,7 +1051,6 @@
                 parts.push(light);
 
                 this.explosionParticles.push({ particles: parts, age: 0, life: 1.2 });
-
                 setTimeout(() => { this.createSmoke(position, size); }, 150);
                 this.audio.playExplosion();
                 this.vibration.explosionVibrate();
@@ -1072,11 +1067,8 @@
                     p.position.copy(position);
                     p.position.x += (Math.random() - 0.5) * 2 * size;
                     p.position.z += (Math.random() - 0.5) * 2 * size;
-                    p.velocity = new THREE.Vector3(
-                        (Math.random() - 0.5) * 3 * size,
-                        2 + Math.random() * 5 * size,
-                        (Math.random() - 0.5) * 3 * size
-                    );
+                    p.velocity = new THREE.Vector3((Math.random() - 0.5) * 3 * size, 2 + Math.random() * 5 * size, (Math
+                        .random() - 0.5) * 3 * size);
                     p.life = 1.0 + Math.random() * 2.0;
                     p.age = 0;
                     p.isSmoke = true;
@@ -1090,7 +1082,6 @@
                 const fireGroup = new THREE.Group();
                 fireGroup.position.copy(position);
                 fireGroup.position.y = 1.9;
-
                 for (let i = 0; i < 8; i++) {
                     const flame = new THREE.Mesh(
                         new THREE.ConeGeometry(0.15 + Math.random() * 0.2, 0.5 + Math.random() * 0.8, 6),
@@ -1104,11 +1095,9 @@
                     flame.userData = { speed: 0.5 + Math.random() * 1.5, offset: Math.random() * Math.PI * 2 };
                     fireGroup.add(flame);
                 }
-
                 const fireLight = new THREE.PointLight(0xff4400, 2, 6);
                 fireLight.position.y = 0.5;
                 fireGroup.add(fireLight);
-
                 this.scene.add(fireGroup);
                 this.deckFires.push({ group: fireGroup, life: 4 + Math.random() * 6, age: 0 });
             }
@@ -1160,9 +1149,12 @@
                     if (this._fbPitch) pitch = this._fbPitch();
                 }
 
-                this.targetYaw = steer;
+                // Trigger de giro: velocidad constante
+                if (steer !== 0) {
+                    this.turretYaw += steer * delta * 2.5; // velocidad angular
+                }
+
                 this.targetPitch = pitch;
-                this.turretYaw += (this.targetYaw - this.turretYaw) * Math.min(delta * 5, 1);
                 this.turretPitch += (this.targetPitch - this.turretPitch) * Math.min(delta * 7, 1);
                 this.turretPitch = THREE.MathUtils.clamp(this.turretPitch, -0.4, 0.5);
 
@@ -1373,9 +1365,9 @@
                 .catch(() => {});
         }
 
-        console.log('⚓ Batalla de Midway v7 - Giro lento 360° + botón inversor');
-        console.log('💥 Sonidos sintéticos graves (Web Audio API)');
-        console.log('🔄 Botón para invertir cabeceo si lo necesitas');
+        console.log('⚓ Batalla de Midway v8 - TRIGGER DE GIRO + Audio híbrido');
+        console.log('🚗 Inclinar = trigger de giro | Centro = parado');
+        console.log('🔊 Samples Base64 + Síntesis de fallback');
     </script>
 </body>
 </html>
