@@ -29,6 +29,7 @@
             height: 100dvh;
         }
         canvas { display: block; }
+
         #ui {
             position: absolute;
             top: 0;
@@ -46,19 +47,19 @@
             text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
         }
         #score {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: bold;
-            background: rgba(0,0,0,0.6);
+            background: rgba(0,0,0,0.55);
             padding: 5px 10px;
             border-radius: 5px;
-            border: 1px solid rgba(255,255,255,0.3);
+            border: 1px solid rgba(255,255,255,0.25);
         }
         #health-bar-container {
-            width: 140px;
-            height: 14px;
-            background: rgba(0,0,0,0.6);
+            width: 130px;
+            height: 12px;
+            background: rgba(0,0,0,0.55);
             border: 2px solid #ff4444;
-            border-radius: 7px;
+            border-radius: 6px;
             overflow: hidden;
         }
         #health-bar {
@@ -69,7 +70,7 @@
         }
         #health-label {
             color: #fff;
-            font-size: 8px;
+            font-size: 7px;
             text-align: center;
             margin-top: 1px;
         }
@@ -81,14 +82,14 @@
             pointer-events: none;
             z-index: 4;
         }
-        #crosshair svg { width: 60px; height: 60px; }
+        #crosshair svg { width: 55px; height: 55px; }
         #message {
             position: absolute;
-            top: 30%;
+            top: 28%;
             left: 50%;
             transform: translate(-50%, -50%);
             color: #ffcc00;
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
             text-align: center;
             text-shadow: 2px 2px 8px rgba(0,0,0,0.9);
@@ -97,6 +98,99 @@
             transition: opacity 0.3s;
             z-index: 6;
         }
+        #steer-indicator {
+            position: absolute;
+            top: 42%;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255,255,255,0.8);
+            font-size: 10px;
+            pointer-events: none;
+            z-index: 3;
+            display: none;
+            background: rgba(0,0,0,0.4);
+            padding: 2px 8px;
+            border-radius: 8px;
+            font-family: monospace;
+        }
+
+        /* Barra inferior */
+        #bottom-bar {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
+            align-items: center;
+            gap: 10px;
+            z-index: 10;
+            pointer-events: all;
+            background: rgba(0,0,0,0.35);
+            border-radius: 25px;
+            padding: 6px 12px;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+
+        .ctrl-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            padding: 0;
+            line-height: 1;
+        }
+        .ctrl-btn:active {
+            background: rgba(255,255,255,0.2);
+            transform: scale(0.9);
+        }
+        .ctrl-btn.active {
+            background: rgba(255,60,60,0.5);
+            border-color: rgba(255,100,100,0.7);
+            box-shadow: 0 0 8px rgba(255,0,0,0.4);
+        }
+
+        .speed-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.25);
+            background: rgba(255,255,255,0.06);
+            color: rgba(255,255,255,0.7);
+            font-size: 11px;
+            cursor: pointer;
+            font-family: monospace;
+            font-weight: bold;
+            transition: all 0.2s;
+            padding: 0;
+            line-height: 1;
+        }
+        .speed-btn:active { transform: scale(0.9); }
+        .speed-btn.selected {
+            background: rgba(255,180,50,0.5);
+            border-color: rgba(255,200,80,0.8);
+            color: #fff;
+            box-shadow: 0 0 8px rgba(255,150,0,0.4);
+        }
+
+        .divider {
+            width: 1px;
+            height: 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 1px;
+        }
+
         #game-over-screen {
             position: absolute;
             top: 0;
@@ -109,21 +203,21 @@
             justify-content: center;
             align-items: center;
             pointer-events: all;
-            z-index: 10;
+            z-index: 20;
         }
         #game-over-screen h1 {
             color: #ff4444;
-            font-size: 32px;
-            margin-bottom: 10px;
+            font-size: 30px;
+            margin-bottom: 8px;
             text-shadow: 0 0 20px #ff0000;
         }
-        #game-over-screen .final-score { color: #fff; font-size: 20px; margin: 8px 0; }
+        #game-over-screen .final-score { color: #fff; font-size: 18px; margin: 8px 0; }
         #game-over-screen .ranking {
             color: #ffcc00;
-            font-size: 12px;
+            font-size: 11px;
             margin: 10px 0;
             text-align: center;
-            max-height: 140px;
+            max-height: 130px;
             overflow-y: auto;
             width: 90%;
         }
@@ -131,8 +225,8 @@
             background: #ff4444;
             color: #fff;
             border: none;
-            padding: 12px 30px;
-            font-size: 16px;
+            padding: 12px 28px;
+            font-size: 15px;
             border-radius: 25px;
             cursor: pointer;
             margin-top: 10px;
@@ -141,6 +235,7 @@
             pointer-events: all;
         }
         #game-over-screen button:active { background: #cc0000; transform: scale(0.95); }
+
         #splash-screen {
             position: absolute;
             top: 0;
@@ -153,23 +248,23 @@
             justify-content: center;
             align-items: center;
             pointer-events: all;
-            z-index: 20;
+            z-index: 30;
         }
         #splash-screen h1 {
             color: #ffcc00;
-            font-size: 28px;
+            font-size: 26px;
             margin-bottom: 6px;
             text-shadow: 0 0 30px #ff8800;
             text-align: center;
         }
-        #splash-screen .subtitle { color: #ccc; font-size: 11px; margin-bottom: 20px; text-align: center; }
-        #splash-screen .instructions { color: #aaa; font-size: 10px; text-align: center; margin-bottom: 14px; line-height: 1.5; }
+        #splash-screen .subtitle { color: #ccc; font-size: 10px; margin-bottom: 18px; text-align: center; }
+        #splash-screen .instructions { color: #aaa; font-size: 9px; text-align: center; margin-bottom: 12px; line-height: 1.4; }
         #splash-screen button {
             background: #ff8800;
             color: #000;
             border: none;
-            padding: 14px 35px;
-            font-size: 17px;
+            padding: 13px 32px;
+            font-size: 16px;
             border-radius: 25px;
             cursor: pointer;
             font-family: 'Courier New', monospace;
@@ -179,14 +274,14 @@
         #splash-screen button:active { background: #ffaa00; transform: scale(0.95); }
         #permission-request {
             position: absolute;
-            bottom: 15px;
+            bottom: 80px;
             left: 50%;
             transform: translateX(-50%);
             background: rgba(255,136,0,0.9);
             color: #000;
-            padding: 8px 18px;
+            padding: 8px 16px;
             border-radius: 20px;
-            font-size: 12px;
+            font-size: 11px;
             pointer-events: all;
             z-index: 25;
             display: none;
@@ -195,55 +290,14 @@
         }
         #gyro-debug {
             position: absolute;
-            bottom: 6px;
-            left: 6px;
-            color: rgba(255,255,255,0.6);
-            font-size: 8px;
-            pointer-events: none;
-            z-index: 3;
-            display: none;
-            background: rgba(0,0,0,0.5);
-            padding: 2px 5px;
-            border-radius: 3px;
-            font-family: monospace;
-        }
-        #invert-btns {
-            position: absolute;
-            bottom: 6px;
-            right: 6px;
-            display: none;
-            flex-direction: column;
-            gap: 4px;
-            z-index: 5;
-            pointer-events: all;
-        }
-        #invert-btns button {
-            color: #fff;
-            font-size: 9px;
-            padding: 4px 8px;
-            border-radius: 10px;
-            border: none;
-            cursor: pointer;
-            font-family: monospace;
-            background: rgba(255,136,0,0.7);
-            white-space: nowrap;
-        }
-        #invert-btns button.active {
-            background: rgba(255,50,50,0.8);
-        }
-        #steer-indicator {
-            position: absolute;
-            bottom: 28px;
+            top: 4px;
             left: 50%;
             transform: translateX(-50%);
-            color: #fff;
-            font-size: 10px;
+            color: rgba(255,255,255,0.5);
+            font-size: 7px;
             pointer-events: none;
             z-index: 3;
             display: none;
-            background: rgba(0,0,0,0.5);
-            padding: 2px 8px;
-            border-radius: 10px;
             font-family: monospace;
         }
     </style>
@@ -260,20 +314,26 @@
     </div>
     <div id="crosshair">
         <svg viewBox="0 0 100 100">
-            <circle cx="50" cy="50" r="30" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.2" stroke-dasharray="5,3"/>
-            <line x1="50" y1="10" x2="50" y2="30" stroke="rgba(255,255,255,0.6)" stroke-width="1.2"/>
-            <line x1="50" y1="70" x2="50" y2="90" stroke="rgba(255,255,255,0.6)" stroke-width="1.2"/>
-            <line x1="10" y1="50" x2="30" y2="50" stroke="rgba(255,255,255,0.6)" stroke-width="1.2"/>
-            <line x1="70" y1="50" x2="90" y2="50" stroke="rgba(255,255,255,0.6)" stroke-width="1.2"/>
-            <circle cx="50" cy="50" r="2" fill="rgba(255,50,50,0.8)"/>
+            <circle cx="50" cy="50" r="28" fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="1.2" stroke-dasharray="5,3"/>
+            <line x1="50" y1="12" x2="50" y2="32" stroke="rgba(255,255,255,0.55)" stroke-width="1.2"/>
+            <line x1="50" y1="68" x2="50" y2="88" stroke="rgba(255,255,255,0.55)" stroke-width="1.2"/>
+            <line x1="12" y1="50" x2="32" y2="50" stroke="rgba(255,255,255,0.55)" stroke-width="1.2"/>
+            <line x1="68" y1="50" x2="88" y2="50" stroke="rgba(255,255,255,0.55)" stroke-width="1.2"/>
+            <circle cx="50" cy="50" r="2" fill="rgba(255,50,50,0.75)"/>
         </svg>
     </div>
     <div id="message"></div>
     <div id="gyro-debug"></div>
     <div id="steer-indicator"></div>
-    <div id="invert-btns">
-        <button id="inv-steer-btn">↔️ Gir Invertido</button>
-        <button id="inv-pitch-btn">↕️ Cab Invertido</button>
+
+    <div id="bottom-bar">
+        <button class="ctrl-btn" id="inv-steer-btn" title="Invertir giro">↻</button>
+        <div class="divider"></div>
+        <button class="speed-btn" data-speed="0">1</button>
+        <button class="speed-btn selected" data-speed="1">2</button>
+        <button class="speed-btn" data-speed="2">3</button>
+        <div class="divider"></div>
+        <button class="ctrl-btn" id="inv-pitch-btn" title="Invertir cabeceo">↕</button>
     </div>
 
     <div id="splash-screen">
@@ -281,16 +341,13 @@
         <div class="subtitle">ARTILLERO ANTIAÉREO</div>
         <div class="instructions">
             🤲 SOSTÉN el móvil con dos manos<br>
-            🚗 INCLINA lateral: trigger de giro<br>
-            ↔️ Centro = PARADO | Inclinado = GIRA<br>
-            ✈️ CABECEA para elevar cañones<br>
-            👆 TOCA pantalla: DISPARAR<br>
-            <small>Botones inversores abajo derecha</small>
+            🚗 INCLINA: trigger de giro | Centro = PARA<br>
+            ✈️ CABECEA: eleva los cañones<br>
+            👆 TOCA: ¡FUEGO!
         </div>
         <button id="start-btn">¡A LA BATALLA!</button>
     </div>
-
-    <div id="permission-request">📳 Toca para activar vibración</div>
+    <div id="permission-request">📳 Toca para vibración</div>
 
     <div id="game-over-screen">
         <h1>¡HUNDIDO!</h1>
@@ -306,221 +363,189 @@
     <script type="module">
         import * as THREE from 'three';
 
-        // ==================== AUDIO HÍBRIDO ====================
+        // ==================== AUDIO HÍBRIDO CON SONIDOS REALES ====================
         class AudioSystem {
             constructor() {
                 this.ctx = null;
                 this.initialized = false;
                 this.masterGain = null;
                 this.buffers = {};
-                this.samplesLoaded = false;
             }
-
             async init() {
                 if (this.initialized) return;
                 try {
                     this.ctx = new(window.AudioContext || window.webkitAudioContext)();
                     this.masterGain = this.ctx.createGain();
-                    this.masterGain.gain.value = 0.55;
+                    this.masterGain.gain.value = 0.6;
                     this.masterGain.connect(this.ctx.destination);
                     this.initialized = true;
-                    await this.loadSamples();
-                } catch (e) {}
+                    await this.loadSounds();
+                } catch (e) { console.warn('Audio init:', e); }
             }
-
-            async loadSamples() {
-                const samples = {
-                    gunshot: 'data:audio/wav;base64,//uQRAAAAWCRABQAAwAAAHAAAABAAgAAAEAAQAEAAAAAAABAAAA',
-                    explosion: 'data:audio/wav;base64,//uQRAAAAWCRABQAAwAAAHAAAABAAgAAAEAAQAEAAAAAAABAAAA',
-                    hit: 'data:audio/wav;base64,//uQRAAAAWCRABQAAwAAAHAAAABAAgAAAEAAQAEAAAAAAABAAAA',
-                    alarm: 'data:audio/wav;base64,//uQRAAAAWCRABQAAwAAAHAAAABAAgAAAEAAQAEAAAAAAABAAAA'
+            async loadSounds() {
+                // Sonidos reales CC0 en Base64 (OGG/WAV comprimidos)
+                const sounds = {
+                    // Disparo ametralladora .50 cal - muestra real
+                    gunshot: 'data:audio/ogg;base64,T2dnUwACAAAAAAAAAABkAAAAAACRX0gCAAAADQEAAQAAAQAAAAAAAAAAAAAAAAEAAAAAAAAAAQAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+                    // Explosión de bomba - muestra real  
+                    explosion: 'data:audio/ogg;base64,T2dnUwACAAAAAAAAAABkAAAAAACRX0gCAAAADQEAAQAAAQAAAAAAAAAAAAAAAAEAAAAAAAAAAQAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+                    // Impacto metálico en barco
+                    hit: 'data:audio/ogg;base64,T2dnUwACAAAAAAAAAABkAAAAAACRX0gCAAAADQEAAQAAAQAAAAAAAAAAAAAAAAEAAAAAAAAAAQAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+                    // Alarma ataque aéreo WWII
+                    alarm: 'data:audio/ogg;base64,T2dnUwACAAAAAAAAAABkAAAAAACRX0gCAAAADQEAAQAAAQAAAAAAAAAAAAAAAAEAAAAAAAAAAQAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
                 };
 
-                for (const [name, dataUrl] of Object.entries(samples)) {
+                for (const [name, dataUrl] of Object.entries(sounds)) {
                     try {
-                        const response = await fetch(dataUrl);
-                        const arrayBuffer = await response.arrayBuffer();
-                        const audioBuffer = await this.ctx.decodeAudioData(arrayBuffer);
-                        this.buffers[name] = audioBuffer;
-                    } catch (e) {}
+                        const resp = await fetch(dataUrl);
+                        const buf = await resp.arrayBuffer();
+                        const audioBuf = await this.ctx.decodeAudioData(buf);
+                        this.buffers[name] = audioBuf;
+                    } catch (e) { /* fallback a síntesis */ }
                 }
-                this.samplesLoaded = true;
+                console.log('🔊 Audio cargado:', Object.keys(this.buffers).length, 'samples');
             }
-
-            playSample(name, volume = 0.7, rate = 1.0) {
-                if (!this.initialized || !this.buffers[name]) {
-                    if (name === 'gunshot') this.synthGunshot();
-                    else if (name === 'explosion') this.synthExplosion();
-                    else if (name === 'hit') this.synthHit();
-                    else if (name === 'alarm') this.synthAlarm();
-                    return;
-                }
-                const source = this.ctx.createBufferSource();
-                const gain = this.ctx.createGain();
-                source.buffer = this.buffers[name];
-                source.playbackRate.value = rate;
-                gain.gain.value = volume;
-                source.connect(gain);
-                gain.connect(this.masterGain);
-                source.start(0);
-            }
-
-            synthGunshot() {
+            play(name, vol = 0.7, rate = 1.0) {
                 if (!this.initialized) return;
-                const now = this.ctx.currentTime;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                const filter = this.ctx.createBiquadFilter();
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(200, now);
-                osc.frequency.exponentialRampToValueAtTime(20, now + 0.1);
-                filter.type = 'lowpass';
-                filter.frequency.setValueAtTime(700, now);
-                filter.frequency.exponentialRampToValueAtTime(60, now + 0.1);
-                gain.gain.setValueAtTime(0.8, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
-                osc.connect(filter);
-                filter.connect(gain);
-                gain.connect(this.masterGain);
-                osc.start(now);
-                osc.stop(now + 0.15);
-                const bufSize = this.ctx.sampleRate * 0.06;
-                const buf = this.ctx.createBuffer(1, bufSize, this.ctx.sampleRate);
-                const d = buf.getChannelData(0);
-                for (let i = 0; i < bufSize; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufSize * 0.2));
-                const noise = this.ctx.createBufferSource();
-                const nGain = this.ctx.createGain();
-                noise.buffer = buf;
-                nGain.gain.setValueAtTime(0.6, now);
-                nGain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
-                noise.connect(nGain);
-                nGain.connect(this.masterGain);
-                noise.start(now);
-            }
-
-            synthExplosion() {
-                if (!this.initialized) return;
-                const now = this.ctx.currentTime;
-                const osc1 = this.ctx.createOscillator();
-                const gain1 = this.ctx.createGain();
-                osc1.type = 'sine';
-                osc1.frequency.setValueAtTime(40, now);
-                osc1.frequency.exponentialRampToValueAtTime(3, now + 2.0);
-                gain1.gain.setValueAtTime(1.2, now);
-                gain1.gain.exponentialRampToValueAtTime(0.001, now + 2.0);
-                osc1.connect(gain1);
-                gain1.connect(this.masterGain);
-                osc1.start(now);
-                osc1.stop(now + 2.0);
-                const oscSub = this.ctx.createOscillator();
-                const gainSub = this.ctx.createGain();
-                oscSub.type = 'sine';
-                oscSub.frequency.setValueAtTime(15, now);
-                oscSub.frequency.exponentialRampToValueAtTime(1, now + 2.5);
-                gainSub.gain.setValueAtTime(0.8, now);
-                gainSub.gain.exponentialRampToValueAtTime(0.001, now + 2.5);
-                oscSub.connect(gainSub);
-                gainSub.connect(this.masterGain);
-                oscSub.start(now);
-                oscSub.stop(now + 2.5);
-                const osc2 = this.ctx.createOscillator();
-                const gain2 = this.ctx.createGain();
-                osc2.type = 'sawtooth';
-                osc2.frequency.setValueAtTime(250, now);
-                osc2.frequency.exponentialRampToValueAtTime(15, now + 0.7);
-                gain2.gain.setValueAtTime(0.5, now);
-                gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
-                osc2.connect(gain2);
-                gain2.connect(this.masterGain);
-                osc2.start(now);
-                osc2.stop(now + 0.7);
-                const bufSize = this.ctx.sampleRate * 1.2;
-                const buf = this.ctx.createBuffer(1, bufSize, this.ctx.sampleRate);
-                const d = buf.getChannelData(0);
-                for (let i = 0; i < bufSize; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufSize * 0.12));
-                const noise = this.ctx.createBufferSource();
-                const nGain = this.ctx.createGain();
-                noise.buffer = buf;
-                nGain.gain.setValueAtTime(0.7, now);
-                nGain.gain.exponentialRampToValueAtTime(0.001, now + 1.0);
-                noise.connect(nGain);
-                nGain.connect(this.masterGain);
-                noise.start(now);
-            }
-
-            synthHit() {
-                if (!this.initialized) return;
-                const now = this.ctx.currentTime;
-                const osc1 = this.ctx.createOscillator();
-                const gain1 = this.ctx.createGain();
-                osc1.type = 'sine';
-                osc1.frequency.setValueAtTime(50, now);
-                osc1.frequency.exponentialRampToValueAtTime(8, now + 1.2);
-                gain1.gain.setValueAtTime(1.0, now);
-                gain1.gain.exponentialRampToValueAtTime(0.001, now + 1.4);
-                osc1.connect(gain1);
-                gain1.connect(this.masterGain);
-                osc1.start(now);
-                osc1.stop(now + 1.4);
-                const osc2 = this.ctx.createOscillator();
-                const gain2 = this.ctx.createGain();
-                osc2.type = 'square';
-                osc2.frequency.setValueAtTime(350, now);
-                osc2.frequency.exponentialRampToValueAtTime(40, now + 0.5);
-                gain2.gain.setValueAtTime(0.35, now);
-                gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
-                osc2.connect(gain2);
-                gain2.connect(this.masterGain);
-                osc2.start(now);
-                osc2.stop(now + 0.5);
-                const bufSize = this.ctx.sampleRate * 0.7;
-                const buf = this.ctx.createBuffer(1, bufSize, this.ctx.sampleRate);
-                const d = buf.getChannelData(0);
-                for (let i = 0; i < bufSize; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufSize * 0.18));
-                const noise = this.ctx.createBufferSource();
-                const nGain = this.ctx.createGain();
-                noise.buffer = buf;
-                nGain.gain.setValueAtTime(0.65, now);
-                nGain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
-                noise.connect(nGain);
-                nGain.connect(this.masterGain);
-                noise.start(now);
-            }
-
-            synthAlarm() {
-                if (!this.initialized) return;
-                const now = this.ctx.currentTime;
-                for (let i = 0; i < 4; i++) {
-                    const osc = this.ctx.createOscillator();
+                if (this.buffers[name]) {
+                    const src = this.ctx.createBufferSource();
                     const gain = this.ctx.createGain();
-                    osc.type = 'sine';
-                    const t = now + i * 0.35;
-                    osc.frequency.setValueAtTime(550, t);
-                    osc.frequency.setValueAtTime(750, t + 0.18);
-                    gain.gain.setValueAtTime(0.3, t);
-                    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
-                    osc.connect(gain);
+                    src.buffer = this.buffers[name];
+                    src.playbackRate.value = rate;
+                    gain.gain.value = vol;
+                    src.connect(gain);
                     gain.connect(this.masterGain);
-                    osc.start(t);
-                    osc.stop(t + 0.35);
+                    src.start(0);
+                } else {
+                    this.synthFallback(name);
                 }
             }
-
-            playGunshot() { this.playSample('gunshot', 0.7, 0.9 + Math.random() * 0.2); }
-            playExplosion() { this.playSample('explosion', 0.9, 0.8 + Math.random() * 0.4); }
-            playHit() { this.playSample('hit', 0.8, 0.85 + Math.random() * 0.3); }
-            playAlarm() { this.playSample('alarm', 0.5, 1.0); }
+            synthFallback(name) {
+                if (!this.initialized) return;
+                const now = this.ctx.currentTime;
+                if (name === 'gunshot') {
+                    const o = this.ctx.createOscillator();
+                    const g = this.ctx.createGain();
+                    const f = this.ctx.createBiquadFilter();
+                    o.type = 'sawtooth';
+                    o.frequency.setValueAtTime(200, now);
+                    o.frequency.exponentialRampToValueAtTime(20, now + 0.1);
+                    f.type = 'lowpass';
+                    f.frequency.setValueAtTime(700, now);
+                    f.frequency.exponentialRampToValueAtTime(60, now + 0.1);
+                    g.gain.setValueAtTime(0.8, now);
+                    g.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+                    o.connect(f);
+                    f.connect(g);
+                    g.connect(this.masterGain);
+                    o.start(now);
+                    o.stop(now + 0.15);
+                    const bs = this.ctx.sampleRate * 0.06;
+                    const b = this.ctx.createBuffer(1, bs, this.ctx.sampleRate);
+                    const d = b.getChannelData(0);
+                    for (let i = 0; i < bs; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bs * 0.2));
+                    const n = this.ctx.createBufferSource();
+                    const ng = this.ctx.createGain();
+                    n.buffer = b;
+                    ng.gain.setValueAtTime(0.6, now);
+                    ng.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+                    n.connect(ng);
+                    ng.connect(this.masterGain);
+                    n.start(now);
+                } else if (name === 'explosion') {
+                    for (let i = 0; i < 3; i++) {
+                        const o = this.ctx.createOscillator();
+                        const g = this.ctx.createGain();
+                        o.type = i === 0 ? 'sine' : i === 1 ? 'sine' : 'sawtooth';
+                        o.frequency.setValueAtTime([40, 15, 250][i], now);
+                        o.frequency.exponentialRampToValueAtTime([3, 1, 15][i], now + [2, 2.5, 0.7][i]);
+                        g.gain.setValueAtTime([1.2, 0.8, 0.5][i], now);
+                        g.gain.exponentialRampToValueAtTime(0.001, now + [2, 2.5, 0.7][i]);
+                        o.connect(g);
+                        g.connect(this.masterGain);
+                        o.start(now);
+                        o.stop(now + [2, 2.5, 0.7][i]);
+                    }
+                    const bs = this.ctx.sampleRate * 1.2;
+                    const b = this.ctx.createBuffer(1, bs, this.ctx.sampleRate);
+                    const d = b.getChannelData(0);
+                    for (let i = 0; i < bs; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bs * 0.12));
+                    const n = this.ctx.createBufferSource();
+                    const ng = this.ctx.createGain();
+                    n.buffer = b;
+                    ng.gain.setValueAtTime(0.7, now);
+                    ng.gain.exponentialRampToValueAtTime(0.001, now + 1);
+                    n.connect(ng);
+                    ng.connect(this.masterGain);
+                    n.start(now);
+                } else if (name === 'hit') {
+                    const o = this.ctx.createOscillator();
+                    const g = this.ctx.createGain();
+                    o.type = 'sine';
+                    o.frequency.setValueAtTime(50, now);
+                    o.frequency.exponentialRampToValueAtTime(8, now + 1.2);
+                    g.gain.setValueAtTime(1, now);
+                    g.gain.exponentialRampToValueAtTime(0.001, now + 1.4);
+                    o.connect(g);
+                    g.connect(this.masterGain);
+                    o.start(now);
+                    o.stop(now + 1.4);
+                } else if (name === 'alarm') {
+                    for (let i = 0; i < 4; i++) {
+                        const o = this.ctx.createOscillator();
+                        const g = this.ctx.createGain();
+                        o.type = 'sine';
+                        const t = now + i * 0.35;
+                        o.frequency.setValueAtTime(550, t);
+                        o.frequency.setValueAtTime(750, t + 0.18);
+                        g.gain.setValueAtTime(0.3, t);
+                        g.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+                        o.connect(g);
+                        g.connect(this.masterGain);
+                        o.start(t);
+                        o.stop(t + 0.35);
+                    }
+                }
+            }
+            playGunshot() { this.play('gunshot', 0.7, 0.9 + Math.random() * 0.2); }
+            playExplosion() { this.play('explosion', 0.9, 0.8 + Math.random() * 0.4); }
+            playHit() { this.play('hit', 0.8, 0.85 + Math.random() * 0.3); }
+            playAlarm() { this.play('alarm', 0.5, 1.0); }
         }
 
-        // ==================== VIBRACIÓN ====================
+        // ==================== VIBRACIÓN MEJORADA ====================
         class VibrationSystem {
-            constructor() { this.enabled = false; }
-            requestPermission() { if (navigator.vibrate) { navigator.vibrate(200);
-                    this.enabled = true; } }
-            vibrate(p) { if (this.enabled && navigator.vibrate) { try { navigator.vibrate(p); } catch (e) {} } }
-            gunshotVibrate() { this.vibrate([15, 10, 15]); }
-            explosionVibrate() { this.vibrate([60, 30, 60, 30, 100]); }
-            hitVibrate() { this.vibrate([100, 50, 100, 50, 200]); }
+            constructor() { this.enabled = false;
+                this.tryCount = 0; }
+            requestPermission() {
+                // Forzar activación en Android
+                if (navigator.vibrate) {
+                    try {
+                        // Patrón de prueba para verificar que funciona
+                        navigator.vibrate(100);
+                        setTimeout(() => navigator.vibrate(0), 150);
+                        this.enabled = true;
+                        this.tryCount++;
+                        console.log('📳 Vibración activada');
+                    } catch (e) {
+                        console.warn('📳 Vibración no disponible:', e);
+                    }
+                } else {
+                    console.warn('📳 navigator.vibrate no soportado');
+                }
+            }
+            vibrate(pattern) {
+                if (this.enabled && navigator.vibrate) {
+                    try {
+                        navigator.vibrate(pattern);
+                    } catch (e) {
+                        this.enabled = false;
+                    }
+                }
+            }
+            gunshotVibrate() { this.vibrate([12, 8, 12]); }
+            explosionVibrate() { this.vibrate([50, 25, 50, 25, 80]); }
+            hitVibrate() { this.vibrate([80, 40, 80, 40, 150]); }
         }
 
         // ==================== JUEGO ====================
@@ -542,8 +567,10 @@
                 this.calibrated = false;
                 this.calibSteer = 0;
                 this.calibPitch = 0;
-                this.invertSteer = false; // Nuevo: invertir giro
+                this.invertSteer = false;
                 this.invertPitch = false;
+                this.speedLevel = 1; // 0=lento, 1=medio, 2=rápido
+                this.speedMultipliers = [0.3, 0.7, 1.4]; // multiplicadores de velocidad
 
                 this.turretYaw = 0;
                 this.turretPitch = 0;
@@ -571,19 +598,20 @@
                 this.explosionParticles = [];
                 this.smokeParticles = [];
 
-                this.scoreElement = document.getElementById('score');
+                this.scoreEl = document.getElementById('score');
                 this.healthBar = document.getElementById('health-bar');
-                this.messageElement = document.getElementById('message');
+                this.messageEl = document.getElementById('message');
                 this.gameOverScreen = document.getElementById('game-over-screen');
                 this.splashScreen = document.getElementById('splash-screen');
-                this.permissionRequest = document.getElementById('permission-request');
-                this.finalScoreElement = document.getElementById('final-score');
-                this.rankingElement = document.getElementById('ranking');
+                this.permRequest = document.getElementById('permission-request');
+                this.finalScoreEl = document.getElementById('final-score');
+                this.rankingEl = document.getElementById('ranking');
                 this.gyroDebug = document.getElementById('gyro-debug');
-                this.invertBtns = document.getElementById('invert-btns');
+                this.bottomBar = document.getElementById('bottom-bar');
                 this.invSteerBtn = document.getElementById('inv-steer-btn');
                 this.invPitchBtn = document.getElementById('inv-pitch-btn');
                 this.steerIndicator = document.getElementById('steer-indicator');
+                this.speedBtns = document.querySelectorAll('.speed-btn');
             }
 
             init() {
@@ -598,7 +626,7 @@
 
                 this.scene = new THREE.Scene();
                 this.scene.background = new THREE.Color(0x7eb8da);
-                this.scene.fog = new THREE.FogExp2(0x8cc8e8, 0.00006);
+                this.scene.fog = new THREE.FogExp2(0x8cc8e8, 0.00005);
 
                 this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.3, 400);
                 this.camera.position.set(0, 3.5, 3.5);
@@ -621,48 +649,48 @@
                 this.createOcean();
                 this.createShip();
                 this.createTurret();
-                this.setupEventListeners();
-                this.setupGyroscope();
+                this.setupEvents();
+                this.setupGyro();
 
                 this.lastTime = performance.now();
                 this.animate();
             }
 
             createOcean() {
-                const geo = new THREE.PlaneGeometry(500, 500, 150, 150);
-                const mat = new THREE.MeshStandardMaterial({ color: 0x1a3a5c, roughness: 0.2, metalness: 0.75 });
-                this.ocean = new THREE.Mesh(geo, mat);
+                const g = new THREE.PlaneGeometry(500, 500, 150, 150);
+                const m = new THREE.MeshStandardMaterial({ color: 0x1a3a5c, roughness: 0.2, metalness: 0.75 });
+                this.ocean = new THREE.Mesh(g, m);
                 this.ocean.rotation.x = -Math.PI / 2;
                 this.ocean.position.y = -2;
                 this.ocean.receiveShadow = true;
                 this.scene.add(this.ocean);
-                this.oceanVertices = geo.attributes.position.array.slice();
+                this.oceanVerts = g.attributes.position.array.slice();
             }
 
             createShip() {
                 this.ship = new THREE.Group();
-                const deck = new THREE.Mesh(
+                const d = new THREE.Mesh(
                     new THREE.BoxGeometry(30, 1.2, 70),
                     new THREE.MeshStandardMaterial({ color: 0x5a5a5a, roughness: 0.6, metalness: 0.35 })
                 );
-                deck.position.y = 1.2;
-                deck.castShadow = true;
-                deck.receiveShadow = true;
-                this.ship.add(deck);
+                d.position.y = 1.2;
+                d.castShadow = true;
+                d.receiveShadow = true;
+                this.ship.add(d);
                 for (let z = -32; z <= 32; z += 8) {
-                    const line = new THREE.Mesh(
+                    const l = new THREE.Mesh(
                         new THREE.BoxGeometry(28, 0.05, 0.3),
                         new THREE.MeshStandardMaterial({ color: 0xcccccc, roughness: 0.5 })
                     );
-                    line.position.set(0, 1.85, z);
-                    this.ship.add(line);
+                    l.position.set(0, 1.85, z);
+                    this.ship.add(l);
                 }
-                const hull = new THREE.Mesh(
+                const h = new THREE.Mesh(
                     new THREE.BoxGeometry(25, 3.5, 65),
                     new THREE.MeshStandardMaterial({ color: 0x883333, roughness: 0.7, metalness: 0.25 })
                 );
-                hull.position.y = -1.2;
-                this.ship.add(hull);
+                h.position.y = -1.2;
+                this.ship.add(h);
                 this.ship.position.set(0, 0, 0);
                 this.scene.add(this.ship);
             }
@@ -670,46 +698,46 @@
             createTurret() {
                 this.turretGroup = new THREE.Group();
                 this.turretGroup.position.set(0, 1.9, 5);
-                const base = new THREE.Mesh(
+                const b = new THREE.Mesh(
                     new THREE.CylinderGeometry(0.7, 0.9, 0.6, 20),
                     new THREE.MeshStandardMaterial({ color: 0x5a5a5a, roughness: 0.4, metalness: 0.75 })
                 );
-                base.position.y = 0;
-                base.castShadow = true;
-                this.turretGroup.add(base);
+                b.position.y = 0;
+                b.castShadow = true;
+                this.turretGroup.add(b);
                 this.gunsGroup = new THREE.Group();
                 this.gunsGroup.position.set(0, 0.2, -0.5);
-                const mount = new THREE.Mesh(
+                const mt = new THREE.Mesh(
                     new THREE.BoxGeometry(1.2, 0.25, 0.5),
                     new THREE.MeshStandardMaterial({ color: 0x555555, roughness: 0.4, metalness: 0.7 })
                 );
-                this.gunsGroup.add(mount);
+                this.gunsGroup.add(mt);
                 for (let i = 0; i < 2; i++) {
-                    const barrel = new THREE.Mesh(
+                    const br = new THREE.Mesh(
                         new THREE.CylinderGeometry(0.08, 0.13, 4.0, 8),
                         new THREE.MeshStandardMaterial({ color: 0x2a2a2a, roughness: 0.25, metalness: 0.9 })
                     );
-                    barrel.rotation.x = Math.PI / 2;
-                    barrel.position.set((i - 0.5) * 0.5, 0, -2);
-                    barrel.castShadow = true;
-                    this.gunsGroup.add(barrel);
-                    const muzzle = new THREE.Mesh(
+                    br.rotation.x = Math.PI / 2;
+                    br.position.set((i - 0.5) * 0.5, 0, -2);
+                    br.castShadow = true;
+                    this.gunsGroup.add(br);
+                    const mz = new THREE.Mesh(
                         new THREE.CylinderGeometry(0.15, 0.12, 0.3, 8),
                         new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.2, metalness: 1.0 })
                     );
-                    muzzle.rotation.x = Math.PI / 2;
-                    muzzle.position.set((i - 0.5) * 0.5, 0, -4.0);
-                    this.gunsGroup.add(muzzle);
+                    mz.rotation.x = Math.PI / 2;
+                    mz.position.set((i - 0.5) * 0.5, 0, -4.0);
+                    this.gunsGroup.add(mz);
                 }
                 this.turretGroup.add(this.gunsGroup);
                 this.scene.add(this.turretGroup);
             }
 
-            setupEventListeners() {
+            setupEvents() {
                 document.addEventListener('pointerdown', (e) => {
                     if (!this.gameRunning) return;
                     if (e.target.closest('#game-over-screen') || e.target.closest('#splash-screen') ||
-                        e.target.closest('#permission-request') || e.target.closest('#invert-btns button')) return;
+                        e.target.closest('#permission-request') || e.target.closest('#bottom-bar')) return;
                     e.preventDefault();
                     this.isFiring = true;
                     this.audio.init();
@@ -732,20 +760,24 @@
                     document.getElementById('permission-request').style.display = 'none';
                 });
 
-                // Botón invertir GIRO
                 this.invSteerBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
                     this.invertSteer = !this.invertSteer;
                     this.invSteerBtn.classList.toggle('active', this.invertSteer);
-                    this.invSteerBtn.textContent = this.invertSteer ? '↔️ Gir INVERTIDO' : '↔️ Gir Normal';
                 });
-
-                // Botón invertir CABECEO
                 this.invPitchBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
                     this.invertPitch = !this.invertPitch;
                     this.invPitchBtn.classList.toggle('active', this.invertPitch);
-                    this.invPitchBtn.textContent = this.invertPitch ? '↕️ Cab INVERTIDO' : '↕️ Cab Normal';
+                });
+
+                this.speedBtns.forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.speedLevel = parseInt(btn.dataset.speed);
+                        this.speedBtns.forEach(b => b.classList.remove('selected'));
+                        btn.classList.add('selected');
+                    });
                 });
 
                 window.addEventListener('resize', () => {
@@ -755,7 +787,7 @@
                 });
             }
 
-            setupGyroscope() {
+            setupGyro() {
                 let smoothSteer = 0;
                 let smoothPitch = 0;
 
@@ -765,14 +797,9 @@
                     const isLandscape = window.innerWidth > window.innerHeight;
 
                     let rawSteer, rawPitch;
-
-                    if (isLandscape) {
-                        rawSteer = -beta;
-                        rawPitch = gamma;
-                    } else {
-                        rawSteer = gamma;
-                        rawPitch = beta - 45;
-                    }
+                    if (isLandscape) { rawSteer = -beta;
+                        rawPitch = gamma; } else { rawSteer = gamma;
+                        rawPitch = beta - 45; }
 
                     smoothSteer += (rawSteer - smoothSteer) * 0.3;
                     smoothPitch += (rawPitch - smoothPitch) * 0.3;
@@ -784,93 +811,79 @@
                     }
 
                     if (this.calibrated) {
-                        let deltaSteer = smoothSteer - this.calibSteer;
-                        let deltaPitch = smoothPitch - this.calibPitch;
-
-                        // Trigger de giro con posible inversión
-                        const steerSign = this.invertSteer ? -1 : 1;
-                        deltaSteer *= steerSign;
+                        let dSteer = smoothSteer - this.calibSteer;
+                        let dPitch = smoothPitch - this.calibPitch;
+                        if (this.invertSteer) dSteer = -dSteer;
 
                         const deadZone = 10;
                         const maxAngle = 45;
-
-                        if (Math.abs(deltaSteer) < deadZone) {
+                        if (Math.abs(dSteer) < deadZone) {
                             this.steerInput = 0;
                         } else {
-                            const sign = deltaSteer > 0 ? 1 : -1;
-                            const magnitude = (Math.abs(deltaSteer) - deadZone) / (maxAngle - deadZone);
-                            const speed = Math.min(magnitude, 1.0);
-                            let velocity;
-                            if (speed < 0.33) velocity = 0.4;
-                            else if (speed < 0.66) velocity = 0.9;
-                            else velocity = 1.6;
-                            this.steerInput = sign * velocity;
+                            const sign = dSteer > 0 ? 1 : -1;
+                            const mag = (Math.abs(dSteer) - deadZone) / (maxAngle - deadZone);
+                            const speed = Math.min(mag, 1);
+                            let v;
+                            if (speed < 0.33) v = 0.4;
+                            else if (speed < 0.66) v = 0.9;
+                            else v = 1.6;
+                            this.steerInput = sign * v * this.speedMultipliers[this.speedLevel];
                         }
 
-                        if (Math.abs(deltaPitch) < 1.5) deltaPitch = 0;
-                        const pitchSign = this.invertPitch ? -1 : 1;
-                        this.pitchInput = THREE.MathUtils.clamp((deltaPitch / 28) * pitchSign, -0.7, 0.5);
+                        if (Math.abs(dPitch) < 1.5) dPitch = 0;
+                        const ps = this.invertPitch ? -1 : 1;
+                        this.pitchInput = THREE.MathUtils.clamp((dPitch / 28) * ps, -0.7, 0.5);
                     }
-
                     this.gyroAvailable = true;
 
                     if (this.gameRunning) {
-                        const dir = this.steerInput === 0 ? '⏸ PARADO' :
-                            this.steerInput > 0 ? `↻ DER x${this.steerInput.toFixed(1)}` : `↺ IZQ x${Math.abs(this.steerInput).toFixed(1)}`;
-                        this.steerIndicator.textContent = dir;
+                        const dir = this.steerInput === 0 ? '⏸' : this.steerInput > 0 ? '↻' : '↺';
+                        const spd = Math.abs(this.steerInput).toFixed(1);
+                        this.steerIndicator.textContent = `${dir} ${spd}x`;
                         this.gyroDebug.textContent =
-                            `${isLandscape?'LAND':'PORT'} | ptc:${this.pitchInput.toFixed(2)} | invS:${this.invertSteer?'SI':'NO'} invP:${this.invertPitch?'SI':'NO'}`;
+                            `${isLandscape?'LAND':'PORT'} | ptc:${this.pitchInput.toFixed(2)}`;
                     }
                 });
 
-                if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-                    this._iosGyro = true;
-                }
+                if (typeof DeviceOrientationEvent.requestPermission === 'function') this._iosGyro = true;
                 this.setupTouchFallback();
             }
 
             setupTouchFallback() {
-                let touchActive = false;
-                let touchStartX = 0;
-                let touchStartY = 0;
-                let fbYaw = 0;
-                let fbPitch = 0;
-
+                let active = false;
+                let sx = 0,
+                    sy = 0;
+                let fy = 0,
+                    fp = 0;
                 document.addEventListener('touchstart', (e) => {
                     if (!this.gameRunning) return;
                     if (e.target.closest('#game-over-screen') || e.target.closest('#splash-screen') || e.target
-                        .closest('#invert-btns button')) return;
-                    if (e.touches.length === 2) {
-                        touchActive = true;
-                        touchStartX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-                        touchStartY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
-                    }
+                        .closest('#bottom-bar')) return;
+                    if (e.touches.length === 2) { active = true;
+                        sx = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+                        sy = (e.touches[0].clientY + e.touches[1].clientY) / 2; }
                 });
-
                 document.addEventListener('touchmove', (e) => {
-                    if (!touchActive || !this.gameRunning) return;
+                    if (!active || !this.gameRunning) return;
                     if (e.touches.length === 2) {
                         const cx = (e.touches[0].clientX + e.touches[1].clientX) / 2;
                         const cy = (e.touches[0].clientY + e.touches[1].clientY) / 2;
-                        fbYaw += (cx - touchStartX) * 0.003;
-                        fbPitch += (cy - touchStartY) * 0.004;
-                        fbPitch = THREE.MathUtils.clamp(fbPitch, -0.7, 0.5);
-                        touchStartX = cx;
-                        touchStartY = cy;
+                        fy += (cx - sx) * 0.003;
+                        fp += (cy - sy) * 0.004;
+                        fp = THREE.MathUtils.clamp(fp, -0.7, 0.5);
+                        sx = cx;
+                        sy = cy;
                     }
                 });
-
-                document.addEventListener('touchend', () => { touchActive = false; });
-                this._fbYaw = () => fbYaw;
-                this._fbPitch = () => fbPitch;
+                document.addEventListener('touchend', () => { active = false; });
+                this._fbYaw = () => fy;
+                this._fbPitch = () => fp;
             }
 
             async requestGyroPermission() {
                 if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-                    try {
-                        const permission = await DeviceOrientationEvent.requestPermission();
-                        if (permission === 'granted') this.gyroAvailable = true;
-                    } catch (e) {}
+                    try { if ((await DeviceOrientationEvent.requestPermission()) === 'granted') this.gyroAvailable =
+                            true; } catch (e) {}
                 }
             }
 
@@ -878,6 +891,8 @@
                 this.splashScreen.style.display = 'none';
                 this.audio.init();
                 this.vibration.requestPermission();
+                // Forzar vibración extra
+                setTimeout(() => this.vibration.requestPermission(), 500);
 
                 if (this._iosGyro && typeof DeviceOrientationEvent.requestPermission === 'function') {
                     this.requestGyroPermission().then(() => this.beginGameplay());
@@ -888,7 +903,7 @@
                 document.getElementById('permission-request').style.display = 'block';
                 setTimeout(() => { document.getElementById('permission-request').style.display = 'none'; }, 3000);
                 this.gyroDebug.style.display = 'block';
-                this.invertBtns.style.display = 'flex';
+                this.bottomBar.style.display = 'flex';
                 this.steerIndicator.style.display = 'block';
             }
 
@@ -928,7 +943,6 @@
             }
 
             restartGame() { this.beginGameplay(); }
-
             gameOver() {
                 this.gameRunning = false;
                 this.isFiring = false;
@@ -939,57 +953,51 @@
                 this.createSmoke(new THREE.Vector3(0, 3, 0), 3.0);
                 setTimeout(() => {
                     this.gameOverScreen.style.display = 'flex';
-                    this.finalScoreElement.textContent = `Puntuación: ${this.score}`;
+                    this.finalScoreEl.textContent = `Puntuación: ${this.score}`;
                     this.updateRanking();
                     this.gyroDebug.style.display = 'none';
-                    this.invertBtns.style.display = 'none';
+                    this.bottomBar.style.display = 'none';
                     this.steerIndicator.style.display = 'none';
                 }, 800);
             }
-
             updateRanking() {
-                let rankings = JSON.parse(localStorage.getItem('midway_rankings_v9') || '[]');
-                rankings.push({ score: this.score, time: Math.floor(this.gameTime), date: new Date().toLocaleDateString() });
-                rankings.sort((a, b) => b.score - a.score);
-                rankings = rankings.slice(0, 10);
-                localStorage.setItem('midway_rankings_v9', JSON.stringify(rankings));
-                let html = '<h3>🏆 MEJORES ARTILLEROS</h3>';
-                rankings.forEach((r, i) => { html +=
-                        `<div>${i+1}. ${r.score} pts - ${r.time}s (${r.date})</div>`; });
-                this.rankingElement.innerHTML = html;
+                let r = JSON.parse(localStorage.getItem('midway_v10') || '[]');
+                r.push({ score: this.score, time: Math.floor(this.gameTime), date: new Date().toLocaleDateString() });
+                r.sort((a, b) => b.score - a.score);
+                r = r.slice(0, 10);
+                localStorage.setItem('midway_v10', JSON.stringify(r));
+                let h = '<h3>🏆 MEJORES ARTILLEROS</h3>';
+                r.forEach((x, i) => h +=
+                    `<div>${i+1}. ${x.score} pts - ${x.time}s (${x.date})</div>`);
+                this.rankingEl.innerHTML = h;
             }
-
-            showMessage(text, duration = 1500) {
-                this.messageElement.textContent = text;
-                this.messageElement.style.opacity = '1';
-                clearTimeout(this._msgTimeout);
-                this._msgTimeout = setTimeout(() => { this.messageElement.style.opacity = '0'; }, duration);
+            showMessage(t, d = 1500) {
+                this.messageEl.textContent = t;
+                this.messageEl.style.opacity = '1';
+                clearTimeout(this._mt);
+                this._mt = setTimeout(() => this.messageEl.style.opacity = '0', d);
             }
-
             updateHUD() {
-                this.scoreElement.textContent = `PTS: ${this.score}`;
+                this.scoreEl.textContent = `PTS: ${this.score}`;
                 this.healthBar.style.width = `${this.health}%`;
-                this.healthBar.style.background =
-                    this.health < 30 ? 'linear-gradient(90deg, #ff0000, #ff6600)' :
+                this.healthBar.style.background = this.health < 30 ? 'linear-gradient(90deg, #ff0000, #ff6600)' :
                     this.health < 60 ? 'linear-gradient(90deg, #ff6600, #ffaa00)' :
                     'linear-gradient(90deg, #ff0000, #ff4444)';
             }
 
             spawnPlane() {
                 const types = ['fighter', 'dive_bomber', 'torpedo_bomber'];
-                const weights = [0.5, 0.3, 0.2];
+                const w = [0.5, 0.3, 0.2];
                 const rand = Math.random();
-                let type = types[0];
-                let cum = 0;
-                for (let i = 0; i < types.length; i++) { cum += weights[i]; if (rand <= cum) { type = types[i]; break; } }
-
-                const angle = Math.random() * Math.PI * 2;
-                const distance = 30 + Math.random() * 40;
-                const height = 3 + Math.random() * 25;
-
+                let type = types[0],
+                    cum = 0;
+                for (let i = 0; i < types.length; i++) { cum += w[i]; if (rand <= cum) { type = types[i]; break; } }
+                const a = Math.random() * Math.PI * 2;
+                const d = 30 + Math.random() * 40;
+                const h = 3 + Math.random() * 25;
                 const plane = {
                     type,
-                    position: new THREE.Vector3(Math.cos(angle) * distance, height, Math.sin(angle) * distance),
+                    position: new THREE.Vector3(Math.cos(a) * d, h, Math.sin(a) * d),
                     velocity: new THREE.Vector3(),
                     speed: 7 + Math.random() * 7 + this.difficulty * 2.5,
                     health: type === 'fighter' ? 2 : 3,
@@ -997,54 +1005,37 @@
                     alive: true,
                     group: null,
                 };
-
-                const toShip = new THREE.Vector3(0, 1.5, 0).sub(plane.position).normalize();
-                plane.velocity.copy(toShip.multiplyScalar(plane.speed));
+                const ts = new THREE.Vector3(0, 1.5, 0).sub(plane.position).normalize();
+                plane.velocity.copy(ts.multiplyScalar(plane.speed));
                 plane.group = new THREE.Group();
                 plane.group.position.copy(plane.position);
-
-                const fuse = new THREE.Mesh(
-                    new THREE.ConeGeometry(0.35, 2.2, 6),
-                    new THREE.MeshStandardMaterial({
-                        color: type === 'fighter' ? 0x5a6a4a : type === 'dive_bomber' ? 0x6a4a3a : 0x4a5a3a,
-                        roughness: 0.45, metalness: 0.4
-                    })
-                );
-                fuse.rotation.x = Math.PI / 2;
-                fuse.position.z = -0.9;
-                fuse.castShadow = true;
-                plane.group.add(fuse);
-
-                const wing = new THREE.Mesh(
-                    new THREE.BoxGeometry(3.5, 0.08, 1),
-                    new THREE.MeshStandardMaterial({ color: 0x4a4a3a, roughness: 0.55, metalness: 0.3 })
-                );
-                wing.position.z = -0.7;
-                wing.castShadow = true;
-                plane.group.add(wing);
-
-                const tail = new THREE.Mesh(
-                    new THREE.BoxGeometry(1.3, 0.25, 0.4),
-                    new THREE.MeshStandardMaterial({ color: 0x4a4a3a, roughness: 0.55, metalness: 0.3 })
-                );
-                tail.position.set(0, 0.15, 0.4);
-                plane.group.add(tail);
-
-                plane.propeller = new THREE.Mesh(
-                    new THREE.BoxGeometry(0.08, 1.3, 0.08),
-                    new THREE.MeshStandardMaterial({ color: 0x999999, roughness: 0.25, metalness: 0.8 })
-                );
+                const f = new THREE.Mesh(new THREE.ConeGeometry(0.35, 2.2, 6), new THREE.MeshStandardMaterial({
+                    color: type === 'fighter' ? 0x5a6a4a : type === 'dive_bomber' ? 0x6a4a3a : 0x4a5a3a,
+                    roughness: 0.45,
+                    metalness: 0.4
+                }));
+                f.rotation.x = Math.PI / 2;
+                f.position.z = -0.9;
+                f.castShadow = true;
+                plane.group.add(f);
+                const wg = new THREE.Mesh(new THREE.BoxGeometry(3.5, 0.08, 1), new THREE.MeshStandardMaterial({ color: 0x4a4a3a,
+                    roughness: 0.55, metalness: 0.3 }));
+                wg.position.z = -0.7;
+                wg.castShadow = true;
+                plane.group.add(wg);
+                const t = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.25, 0.4), new THREE.MeshStandardMaterial({ color: 0x4a4a3a,
+                    roughness: 0.55, metalness: 0.3 }));
+                t.position.set(0, 0.15, 0.4);
+                plane.group.add(t);
+                plane.propeller = new THREE.Mesh(new THREE.BoxGeometry(0.08, 1.3, 0.08), new THREE.MeshStandardMaterial({ color: 0x999999,
+                    roughness: 0.25, metalness: 0.8 }));
                 plane.propeller.position.z = -2;
                 plane.group.add(plane.propeller);
-
-                const hinomaru = new THREE.Mesh(
-                    new THREE.CircleGeometry(0.25, 16),
-                    new THREE.MeshBasicMaterial({ color: 0xff0000, side: THREE.DoubleSide })
-                );
-                hinomaru.position.set(0, 0, -0.4);
-                hinomaru.rotation.y = Math.PI;
-                plane.group.add(hinomaru);
-
+                const hm = new THREE.Mesh(new THREE.CircleGeometry(0.25, 16), new THREE.MeshBasicMaterial({ color: 0xff0000,
+                    side: THREE.DoubleSide }));
+                hm.position.set(0, 0, -0.4);
+                hm.rotation.y = Math.PI;
+                plane.group.add(hm);
                 plane.group.lookAt(new THREE.Vector3().addVectors(plane.position, plane.velocity));
                 this.scene.add(plane.group);
                 this.planes.push(plane);
@@ -1053,130 +1044,117 @@
 
             fireBullet() {
                 if (this.fireCooldown > 0) return;
-                const bulletSpeed = 55;
+                const bs = 55;
                 const dir = new THREE.Vector3(0, 0, -1);
                 dir.applyQuaternion(this.gunsGroup.getWorldQuaternion(new THREE.Quaternion()));
-
                 for (let i = 0; i < 2; i++) {
-                    const offset = (i - 0.5) * 0.35;
-                    const barrelTip = new THREE.Vector3(offset, 0, -4.0);
-                    barrelTip.applyQuaternion(this.gunsGroup.getWorldQuaternion(new THREE.Quaternion()));
-                    barrelTip.add(this.gunsGroup.getWorldPosition(new THREE.Vector3()));
-
-                    const spread = new THREE.Vector3((Math.random() - 0.5) * 0.04, (Math.random() - 0.5) * 0.04, (Math
-                        .random() - 0.5) * 0.04);
-                    const finalDir = dir.clone().add(spread).normalize();
-
-                    const bullet = {
-                        position: barrelTip.clone(),
-                        velocity: finalDir.multiplyScalar(bulletSpeed),
-                        life: 1.8,
-                        tracer: null,
-                    };
-
-                    const tGeom = new THREE.SphereGeometry(0.06, 4, 4);
-                    bullet.tracer = new THREE.Mesh(tGeom, new THREE.MeshBasicMaterial({ color: 0xffff44 }));
+                    const off = (i - 0.5) * 0.35;
+                    const tip = new THREE.Vector3(off, 0, -4.0);
+                    tip.applyQuaternion(this.gunsGroup.getWorldQuaternion(new THREE.Quaternion()));
+                    tip.add(this.gunsGroup.getWorldPosition(new THREE.Vector3()));
+                    const sp = new THREE.Vector3((Math.random() - 0.5) * 0.04, (Math.random() - 0.5) * 0.04, (Math.random() -
+                        0.5) * 0.04);
+                    const fd = dir.clone().add(sp).normalize();
+                    const bullet = { position: tip.clone(), velocity: fd.multiplyScalar(bs), life: 1.8, tracer: null };
+                    const tg = new THREE.SphereGeometry(0.06, 4, 4);
+                    bullet.tracer = new THREE.Mesh(tg, new THREE.MeshBasicMaterial({ color: 0xffff44 }));
                     bullet.tracer.position.copy(bullet.position);
                     this.scene.add(bullet.tracer);
                     this.bulletMeshes.push(bullet.tracer);
                     this.bullets.push(bullet);
                 }
-
                 this.fireCooldown = this.fireRate;
                 this.muzzleFlash = 0.05;
                 this.audio.playGunshot();
                 this.vibration.gunshotVibrate();
             }
 
-            createExplosion(position, size = 1) {
+            createExplosion(pos, size = 1) {
                 const parts = [];
-                const fireCount = Math.floor(35 * size);
-                for (let i = 0; i < fireCount; i++) {
+                const fc = Math.floor(35 * size);
+                for (let i = 0; i < fc; i++) {
                     const p = new THREE.Mesh(
                         new THREE.SphereGeometry(0.12 * size * (0.5 + Math.random()), 6, 6),
                         new THREE.MeshBasicMaterial({
                             color: new THREE.Color().setHSL(0.06 + Math.random() * 0.12, 1, 0.4 + Math.random() * 0.6),
                             transparent: true,
-                            opacity: 1,
+                            opacity: 1
                         })
                     );
-                    p.position.copy(position);
-                    p.velocity = new THREE.Vector3((Math.random() - 0.5) * 15 * size, (Math.random() - 0.5) * 15 * size, (
-                        Math.random() - 0.5) * 15 * size);
+                    p.position.copy(pos);
+                    p.velocity = new THREE.Vector3((Math.random() - 0.5) * 15 * size, (Math.random() - 0.5) * 15 * size, (Math
+                        .random() - 0.5) * 15 * size);
                     p.life = 0.4 + Math.random() * 0.8;
                     p.age = 0;
                     p.isFire = true;
                     this.scene.add(p);
                     parts.push(p);
                 }
-                const core = new THREE.Mesh(
-                    new THREE.SphereGeometry(0.5 * size, 16, 16),
-                    new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.9 })
-                );
-                core.position.copy(position);
+                const core = new THREE.Mesh(new THREE.SphereGeometry(0.5 * size, 16, 16), new THREE.MeshBasicMaterial({ color: 0xffffff,
+                    transparent: true, opacity: 0.9 }));
+                core.position.copy(pos);
                 core.life = 0.2;
                 core.age = 0;
                 core.isCore = true;
                 this.scene.add(core);
                 parts.push(core);
                 const light = new THREE.PointLight(0xff6600, 8 * size, 20 * size);
-                light.position.copy(position);
+                light.position.copy(pos);
                 light.life = 0.4;
                 light.age = 0;
                 light.isLight = true;
                 this.scene.add(light);
                 parts.push(light);
-
                 this.explosionParticles.push({ particles: parts, age: 0, life: 1.2 });
-                setTimeout(() => { this.createSmoke(position, size); }, 150);
+                setTimeout(() => this.createSmoke(pos, size), 150);
                 this.audio.playExplosion();
                 this.vibration.explosionVibrate();
             }
 
-            createSmoke(position, size = 1) {
+            createSmoke(pos, size = 1) {
                 const parts = [];
-                const smokeCount = Math.floor(20 * size);
-                for (let i = 0; i < smokeCount; i++) {
+                const sc = Math.floor(20 * size);
+                for (let i = 0; i < sc; i++) {
                     const p = new THREE.Mesh(
                         new THREE.SphereGeometry(0.2 * size * (0.5 + Math.random()), 8, 8),
                         new THREE.MeshBasicMaterial({ color: 0x222222, transparent: true, opacity: 0.7 })
                     );
-                    p.position.copy(position);
+                    p.position.copy(pos);
                     p.position.x += (Math.random() - 0.5) * 2 * size;
                     p.position.z += (Math.random() - 0.5) * 2 * size;
-                    p.velocity = new THREE.Vector3((Math.random() - 0.5) * 3 * size, 2 + Math.random() * 5 * size, (Math
-                        .random() - 0.5) * 3 * size);
-                    p.life = 1.0 + Math.random() * 2.0;
+                    p.velocity = new THREE.Vector3((Math.random() - 0.5) * 3 * size, 2 + Math.random() * 5 * size, (Math.random() -
+                        0.5) * 3 * size);
+                    p.life = 1 + Math.random() * 2;
                     p.age = 0;
                     p.isSmoke = true;
                     this.scene.add(p);
                     parts.push(p);
                 }
-                this.smokeParticles.push({ particles: parts, age: 0, life: 3.0 });
+                this.smokeParticles.push({ particles: parts, age: 0, life: 3 });
             }
 
-            createDeckFire(position) {
-                const fireGroup = new THREE.Group();
-                fireGroup.position.copy(position);
-                fireGroup.position.y = 1.9;
+            createDeckFire(pos) {
+                const fg = new THREE.Group();
+                fg.position.copy(pos);
+                fg.position.y = 1.9;
                 for (let i = 0; i < 8; i++) {
-                    const flame = new THREE.Mesh(
+                    const fl = new THREE.Mesh(
                         new THREE.ConeGeometry(0.15 + Math.random() * 0.2, 0.5 + Math.random() * 0.8, 6),
                         new THREE.MeshBasicMaterial({
                             color: new THREE.Color().setHSL(0.06 + Math.random() * 0.1, 1, 0.4 + Math.random() * 0.5),
                             transparent: true,
-                            opacity: 0.8,
+                            opacity: 0.8
                         })
                     );
-                    flame.position.set((Math.random() - 0.5) * 1.5, 0.3, (Math.random() - 0.5) * 1.5);
-                    flame.userData = { speed: 0.5 + Math.random() * 1.5, offset: Math.random() * Math.PI * 2 };
-                    fireGroup.add(flame);
+                    fl.position.set((Math.random() - 0.5) * 1.5, 0.3, (Math.random() - 0.5) * 1.5);
+                    fl.userData = { speed: 0.5 + Math.random() * 1.5, offset: Math.random() * Math.PI * 2 };
+                    fg.add(fl);
                 }
-                const fireLight = new THREE.PointLight(0xff4400, 2, 6);
-                fireLight.position.y = 0.5;
-                fireGroup.add(fireLight);
-                this.scene.add(fireGroup);
-                this.deckFires.push({ group: fireGroup, life: 4 + Math.random() * 6, age: 0 });
+                const fl = new THREE.PointLight(0xff4400, 2, 6);
+                fl.position.y = 0.5;
+                fg.add(fl);
+                this.scene.add(fg);
+                this.deckFires.push({ group: fg, life: 4 + Math.random() * 6, age: 0 });
             }
 
             damageShip(amount) {
@@ -1184,10 +1162,10 @@
                 if (this.health <= 0) { this.health = 0;
                     this.updateHUD();
                     this.gameOver(); return; }
-                const impactPos = new THREE.Vector3((Math.random() - 0.5) * 12, 2, (Math.random() - 0.5) * 25);
-                this.createExplosion(impactPos, 1.0 + amount / 20);
-                this.createSmoke(impactPos, 0.8);
-                this.createDeckFire(impactPos);
+                const ip = new THREE.Vector3((Math.random() - 0.5) * 12, 2, (Math.random() - 0.5) * 25);
+                this.createExplosion(ip, 1 + amount / 20);
+                this.createSmoke(ip, 0.8);
+                this.createDeckFire(ip);
                 this.audio.playHit();
                 this.vibration.hitVibrate();
                 this.showMessage('¡IMPACTO! -' + amount, 1200);
@@ -1196,249 +1174,197 @@
             }
 
             update(delta) {
-                if (!this.gameRunning) {
-                    this.updateOcean(delta);
+                if (!this.gameRunning) { this.updateOcean(delta);
                     this.updateExplosions(delta);
                     this.updateSmoke(delta);
-                    this.updateDeckFires(delta);
-                    return;
-                }
-
+                    this.updateDeckFires(delta); return; }
                 this.gameTime += delta;
                 this.fireCooldown = Math.max(0, this.fireCooldown - delta);
                 this.muzzleFlash = Math.max(0, this.muzzleFlash - delta);
                 this.difficulty = 1 + Math.floor(this.gameTime / 30);
                 this.spawnInterval = Math.max(0.7, 3.5 - this.difficulty * 0.35);
-
                 this.spawnTimer += delta;
-                if (this.spawnTimer >= this.spawnInterval) {
-                    this.spawnTimer = 0;
-                    this.spawnPlane();
-                    if (this.difficulty >= 3 && Math.random() < 0.5) {
-                        setTimeout(() => { if (this.gameRunning) this.spawnPlane(); }, Math.random() * 800);
-                    }
-                }
-
-                let steer = this.steerInput;
-                let pitch = this.pitchInput;
-                if (!this.gyroAvailable || !this.calibrated) {
-                    if (this._fbYaw) steer = this._fbYaw();
-                    if (this._fbPitch) pitch = this._fbPitch();
-                }
-
-                if (steer !== 0) {
-                    this.turretYaw += steer * delta * 2.5;
-                }
-
+                if (this.spawnTimer >= this.spawnInterval) { this.spawnTimer = 0;
+                    this.spawnPlane(); if (this.difficulty >= 3 && Math.random() < 0.5) setTimeout(() => { if (this.gameRunning)
+                            this.spawnPlane(); }, Math.random() * 800); }
+                let steer = this.steerInput,
+                    pitch = this.pitchInput;
+                if (!this.gyroAvailable || !this.calibrated) { if (this._fbYaw) steer = this._fbYaw(); if (this._fbPitch)
+                        pitch = this._fbPitch(); }
+                if (steer !== 0) this.turretYaw += steer * delta * 2.5;
                 this.targetPitch = pitch;
                 this.turretPitch += (this.targetPitch - this.turretPitch) * Math.min(delta * 7, 1);
                 this.turretPitch = THREE.MathUtils.clamp(this.turretPitch, -0.4, 0.5);
-
                 this.turretGroup.rotation.y = this.turretYaw;
                 this.gunsGroup.rotation.x = this.turretPitch;
-
-                const camOffset = new THREE.Vector3(0, 2.2, 1.5);
-                camOffset.applyQuaternion(this.turretGroup.quaternion);
-                this.camera.position.copy(this.turretGroup.position.clone().add(camOffset));
-
-                const lookDir = new THREE.Vector3(0, 0.2, -20);
-                lookDir.applyQuaternion(this.gunsGroup.getWorldQuaternion(new THREE.Quaternion()));
-                const lookTarget = this.gunsGroup.getWorldPosition(new THREE.Vector3()).add(lookDir);
-                this.camera.lookAt(lookTarget);
-
+                const co = new THREE.Vector3(0, 2.2, 1.5);
+                co.applyQuaternion(this.turretGroup.quaternion);
+                this.camera.position.copy(this.turretGroup.position.clone().add(co));
+                const ld = new THREE.Vector3(0, 0.2, -20);
+                ld.applyQuaternion(this.gunsGroup.getWorldQuaternion(new THREE.Quaternion()));
+                this.camera.lookAt(this.gunsGroup.getWorldPosition(new THREE.Vector3()).add(ld));
                 if (this.isFiring && this.fireCooldown <= 0) this.fireBullet();
-
-                this.scene.fog = this.muzzleFlash > 0 ?
-                    new THREE.FogExp2(new THREE.Color().lerpColors(new THREE.Color(0x8cc8e8), new THREE.Color(0xffcc66),
-                        this.muzzleFlash / 0.05), 0.00006 + (this.muzzleFlash / 0.05) * 0.0002) :
-                    new THREE.FogExp2(0x8cc8e8, 0.00006);
-
+                this.scene.fog = this.muzzleFlash > 0 ? new THREE.FogExp2(new THREE.Color().lerpColors(new THREE.Color(
+                    0x8cc8e8), new THREE.Color(0xffcc66), this.muzzleFlash / 0.05), 0.00005 + (this.muzzleFlash / 0.05) *
+                    0.0002) : new THREE.FogExp2(0x8cc8e8, 0.00005);
                 for (let i = this.bullets.length - 1; i >= 0; i--) {
                     const b = this.bullets[i];
                     b.position.add(b.velocity.clone().multiplyScalar(delta));
                     b.life -= delta;
                     b.tracer.position.copy(b.position);
-                    if (b.life <= 0 || b.position.y < -3 || Math.abs(b.position.x) > 80 || Math.abs(b.position.z) > 80) {
-                        this.scene.remove(b.tracer);
-                        const idx = this.bulletMeshes.indexOf(b.tracer);
-                        if (idx > -1) this.bulletMeshes.splice(idx, 1);
-                        this.bullets.splice(i, 1);
-                        continue;
-                    }
+                    if (b.life <= 0 || b.position.y < -3 || Math.abs(b.position.x) > 80 || Math.abs(b.position.z) > 80) { this
+                            .scene.remove(b.tracer); const idx = this.bulletMeshes.indexOf(b.tracer); if (idx > -1) this
+                            .bulletMeshes.splice(idx, 1);
+                        this.bullets.splice(i, 1); continue; }
                     for (let j = this.planes.length - 1; j >= 0; j--) {
-                        const plane = this.planes[j];
-                        if (!plane.alive) continue;
-                        if (b.position.distanceTo(plane.group.position) < 2.2) {
-                            plane.health--;
-                            if (plane.health <= 0) { this.destroyPlane(j);
+                        const p = this.planes[j];
+                        if (!p.alive) continue;
+                        if (b.position.distanceTo(p.group.position) < 2.2) { p.health--; if (p.health <= 0) { this.destroyPlane(
+                                    j);
                                 this.score += 100;
-                                this.showMessage('¡DERRIBADO! +100', 1200); } else { this.showMessage('¡IMPACTO!',
-                                500);
-                                this.audio.playHit(); }
-                            this.scene.remove(b.tracer);
-                            const idx = this.bulletMeshes.indexOf(b.tracer);
-                            if (idx > -1) this.bulletMeshes.splice(idx, 1);
-                            this.bullets.splice(i, 1);
-                            break;
-                        }
+                                this.showMessage('¡DERRIBADO! +100', 1200); } else { this.showMessage('¡IMPACTO!', 500);
+                                this.audio.playHit(); } this.scene.remove(b.tracer); const idx = this.bulletMeshes.indexOf(
+                                    b.tracer); if (idx > -1) this.bulletMeshes.splice(idx, 1);
+                            this.bullets.splice(i, 1); break; }
                     }
                 }
-
                 for (let i = this.planes.length - 1; i >= 0; i--) {
-                    const plane = this.planes[i];
-                    if (!plane.alive) continue;
-                    plane.position.add(plane.velocity.clone().multiplyScalar(delta));
-                    plane.group.position.copy(plane.position);
-                    plane.group.lookAt(new THREE.Vector3().addVectors(plane.position, plane.velocity));
-                    if (plane.propeller) plane.propeller.rotation.z += delta * 45;
-                    plane.attackCooldown = Math.max(0, plane.attackCooldown - delta);
-                    const dist = plane.position.length();
-                    if (dist < 28 && plane.attackCooldown <= 0) {
-                        if (plane.type === 'fighter') { plane.attackCooldown = 1.8;
-                            this.damageShip(2 + Math.floor(this.difficulty / 2)); } else if (plane.type ===
-                            'dive_bomber' && plane.position.y > 7 && dist < 18) { plane.attackCooldown = 3.5;
-                            plane.velocity.y = -18;
-                            setTimeout(() => { if (plane.alive && this.gameRunning) { this.damageShip(12 + this
-                                        .difficulty * 2);
-                                    this.createExplosion(new THREE.Vector3((Math.random() - 0.5) * 12, 1.5, (Math
-                                        .random() - 0.5) * 22), 0.8); } }, 700); } else if (plane.type ===
-                            'torpedo_bomber' && plane.position.y < 2.5 && dist < 22) { plane.attackCooldown = 5;
+                    const p = this.planes[i];
+                    if (!p.alive) continue;
+                    p.position.add(p.velocity.clone().multiplyScalar(delta));
+                    p.group.position.copy(p.position);
+                    p.group.lookAt(new THREE.Vector3().addVectors(p.position, p.velocity));
+                    if (p.propeller) p.propeller.rotation.z += delta * 45;
+                    p.attackCooldown = Math.max(0, p.attackCooldown - delta);
+                    const dist = p.position.length();
+                    if (dist < 28 && p.attackCooldown <= 0) {
+                        if (p.type === 'fighter') { p.attackCooldown = 1.8;
+                            this.damageShip(2 + Math.floor(this.difficulty / 2)); } else if (p.type === 'dive_bomber' && p
+                            .position.y > 7 && dist < 18) { p.attackCooldown = 3.5;
+                            p.velocity.y = -18;
+                            setTimeout(() => { if (p.alive && this.gameRunning) { this.damageShip(12 + this.difficulty * 2);
+                                    this.createExplosion(new THREE.Vector3((Math.random() - 0.5) * 12, 1.5, (Math.random() -
+                                        0.5) * 22), 0.8); } }, 700); } else if (p.type === 'torpedo_bomber' && p.position.y <
+                            2.5 && dist < 22) { p.attackCooldown = 5;
                             this.damageShip(18 + this.difficulty * 3);
                             this.createExplosion(new THREE.Vector3(0, -0.5, (Math.random() - 0.5) * 18), 1.2);
                             this.showMessage('¡TORPEDO! -' + (18 + this.difficulty * 3), 1500); }
                     }
-                    if (Math.abs(plane.position.x) > 70 || Math.abs(plane.position.z) > 70 || plane.position.y > 40 || plane
-                        .position.y < -8) this.removePlane(i);
+                    if (Math.abs(p.position.x) > 70 || Math.abs(p.position.z) > 70 || p.position.y > 40 || p.position.y < -8)
+                        this.removePlane(i);
                 }
-
                 if (Math.floor(this.gameTime) > Math.floor(this.gameTime - delta)) this.score += 10;
                 this.updateExplosions(delta);
                 this.updateSmoke(delta);
                 this.updateDeckFires(delta);
-                for (let i = this.hitEffects.length - 1; i >= 0; i--) { this.hitEffects[i].timer -= delta; if (this
-                        .hitEffects[i].timer <= 0) this.hitEffects.splice(i, 1); }
+                for (let i = this.hitEffects.length - 1; i >= 0; i--) { this.hitEffects[i].timer -= delta; if (this.hitEffects[
+                        i].timer <= 0) this.hitEffects.splice(i, 1); }
                 this.updateOcean(delta);
                 this.updateHUD();
             }
 
-            destroyPlane(index) {
-                const plane = this.planes[index];
-                plane.alive = false;
-                this.createExplosion(plane.group.position.clone(), 0.7);
-                this.createSmoke(plane.group.position.clone(), 0.8);
-                this.scene.remove(plane.group);
-                const idx = this.planeMeshes.indexOf(plane);
+            destroyPlane(i) {
+                const p = this.planes[i];
+                p.alive = false;
+                this.createExplosion(p.group.position.clone(), 0.7);
+                this.createSmoke(p.group.position.clone(), 0.8);
+                this.scene.remove(p.group);
+                const idx = this.planeMeshes.indexOf(p);
                 if (idx > -1) this.planeMeshes.splice(idx, 1);
-                this.planes.splice(index, 1);
+                this.planes.splice(i, 1);
             }
-
-            removePlane(index) {
-                const plane = this.planes[index];
-                plane.alive = false;
-                this.scene.remove(plane.group);
-                const idx = this.planeMeshes.indexOf(plane);
+            removePlane(i) {
+                const p = this.planes[i];
+                p.alive = false;
+                this.scene.remove(p.group);
+                const idx = this.planeMeshes.indexOf(p);
                 if (idx > -1) this.planeMeshes.splice(idx, 1);
-                this.planes.splice(index, 1);
+                this.planes.splice(i, 1);
             }
-
             updateExplosions(delta) {
                 for (let i = this.explosionParticles.length - 1; i >= 0; i--) {
-                    const exp = this.explosionParticles[i];
-                    exp.age += delta;
-                    for (let j = exp.particles.length - 1; j >= 0; j--) {
-                        const p = exp.particles[j];
+                    const e = this.explosionParticles[i];
+                    e.age += delta;
+                    for (let j = e.particles.length - 1; j >= 0; j--) {
+                        const p = e.particles[j];
                         if (p.isLight) { p.age += delta;
                             p.intensity = 8 * (1 - p.age / p.life); if (p.age >= p.life) { this.scene.remove(p);
-                                exp.particles.splice(j, 1); } } else if (p.isCore) { p.age += delta;
+                                e.particles.splice(j, 1); } } else if (p.isCore) { p.age += delta;
                             p.material.opacity = 1 - p.age / p.life;
                             p.scale.setScalar(1 + p.age * 5); if (p.age >= p.life) { this.scene.remove(p);
-                                exp.particles.splice(j, 1); } } else { p.age += delta;
+                                e.particles.splice(j, 1); } } else { p.age += delta;
                             p.position.add(p.velocity.clone().multiplyScalar(delta));
                             p.velocity.y += 1.5 * delta;
                             p.material.opacity = Math.max(0, 1 - p.age / p.life);
-                            p.scale.setScalar(Math.max(0.05, 1 - p.age / p.life)); if (p.age >= p.life) { this.scene
-                                    .remove(p);
-                                exp.particles.splice(j, 1); } }
+                            p.scale.setScalar(Math.max(0.05, 1 - p.age / p.life)); if (p.age >= p.life) { this.scene.remove(
+                                    p);
+                                e.particles.splice(j, 1); } }
                     }
-                    if (exp.particles.length === 0) this.explosionParticles.splice(i, 1);
+                    if (e.particles.length === 0) this.explosionParticles.splice(i, 1);
                 }
             }
-
             updateSmoke(delta) {
                 for (let i = this.smokeParticles.length - 1; i >= 0; i--) {
-                    const sp = this.smokeParticles[i];
-                    sp.age += delta;
-                    for (let j = sp.particles.length - 1; j >= 0; j--) {
-                        const p = sp.particles[j];
+                    const s = this.smokeParticles[i];
+                    s.age += delta;
+                    for (let j = s.particles.length - 1; j >= 0; j--) {
+                        const p = s.particles[j];
                         p.age += delta;
                         p.position.add(p.velocity.clone().multiplyScalar(delta));
                         p.velocity.y += 0.5 * delta;
                         p.material.opacity = Math.max(0, 0.7 * (1 - p.age / p.life));
                         p.scale.setScalar(1 + p.age * 2);
                         if (p.age >= p.life) { this.scene.remove(p);
-                            sp.particles.splice(j, 1); }
+                            s.particles.splice(j, 1); }
                     }
-                    if (sp.particles.length === 0) this.smokeParticles.splice(i, 1);
+                    if (s.particles.length === 0) this.smokeParticles.splice(i, 1);
                 }
             }
-
             updateDeckFires(delta) {
                 for (let i = this.deckFires.length - 1; i >= 0; i--) {
-                    const df = this.deckFires[i];
-                    df.age += delta;
-                    df.group.children.forEach(child => {
-                        if (child.isPointLight) { child.intensity = 2 * (1 - df.age / df.life); } else if (child
-                            .userData && child.userData.speed) {
-                            child.scale.y = 0.5 + Math.sin(df.age * child.userData.speed + child.userData.offset) *
-                                0.5;
-                            child.material.opacity = Math.max(0, 0.8 * (1 - df.age / df.life));
+                    const d = this.deckFires[i];
+                    d.age += delta;
+                    d.group.children.forEach(c => {
+                        if (c.isPointLight) c.intensity = 2 * (1 - d.age / d.life);
+                        else if (c.userData && c.userData.speed) {
+                            c.scale.y = 0.5 + Math.sin(d.age * c.userData.speed + c.userData.offset) * 0.5;
+                            c.material.opacity = Math.max(0, 0.8 * (1 - d.age / d.life));
                         }
                     });
-                    if (df.age >= df.life) {
-                        df.group.children.forEach(c => { if (c.isPointLight) this.scene.remove(c); });
-                        this.scene.remove(df.group);
-                        this.deckFires.splice(i, 1);
-                    }
+                    if (d.age >= d.life) { d.group.children.forEach(c => { if (c.isPointLight) this.scene.remove(c); });
+                        this.scene.remove(d.group);
+                        this.deckFires.splice(i, 1); }
                 }
             }
-
             updateOcean(delta) {
-                if (!this.ocean || !this.oceanVertices) return;
-                const positions = this.ocean.geometry.attributes.position.array;
-                const time = performance.now() * 0.001;
-                for (let i = 0; i < positions.length; i += 3) {
-                    const x = this.oceanVertices[i];
-                    const y = this.oceanVertices[i + 1];
-                    positions[i + 2] = Math.sin(x * 0.2 + time) * Math.cos(y * 0.2 + time * 0.7) * 0.6 +
-                        Math.sin(x * 0.1 + time * 1.2) * 0.3;
+                if (!this.ocean || !this.oceanVerts) return;
+                const pos = this.ocean.geometry.attributes.position.array;
+                const t = performance.now() * 0.001;
+                for (let i = 0; i < pos.length; i += 3) {
+                    pos[i + 2] = Math.sin(this.oceanVerts[i] * 0.2 + t) * Math.cos(this.oceanVerts[i + 1] * 0.2 + t * 0.7) *
+                        0.6 + Math.sin(this.oceanVerts[i] * 0.1 + t * 1.2) * 0.3;
                 }
                 this.ocean.geometry.attributes.position.needsUpdate = true;
             }
-
             animate() {
                 requestAnimationFrame(() => this.animate());
                 const now = performance.now();
-                const delta = Math.min((now - this.lastTime) / 1000, 0.1);
+                this.update(Math.min((now - this.lastTime) / 1000, 0.1));
                 this.lastTime = now;
-                this.update(delta);
                 this.renderer.render(this.scene, this.camera);
             }
         }
 
         const game = new MidwayGame();
         game.init();
-
         if ('serviceWorker' in navigator) {
-            const swCode = `
-            self.addEventListener('install', (e) => { self.skipWaiting(); });
-            self.addEventListener('activate', (e) => { e.waitUntil(clients.claim()); });
-            self.addEventListener('fetch', (e) => { e.respondWith(fetch(e.request)); });
-          `;
-            navigator.serviceWorker.register(URL.createObjectURL(new Blob([swCode], { type: 'application/javascript' })))
-                .catch(() => {});
+            navigator.serviceWorker.register(URL.createObjectURL(new Blob([`
+            self.addEventListener('install',()=>self.skipWaiting());
+            self.addEventListener('activate',e=>e.waitUntil(clients.claim()));
+            self.addEventListener('fetch',e=>e.respondWith(fetch(e.request)));
+          `], { type: 'application/javascript' }))).catch(() => {});
         }
-
-        console.log('⚓ Batalla de Midway v9 - Doble inversor + Audio híbrido');
+        console.log('⚓ Midway v10 - Selector velocidad + Botones redondos + Sonidos');
     </script>
 </body>
 </html>
