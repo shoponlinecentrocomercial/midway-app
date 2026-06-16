@@ -88,7 +88,6 @@
             top: 28%;
             left: 50%;
             transform: translate(-50%, -50%);
-            color: #ffcc00;
             font-size: 18px;
             font-weight: bold;
             text-align: center;
@@ -101,12 +100,12 @@
 
         #joystick-container {
             position: absolute;
-            width: 25vw;
-            height: 25vw;
-            min-width: 120px;
-            min-height: 120px;
-            max-width: 200px;
-            max-height: 200px;
+            width: 40vw;
+            height: 40vw;
+            min-width: 150px;
+            min-height: 150px;
+            max-width: 280px;
+            max-height: 280px;
             border-radius: 50%;
             pointer-events: all;
             z-index: 15;
@@ -120,8 +119,8 @@
         }
         #joystick-thumb {
             position: absolute;
-            width: 40px;
-            height: 40px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
             background: rgba(255,255,255,0.25);
             border: 2px solid rgba(255,255,255,0.5);
@@ -615,7 +614,7 @@
                     let dx = touch.clientX - cx;
                     let dy = touch.clientY - cy;
                     const dist = Math.sqrt(dx * dx + dy * dy);
-                    const maxDist = rect.width / 2 - 20;
+                    const maxDist = rect.width / 2 - 22;
                     if (dist > maxDist) {
                         dx = (dx / dist) * maxDist;
                         dy = (dy / dist) * maxDist;
@@ -710,9 +709,9 @@
                 this.turretPitch = 0;
                 this.gameRunning = true;
                 this.gameOverScreen.style.display = 'none';
-                this.joystickContainer.style.display = 'block'; // Mostrar joystick al reiniciar
+                this.joystickContainer.style.display = 'block';
                 this.updateHUD();
-                this.showMessage('¡DEFIENDE EL BUQUE!', 2000);
+                this.showMessage('¡DEFIENDE EL BUQUE!', 2000, '#ffcc00');
                 this.audio.playAlarm();
                 this.lastTime = performance.now();
             }
@@ -737,19 +736,20 @@
             }
 
             updateRanking() {
-                let r = JSON.parse(localStorage.getItem('midway_v14') || '[]');
+                let r = JSON.parse(localStorage.getItem('midway_v16') || '[]');
                 r.push({ score: this.score, time: Math.floor(this.gameTime), date: new Date().toLocaleDateString() });
                 r.sort((a, b) => b.score - a.score);
                 r = r.slice(0, 10);
-                localStorage.setItem('midway_v14', JSON.stringify(r));
+                localStorage.setItem('midway_v16', JSON.stringify(r));
                 let h = '<h3>🏆 MEJORES ARTILLEROS</h3>';
                 r.forEach((x, i) => h +=
                     `<div>${i+1}. ${x.score} pts - ${x.time}s (${x.date})</div>`);
                 this.rankingEl.innerHTML = h;
             }
 
-            showMessage(t, d = 1500) {
+            showMessage(t, d = 1500, color = '#ffcc00') {
                 this.messageEl.textContent = t;
+                this.messageEl.style.color = color;
                 this.messageEl.style.opacity = '1';
                 clearTimeout(this._mt);
                 this._mt = setTimeout(() => this.messageEl.style.opacity = '0', d);
@@ -942,7 +942,7 @@
                 this.createDeckFire(ip);
                 this.audio.playHit();
                 this.vibration.hitVibrate();
-                this.showMessage('¡IMPACTO! -' + amount, 1200);
+                this.showMessage('¡IMPACTO! -' + amount, 1200, '#ff4444');
                 this.updateHUD();
                 this.hitEffects.push({ timer: 0.5, intensity: amount / 20 });
             }
@@ -1004,7 +1004,8 @@
                         if (b.position.distanceTo(p.group.position) < 2.2) { p.health--; if (p.health <= 0) { this.destroyPlane(
                                     j);
                                 this.score += 100;
-                                this.showMessage('¡DERRIBADO! +100', 1200); } else { this.showMessage('¡IMPACTO!', 500);
+                                this.showMessage('¡DERRIBADO! +100', 1200, '#00ff88'); } else { this.showMessage(
+                                    '¡IMPACTO!', 500, '#ff4444');
                                 this.audio.playHit(); } this.scene.remove(b.tracer); const idx = this.bulletMeshes.indexOf(
                                     b.tracer); if (idx > -1) this.bulletMeshes.splice(idx, 1);
                             this.bullets.splice(i, 1); break; }
@@ -1031,7 +1032,7 @@
                             2.5 && dist < 22) { p.attackCooldown = 5;
                             this.damageShip(18 + this.difficulty * 3);
                             this.createExplosion(new THREE.Vector3(0, -0.5, (Math.random() - 0.5) * 18), 1.2);
-                            this.showMessage('¡TORPEDO! -' + (18 + this.difficulty * 3), 1500); }
+                            this.showMessage('¡TORPEDO! -' + (18 + this.difficulty * 3), 1500, '#ff4444'); }
                     }
                     if (Math.abs(p.position.x) > 70 || Math.abs(p.position.z) > 70 || p.position.y > 40 || p.position.y < -8)
                         this.removePlane(i);
@@ -1143,7 +1144,7 @@
             self.addEventListener('fetch',e=>e.respondWith(fetch(e.request)));
           `], { type: 'application/javascript' }))).catch(() => {});
         }
-        console.log('⚓ Midway v15 - Joystick reaparece al reiniciar');
+        console.log('⚓ Midway v16 - Joystick 40% + letreros de colores');
     </script>
 </body>
 </html>
