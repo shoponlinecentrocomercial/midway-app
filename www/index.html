@@ -574,7 +574,7 @@ async loadPlaneModel() {
                     this.planeModel = group;
                   //  this.planeModel.scale.set(0.5, 0.5, 0.5);
                     this.planeModel.scale.set(0.01, 0.01, 0.01);
-                    //this.planeModel.rotation.y = Math.PI; // Gira las piezas internas 180 grados en Y
+                    this.planeModel.rotation.y = Math.PI; // Gira las piezas internas 180 grados en Y
                    const contenedor = new THREE.Group();
         
         // 3. Metemos el avión ya rotado dentro de la caja
