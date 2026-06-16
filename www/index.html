@@ -501,42 +501,59 @@
             }
 
             async loadPlaneModel() {
-                const parts = ['Fuselage', 'WingLeft', 'WingRight', 'HtpLeft', 'HtpRight', 'Nose', 'Engine', 'Propeller', 'Shaft'];
-                const group = new THREE.Group();
-                let count = 0;
-                for (const name of parts) {
-                    try {
-                        const url = MODEL_BASE + name + '.glb';
-                        const gltf = await this.gltfLoader.loadAsync(url);
-                        const part = gltf.scene;
-                        part.traverse((c) => { if (c.isMesh) { c.castShadow = true;
-                                c.receiveShadow = true; } });
-                        group.add(part);
-                        count++;
-                    } catch (e) {}
+    try {
+        // 1. Cargamos el modelo único del avión
+        const url = MODEL_BASE + 'avion.glb'; // El nombre de tu archivo único convertido
+        const gltf = await this.gltfLoader.loadAsync(url);
+        
+        // gltf.scene ya actúa como tu grupo principal
+        this.planeModel = gltf.scene; 
+
+        // 2. Activamos sombras en todas sus piezas
+        this.planeModel.traverse((c) => { 
+            if (c.isMesh) { 
+                c.castShadow = true;
+                c.receiveShadow = true; 
+            } 
+        });
+
+        // 3. HACK del ala derecha (espejo)
+        const wingLeft = this.planeModel.getObjectByName('WingLeft');
+        if (wingLeft) {
+            const wingRight = wingLeft.clone();
+            wingRight.name = 'WingRight';
+            wingRight.position.x = -wingLeft.position.x;
+            wingRight.scale.x = -wingLeft.scale.x;
+            wingRight.rotation.y = -wingLeft.rotation.y;
+            wingRight.rotation.z = -wingLeft.rotation.z;
+
+            // Evitamos que el ala derecha se vea negra por invertir la escala
+            wingRight.traverse((child) => {
+                if (child.isMesh && child.material) {
+                    if (Array.isArray(child.material)) {
+                        child.material.forEach(mat => mat.side = THREE.DoubleSide);
+                    } else {
+                        child.material.side = THREE.DoubleSide;
+                    }
                 }
-if (count >= 4) {
-    this.planeModel = group;
-    this.planeModel.scale.set(0.01, 0.01, 0.01); // Tu escala corregida
+            });
 
-    // --- CORRECCIÓN DE ROTACIÓN ---
-    
-    // 1. Para ponerlo horizontal (corregir eje X o Z):
-    // Si está vertical, necesitamos rotarlo 90 grados en el eje X.
-    // Prueba con Math.PI / 2. Si se queda boca abajo, cámbialo a -Math.PI / 2.
-    this.planeModel.rotation.x = Math.PI / 2; 
+            this.planeModel.add(wingRight);
+        }
 
-    // 2. Para que mire al frente (corregir eje Y):
-    // Si se ve desde el lateral, necesitamos rotarlo 90 grados en el eje Y.
-    // Prueba con Math.PI / 2. Si mira hacia el lado contrario, cámbialo a -Math.PI / 2 o a Math.PI.
-    this.planeModel.rotation.y = Math.PI / 2; 
+        // 4. Ajustes globales del avión (escala, posición y rotación inicial)
+        this.planeModel.scale.set(0.01, 0.01, 0.01); // Tu escala corregida
+        
+        // Ajustamos la rotación para que apunte al frente y no vuele marcha atrás
+        this.planeModel.rotation.y = Math.PI; // Ve probando si necesitas Math.PI, Math.PI / 2, etc.
 
-    // ------------------------------
+        this.modelLoaded = true;
+        console.log("✅ Modelo 3D único cargado y configurado correctamente");
 
-    this.modelLoaded = true;
-    console.log(`✅ Modelo 3D (${count} piezas)`);
+    } catch (e) {
+        console.error("Error al cargar el avión:", e);
+    }
 }
-            }
 
             createOcean() {
                 const g = new THREE.PlaneGeometry(500, 500, 150, 150);
