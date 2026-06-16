@@ -572,7 +572,8 @@ async loadPlaneModel() {
                 }
                 if (count >= 4) {
                     this.planeModel = group;
-                    this.planeModel.scale.set(0.5, 0.5, 0.5);
+                  //  this.planeModel.scale.set(0.5, 0.5, 0.5);
+                    this.planeModel.scale.set(0.01, 0.01, 0.01);
                     this.modelLoaded = true;
                     console.log(`✅ Modelo 3D (${count} piezas)`);
                 }
