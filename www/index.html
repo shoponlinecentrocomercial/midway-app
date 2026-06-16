@@ -515,12 +515,22 @@
                         count++;
                     } catch (e) {}
                 }
-                if (count >= 4) {
-                    this.planeModel = group;
-                    this.planeModel.scale.set(0.5, 0.5, 0.5);
-                    this.modelLoaded = true;
-                    console.log(`✅ Modelo 3D (${count} piezas)`);
-                }
+if (count >= 4) {
+    this.planeModel = group;
+
+    // --- CÓDIGO DE DEPURACIÓN (Mide el tamaño real del modelo) ---
+    const box = new THREE.Box3().setFromObject(group);
+    const size = new THREE.Vector3();
+    box.getSize(size);
+    console.log(`Tamaño real del avión (Ancho, Alto, Profundo):`, size);
+    // -------------------------------------------------------------
+
+    // Si mide demasiado, prueba con una escala mucho menor, por ejemplo 0.01 o 0.05
+    this.planeModel.scale.set(0.01, 0.01, 0.01); 
+    
+    this.modelLoaded = true;
+    console.log(`✅ Modelo 3D (${count} piezas)`);
+}
             }
 
             createOcean() {
