@@ -858,7 +858,7 @@ async loadPlaneModel() {
                 plane.group = this.createPlaneMesh(type);
                 plane.group.position.copy(plane.position);
                 plane.group.lookAt(new THREE.Vector3().addVectors(plane.position, plane.velocity));
-                plane.group.rotateY(Math.PI); 
+                plane.group.rotateX(Math.PI / 2); 
                 this.scene.add(plane.group);
                 this.planes.push(plane);
                 this.planeMeshes.push(plane);
