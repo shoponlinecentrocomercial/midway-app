@@ -99,7 +99,6 @@
             z-index: 6;
         }
 
-        /* Joystick */
         #joystick-container {
             position: absolute;
             width: 25vw;
@@ -436,7 +435,6 @@
                 this.spawnTimer = 0;
                 this.spawnInterval = 3.5;
 
-                // Joystick
                 this.joystickActive = false;
                 this.joystickVector = { x: 0, y: 0 };
 
@@ -624,8 +622,9 @@
                     }
                     thumb.style.left = `calc(50% + ${dx}px)`;
                     thumb.style.top = `calc(50% + ${dy}px)`;
-                    // Invertir eje horizontal: arrastrar derecha -> girar derecha
-                    this.joystickVector.x = dx / maxDist;
+                    // INVERTIR EJE HORIZONTAL: arrastrar izquierda -> negativo, pero queremos que gire izquierda (negativo)
+                    // joystickVector.x positivo = gira derecha, así que invertimos el signo
+                    this.joystickVector.x = -dx / maxDist;
                     this.joystickVector.y = -dy / maxDist;
                 };
                 const handleEnd = () => {
@@ -739,11 +738,11 @@
             }
 
             updateRanking() {
-                let r = JSON.parse(localStorage.getItem('midway_v13') || '[]');
+                let r = JSON.parse(localStorage.getItem('midway_v14') || '[]');
                 r.push({ score: this.score, time: Math.floor(this.gameTime), date: new Date().toLocaleDateString() });
                 r.sort((a, b) => b.score - a.score);
                 r = r.slice(0, 10);
-                localStorage.setItem('midway_v13', JSON.stringify(r));
+                localStorage.setItem('midway_v14', JSON.stringify(r));
                 let h = '<h3>🏆 MEJORES ARTILLEROS</h3>';
                 r.forEach((x, i) => h +=
                     `<div>${i+1}. ${x.score} pts - ${x.time}s (${x.date})</div>`);
@@ -965,7 +964,7 @@
                     this.spawnPlane(); if (this.difficulty >= 3 && Math.random() < 0.5) setTimeout(() => { if (this.gameRunning)
                             this.spawnPlane(); }, Math.random() * 800); }
 
-                // Aplicar joystick (eje horizontal ya corregido en setupJoystick)
+                // Aplicar joystick (ahora con eje horizontal corregido)
                 const speedMultiplier = 2.5;
                 if (this.joystickVector.x !== 0) {
                     this.turretYaw += this.joystickVector.x * delta * speedMultiplier * (0.5 + Math.abs(this.joystickVector
@@ -1146,7 +1145,7 @@
             self.addEventListener('fetch',e=>e.respondWith(fetch(e.request)));
           `], { type: 'application/javascript' }))).catch(() => {});
         }
-        console.log('⚓ Midway v13 - Joystick 25% + eje horizontal corregido');
+        console.log('⚓ Midway v14 - Joystick eje horizontal corregido definitivamente');
     </script>
 </body>
 </html>
