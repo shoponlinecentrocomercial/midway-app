@@ -279,56 +279,47 @@
             alarm: AUDIO_BASE + 'sirena.wav'
         };
 
+        // ==================== MODELOS 3D ====================
+        const MODEL_BASE = 'https://raw.githubusercontent.com/shoponlinecentrocomercial/midway-app/main/www/images/';
+        const MODEL_PARTS = [
+            'Fuselage', 'WingLeft', 'WingRight', 'HtpLeft', 'HtpRight',
+            'Nose', 'Engine', 'Propeller', 'Shaft'
+        ];
+
+        // ==================== TEXTURAS ====================
+        const TEXTURE_URL = 'https://raw.githubusercontent.com/shoponlinecentrocomercial/midway-app/main/www/images/portaaviones_1.png';
+
         class AudioSystem {
-            constructor() {
-                this.ctx = null;
+            constructor() { this.ctx = null;
                 this.initialized = false;
                 this.masterGain = null;
-                this.buffers = {};
-            }
-            async init() {
-                if (this.initialized) return;
-                try {
-                    this.ctx = new(window.AudioContext || window.webkitAudioContext)();
+                this.buffers = {}; }
+            async init() { if (this.initialized) return; try { this.ctx = new(window.AudioContext || window
+                        .webkitAudioContext)();
                     this.masterGain = this.ctx.createGain();
                     this.masterGain.gain.value = 0.7;
                     this.masterGain.connect(this.ctx.destination);
                     this.initialized = true;
-                    await this.loadAllSounds();
-                } catch (e) { console.warn('Audio:', e); }
-            }
-            async loadAllSounds() {
-                const promises = Object.entries(SOUND_URLS).map(async ([name, url]) => {
-                    try {
-                        const response = await fetch(url);
-                        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                        const arrayBuffer = await response.arrayBuffer();
-                        const audioBuffer = await this.ctx.decodeAudioData(arrayBuffer);
-                        this.buffers[name] = audioBuffer;
-                    } catch (e) { console.warn(`${name}: ${e.message}`); }
-                });
-                await Promise.all(promises);
-                console.log(`🔊 ${Object.keys(this.buffers).length}/4 sonidos`);
-            }
-            play(name, volume = 0.7, rate = 1.0) {
-                if (!this.initialized || !this.buffers[name]) { this.synthFallback(name); return; }
-                if (this.ctx.state === 'suspended') this.ctx.resume();
-                const source = this.ctx.createBufferSource();
-                const gain = this.ctx.createGain();
+                    await this.loadAllSounds(); } catch (e) { console.warn('Audio:', e); } }
+            async loadAllSounds() { const promises = Object.entries(SOUND_URLS).map(async ([name, url]) => { try { const
+                            response = await fetch(url); if (!response.ok) throw new Error(`HTTP ${response.status}`); const
+                            arrayBuffer = await response.arrayBuffer(); const audioBuffer = await this.ctx.decodeAudioData(
+                            arrayBuffer);
+                        this.buffers[name] = audioBuffer; } catch (e) { console.warn(`${name}: ${e.message}`); } }); await Promise
+                        .all(promises);
+                console.log(`🔊 ${Object.keys(this.buffers).length}/4 sonidos`); }
+            play(name, volume = 0.7, rate = 1.0) { if (!this.initialized || !this.buffers[name]) { this.synthFallback(
+                    name); return; } if (this.ctx.state === 'suspended') this.ctx.resume(); const source = this.ctx
+                    .createBufferSource(); const gain = this.ctx.createGain();
                 source.buffer = this.buffers[name];
                 source.playbackRate.value = rate;
                 gain.gain.value = volume;
                 source.connect(gain);
                 gain.connect(this.masterGain);
-                source.start(0);
-            }
+                source.start(0); }
             resumeContext() { if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume(); }
-            synthFallback(name) {
-                if (!this.initialized) return;
-                const now = this.ctx.currentTime;
-                if (name === 'gunshot') {
-                    const osc = this.ctx.createOscillator();
-                    const gain = this.ctx.createGain();
+            synthFallback(name) { if (!this.initialized) return; const now = this.ctx.currentTime; if (name === 'gunshot') { const
+                        osc = this.ctx.createOscillator(); const gain = this.ctx.createGain();
                     osc.type = 'sawtooth';
                     osc.frequency.setValueAtTime(200, now);
                     osc.frequency.exponentialRampToValueAtTime(30, now + 0.1);
@@ -337,10 +328,8 @@
                     osc.connect(gain);
                     gain.connect(this.masterGain);
                     osc.start(now);
-                    osc.stop(now + 0.15);
-                } else if (name === 'explosion' || name === 'hit') {
-                    const osc = this.ctx.createOscillator();
-                    const gain = this.ctx.createGain();
+                    osc.stop(now + 0.15); } else if (name === 'explosion' || name === 'hit') { const osc = this.ctx
+                        .createOscillator(); const gain = this.ctx.createGain();
                     osc.type = 'sine';
                     osc.frequency.setValueAtTime(50, now);
                     osc.frequency.exponentialRampToValueAtTime(8, now + 1.0);
@@ -349,13 +338,9 @@
                     osc.connect(gain);
                     gain.connect(this.masterGain);
                     osc.start(now);
-                    osc.stop(now + 1.2);
-                } else if (name === 'alarm') {
-                    for (let i = 0; i < 3; i++) {
-                        const osc = this.ctx.createOscillator();
-                        const gain = this.ctx.createGain();
-                        osc.type = 'sine';
-                        const t = now + i * 0.4;
+                    osc.stop(now + 1.2); } else if (name === 'alarm') { for (let i = 0; i < 3; i++) { const osc = this.ctx
+                            .createOscillator(); const gain = this.ctx.createGain();
+                        osc.type = 'sine'; const t = now + i * 0.4;
                         osc.frequency.setValueAtTime(500, t);
                         osc.frequency.setValueAtTime(700, t + 0.2);
                         gain.gain.setValueAtTime(0.2, t);
@@ -363,29 +348,22 @@
                         osc.connect(gain);
                         gain.connect(this.masterGain);
                         osc.start(t);
-                        osc.stop(t + 0.35);
-                    }
-                }
-            }
+                        osc.stop(t + 0.35); } } }
             playGunshot() { this.play('gunshot', 0.8, 0.9 + Math.random() * 0.2); }
             playExplosion() { this.play('explosion', 0.9, 0.8 + Math.random() * 0.4); }
             playHit() { this.play('hit', 0.85, 0.85 + Math.random() * 0.3); }
             playAlarm() { this.play('alarm', 0.6, 1.0); }
         }
 
-        // ==================== VIBRACIÓN ====================
         function vibrate(pattern) { if (navigator.vibrate) { try { navigator.vibrate(pattern); } catch (e) {} } }
 
-        // ==================== RADAR ====================
         class Radar {
             constructor(canvas) { this.canvas = canvas;
                 this.ctx = canvas.getContext('2d');
                 this.range = 55; }
-            draw(planes) {
-                const ctx = this.ctx,
+            draw(planes) { const ctx = this.ctx,
                     w = this.canvas.width,
-                    h = this.canvas.height;
-                const cx = w / 2,
+                    h = this.canvas.height; const cx = w / 2,
                     cy = h / 2,
                     r = w / 2 - 2;
                 ctx.clearRect(0, 0, w, h);
@@ -394,8 +372,7 @@
                 ctx.arc(cx, cy, r, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.strokeStyle = 'rgba(0,255,100,0.3)';
-                ctx.lineWidth = 0.5;
-                for (let i = 1; i <= 3; i++) { ctx.beginPath();
+                ctx.lineWidth = 0.5; for (let i = 1; i <= 3; i++) { ctx.beginPath();
                     ctx.arc(cx, cy, r * (i / 3), 0, Math.PI * 2);
                     ctx.stroke(); }
                 ctx.strokeStyle = 'rgba(0,255,100,0.2)';
@@ -411,14 +388,9 @@
                 ctx.fill();
                 ctx.strokeStyle = '#fff';
                 ctx.lineWidth = 0.8;
-                ctx.stroke();
-                for (const p of planes) {
-                    if (!p.alive) continue;
-                    const dx = p.position.x,
+                ctx.stroke(); for (const p of planes) { if (!p.alive) continue; const dx = p.position.x,
                         dz = p.position.z,
-                        dist = Math.sqrt(dx * dx + dz * dz);
-                    if (dist < this.range) {
-                        const s = r / this.range,
+                        dist = Math.sqrt(dx * dx + dz * dz); if (dist < this.range) { const s = r / this.range,
                             px = cx + dx * s,
                             py = cy + dz * s,
                             a = Math.atan2(dz, dx);
@@ -432,26 +404,20 @@
                         ctx.lineTo(-2, 1.5);
                         ctx.closePath();
                         ctx.fill();
-                        ctx.restore();
-                    } else {
-                        const a = Math.atan2(dz, dx),
+                        ctx.restore(); } else { const a = Math.atan2(dz, dx),
                             px = cx + Math.cos(a) * r,
                             py = cy + Math.sin(a) * r;
                         ctx.fillStyle = '#ff6666';
                         ctx.beginPath();
                         ctx.arc(px, py, 1.5, 0, Math.PI * 2);
-                        ctx.fill();
-                    }
-                }
+                        ctx.fill(); } }
                 ctx.strokeStyle = 'rgba(0,255,100,0.5)';
                 ctx.lineWidth = 1;
                 ctx.beginPath();
                 ctx.arc(cx, cy, r, 0, Math.PI * 2);
-                ctx.stroke();
-            }
+                ctx.stroke(); }
         }
 
-        // ==================== JUEGO ====================
         class MidwayGame {
             constructor() {
                 this.audio = new AudioSystem();
@@ -462,12 +428,10 @@
                 this.difficulty = 1;
                 this.spawnTimer = 0;
                 this.spawnInterval = 3.5;
-
                 this.joystickActive = false;
                 this.joystickVector = { x: 0, y: 0 };
                 this.turretYaw = 0;
                 this.turretPitch = 0;
-
                 this.isFiring = false;
                 this.fireCooldown = 0;
                 this.fireRate = 0.1;
@@ -477,7 +441,6 @@
                 this.explosions = [];
                 this.hitEffects = [];
                 this.deckFires = [];
-
                 this.scene = null;
                 this.camera = null;
                 this.renderer = null;
@@ -489,24 +452,10 @@
                 this.planeMeshes = [];
                 this.explosionParticles = [];
                 this.smokeParticles = [];
-
-                // Modelo 3D
                 this.planeModel = null;
                 this.modelLoaded = false;
                 this.gltfLoader = new GLTFLoader();
-
-                // IDs de los archivos GLB en Drive
-                this.driveFileIds = {
-                    Fuselage: '1z2p7rgdyIsZhu2_wBritxUsVUhqtOtjQ',
-                    WingLeft: '1Ro6geAxhe9mbnNQfn6hGLjaL_0sDV-rj',
-                    WingRight: '1PP4PJXrMHPxzx0RYO4KMle-O0ggFnSQX',
-                    HtpLeft: '19AtpLR-FhrovOXvkFti3p4bT5zzl2F25',
-                    HtpRight: '1eoznQthEqIceZDo7ow58dZHGg8FaYWjd',
-                    Nose: '1-y3OGeeYF9AbCfpriRUL38kjmKMeh_EC',
-                    Engine: '1jx9Kziu-dCnW6EudBVD9LewNEQvNpm9q',
-                    Propeller: '1fwCapN3Kwtbke5pbvmVLHv6SUIacwQjf',
-                    Shaft: '14M0vldkzXwVQhmgJmsL0iTTI15Qc0L74'
-                };
+                this.deckTexture = null;
 
                 this.scoreEl = document.getElementById('score');
                 this.healthBar = document.getElementById('health-bar');
@@ -553,13 +502,13 @@
                 this.scene.add(sun);
                 this.scene.add(new THREE.HemisphereLight(0x87ceeb, 0x334466, 0.5));
 
+                await this.loadResources();
                 this.createOcean();
                 this.createShip();
                 this.createTurret();
                 this.setupEvents();
                 this.setupJoystick();
 
-                await this.loadResources();
                 this.lastTime = performance.now();
                 this.animate();
             }
@@ -567,37 +516,51 @@
             async loadResources() {
                 this.loadingText.textContent = 'Cargando sonidos...';
                 await this.audio.init();
-                this.loadingText.textContent = 'Cargando modelo 3D...';
+
+                this.loadingText.textContent = 'Cargando modelos 3D...';
                 await this.loadPlaneModel();
+
+                this.loadingText.textContent = 'Cargando texturas...';
+                await this.loadDeckTexture();
+
                 this.loadingText.textContent = '¡Listo!';
                 setTimeout(() => { this.loadingOverlay.style.display = 'none'; }, 500);
             }
 
             async loadPlaneModel() {
-                const baseUrl = 'https://drive.google.com/uc?export=download&id=';
-                const partNames = ['Fuselage', 'WingLeft', 'WingRight', 'HtpLeft', 'HtpRight', 'Nose', 'Engine', 'Propeller',
-                    'Shaft'
-                ];
                 const planeGroup = new THREE.Group();
+                let loadedCount = 0;
 
-                for (const name of partNames) {
+                for (const name of MODEL_PARTS) {
                     try {
-                        const url = baseUrl + this.driveFileIds[name];
+                        const url = MODEL_BASE + name + '.glb';
                         const gltf = await this.gltfLoader.loadAsync(url);
                         const part = gltf.scene;
                         part.name = name;
                         part.traverse((child) => { if (child.isMesh) { child.castShadow = true;
                                 child.receiveShadow = true; } });
                         planeGroup.add(part);
+                        loadedCount++;
                     } catch (e) { console.warn(`⚠️ ${name}: ${e.message}`); }
                 }
 
-                if (planeGroup.children.length > 3) {
+                if (loadedCount >= 4) {
                     this.planeModel = planeGroup;
                     this.planeModel.scale.set(0.5, 0.5, 0.5);
                     this.modelLoaded = true;
-                    console.log(`✅ Modelo ensamblado (${planeGroup.children.length} piezas)`);
-                } else { console.warn('⚠️ Modelo incompleto, usando geometría'); }
+                    console.log(`✅ Modelo ensamblado (${loadedCount} piezas)`);
+                } else { console.warn('⚠️ Modelo incompleto, usando geometría básica'); }
+            }
+
+            async loadDeckTexture() {
+                try {
+                    const textureLoader = new THREE.TextureLoader();
+                    this.deckTexture = await textureLoader.loadAsync(TEXTURE_URL);
+                    this.deckTexture.wrapS = THREE.RepeatWrapping;
+                    this.deckTexture.wrapT = THREE.RepeatWrapping;
+                    this.deckTexture.repeat.set(2, 4);
+                    console.log('✅ Textura de cubierta cargada');
+                } catch (e) { console.warn('⚠️ Textura no cargada:', e.message); }
             }
 
             createOcean() {
@@ -610,38 +573,61 @@
                 this.scene.add(this.ocean);
                 this.oceanVerts = g.attributes.position.array.slice();
             }
+
             createShip() {
                 this.ship = new THREE.Group();
-                const d = new THREE.Mesh(new THREE.BoxGeometry(30, 1.2, 70), new THREE.MeshStandardMaterial({ color: 0x5a5a5a,
-                    roughness: 0.6, metalness: 0.35 }));
-                d.position.y = 1.2;
-                d.castShadow = d.receiveShadow = true;
-                this.ship.add(d);
-                for (let z = -32; z <= 32; z += 8) {
-                    const l = new THREE.Mesh(new THREE.BoxGeometry(28, 0.05, 0.3), new THREE.MeshStandardMaterial({ color: 0xcccccc,
-                        roughness: 0.5 }));
-                    l.position.set(0, 1.85, z);
-                    this.ship.add(l);
-                }
-                const h = new THREE.Mesh(new THREE.BoxGeometry(25, 3.5, 65), new THREE.MeshStandardMaterial({ color: 0x883333,
-                    roughness: 0.7, metalness: 0.25 }));
-                h.position.y = -1.2;
-                this.ship.add(h);
+
+                // Cubierta de vuelo con textura realista
+                const deckMat = this.deckTexture ?
+                    new THREE.MeshStandardMaterial({ map: this.deckTexture, roughness: 0.7, metalness: 0.3 }) :
+                    new THREE.MeshStandardMaterial({ color: 0x5a5a5a, roughness: 0.6, metalness: 0.35 });
+
+                const deck = new THREE.Mesh(new THREE.BoxGeometry(28, 1.0, 65), deckMat);
+                deck.position.y = 1.3;
+                deck.castShadow = true;
+                deck.receiveShadow = true;
+                this.ship.add(deck);
+
+                // Isla (torre de control) - LEJOS del cañón, a la derecha
+                const islandMat = new THREE.MeshStandardMaterial({ color: 0x4a4a4a, roughness: 0.5, metalness: 0.5 });
+                const island = new THREE.Mesh(new THREE.BoxGeometry(4, 6, 8), islandMat);
+                island.position.set(9, 4.5, -10); // Posición: derecha, atrás
+                island.castShadow = true;
+                island.receiveShadow = true;
+                this.ship.add(island);
+
+                // Chimenea
+                const funnelMat = new THREE.MeshStandardMaterial({ color: 0x383838, roughness: 0.4, metalness: 0.6 });
+                const funnel = new THREE.Mesh(new THREE.CylinderGeometry(1, 1.3, 6, 8), funnelMat);
+                funnel.position.set(6, 5, -14);
+                funnel.castShadow = true;
+                this.ship.add(funnel);
+
+                // Casco
+                const hullMat = new THREE.MeshStandardMaterial({ color: 0x772222, roughness: 0.7, metalness: 0.3 });
+                const hull = new THREE.Mesh(new THREE.BoxGeometry(24, 3, 60), hullMat);
+                hull.position.y = -1;
+                this.ship.add(hull);
+
                 this.ship.position.set(0, 0, 0);
                 this.scene.add(this.ship);
             }
+
             createTurret() {
                 this.turretGroup = new THREE.Group();
-                this.turretGroup.position.set(0, 1.9, 5);
-                const b = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.9, 0.6, 20), new THREE.MeshStandardMaterial({ color: 0x5a5a5a,
+                this.turretGroup.position.set(0, 2.2, 8); // Más adelante, sobre la cubierta
+
+                const base = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.9, 0.6, 20), new THREE.MeshStandardMaterial({ color: 0x5a5a5a,
                     roughness: 0.4, metalness: 0.75 }));
-                b.position.y = 0;
-                b.castShadow = true;
-                this.turretGroup.add(b);
+                base.position.y = 0;
+                base.castShadow = true;
+                this.turretGroup.add(base);
+
                 this.gunsGroup = new THREE.Group();
                 this.gunsGroup.position.set(0, 0.2, -0.5);
                 this.gunsGroup.add(new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.25, 0.5), new THREE.MeshStandardMaterial({ color: 0x555555,
                     roughness: 0.4, metalness: 0.7 })));
+
                 for (let i = 0; i < 2; i++) {
                     const br = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.13, 4.0, 8), new THREE.MeshStandardMaterial({ color: 0x2a2a2a,
                         roughness: 0.25, metalness: 0.9 }));
@@ -801,11 +787,11 @@
             }
 
             updateRanking() {
-                let r = JSON.parse(localStorage.getItem('midway_v22') || '[]');
+                let r = JSON.parse(localStorage.getItem('midway_v23') || '[]');
                 r.push({ score: this.score, time: Math.floor(this.gameTime), date: new Date().toLocaleDateString() });
                 r.sort((a, b) => b.score - a.score);
                 r = r.slice(0, 10);
-                localStorage.setItem('midway_v22', JSON.stringify(r));
+                localStorage.setItem('midway_v23', JSON.stringify(r));
                 let h = '<h3>🏆 MEJORES ARTILLEROS</h3>';
                 r.forEach((x, i) => h +=
                     `<div>${i+1}. ${x.score} pts - ${x.time}s (${x.date})</div>`);
@@ -911,8 +897,8 @@
 
             createExplosion(pos, size = 1) {
                 const parts = [];
-                for (let i = 0; i < Math.floor(35 * size); i++) { const p = new THREE.Mesh(new THREE.SphereGeometry(0.12 * size *
-                        (0.5 + Math.random()), 6, 6), new THREE.MeshBasicMaterial({ color: new THREE.Color().setHSL(0.06 +
+                for (let i = 0; i < Math.floor(35 * size); i++) { const p = new THREE.Mesh(new THREE.SphereGeometry(0.12 * size * (
+                        0.5 + Math.random()), 6, 6), new THREE.MeshBasicMaterial({ color: new THREE.Color().setHSL(0.06 +
                             Math.random() * 0.12, 1, 0.4 + Math.random() * 0.6), transparent: true, opacity: 1 }));
                     p.position.copy(pos);
                     p.velocity = new THREE.Vector3((Math.random() - 0.5) * 15 * size, (Math.random() - 0.5) * 15 * size, (Math
@@ -1117,7 +1103,7 @@
         game.init(); if ('serviceWorker' in navigator) { navigator.serviceWorker.register(URL.createObjectURL(new Blob([
             `self.addEventListener('install',()=>self.skipWaiting());self.addEventListener('activate',e=>e.waitUntil(clients.claim()));self.addEventListener('fetch',e=>e.respondWith(fetch(e.request)));`
         ], { type: 'application/javascript' }))).catch(() => {}); }
-        console.log('⚓ Midway v22 - IDs reales Drive + Sonidos reales');
+        console.log('⚓ Midway v23 - Textura cubierta + Modelos GitHub');
     </script>
 </body>
 </html>
