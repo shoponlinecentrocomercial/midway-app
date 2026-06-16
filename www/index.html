@@ -571,18 +571,10 @@ async loadPlaneModel() {
                     } catch (e) {}
                 }
                 if (count >= 4) {
+                    group.rotate.y = Math.PI;
                     this.planeModel = group;
                   //  this.planeModel.scale.set(0.5, 0.5, 0.5);
                     this.planeModel.scale.set(0.01, 0.01, 0.01);
-                    this.planeModel.rotation.y = Math.PI; // Gira las piezas internas 180 grados en Y
-                   const contenedor = new THREE.Group();
-        
-        // 3. Metemos el avión ya rotado dentro de la caja
-        contenedor.add(this.planeModel);
-
-        // 4. El juego ahora considerará que "this.planeModel" es la caja contenedora
-        this.planeModel = contenedor;
-
                     this.modelLoaded = true;
                     console.log(`✅ Modelo 3D (${count} piezas)`);
                 }
