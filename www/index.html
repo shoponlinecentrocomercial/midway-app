@@ -98,90 +98,44 @@
             transition: opacity 0.3s;
             z-index: 6;
         }
-        #steer-indicator {
+
+        /* Joystick */
+        #joystick-container {
             position: absolute;
-            top: 42%;
-            left: 50%;
-            transform: translateX(-50%);
-            color: rgba(255,255,255,0.85);
-            font-size: 9px;
-            pointer-events: none;
-            z-index: 3;
-            display: none;
-            background: rgba(0,0,0,0.4);
-            padding: 2px 8px;
-            border-radius: 8px;
-            font-family: monospace;
-            text-align: center;
-            line-height: 1.3;
-        }
-        #bottom-bar {
-            position: absolute;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: none;
-            align-items: center;
-            gap: 8px;
-            z-index: 10;
+            width: 20vw;
+            height: 20vw;
+            min-width: 100px;
+            min-height: 100px;
+            border-radius: 50%;
             pointer-events: all;
-            background: rgba(0,0,0,0.3);
-            border-radius: 25px;
-            padding: 5px 10px;
+            z-index: 15;
+            display: none;
+            border: 2px solid rgba(255,255,255,0.35);
+            background: rgba(255,255,255,0.06);
             backdrop-filter: blur(4px);
             -webkit-backdrop-filter: blur(4px);
-            border: 1px solid rgba(255,255,255,0.12);
+            box-shadow: 0 0 15px rgba(0,0,0,0.4);
+            touch-action: none;
         }
-        .ctrl-btn {
+        #joystick-thumb {
+            position: absolute;
             width: 36px;
             height: 36px;
             border-radius: 50%;
-            border: 1px solid rgba(255,255,255,0.25);
-            background: rgba(255,255,255,0.06);
-            color: #fff;
-            font-size: 15px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-            padding: 0;
-            line-height: 1;
+            background: rgba(255,255,255,0.25);
+            border: 1px solid rgba(255,255,255,0.5);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            box-shadow: 0 0 10px rgba(255,255,255,0.3);
+            transition: background 0.15s;
         }
-        .ctrl-btn:active { background: rgba(255,255,255,0.2); transform: scale(0.9); }
-        .ctrl-btn.active {
-            background: rgba(255,60,60,0.5);
-            border-color: rgba(255,100,100,0.7);
-            box-shadow: 0 0 8px rgba(255,0,0,0.4);
+        #joystick-thumb.active {
+            background: rgba(255,180,50,0.7);
+            box-shadow: 0 0 15px rgba(255,150,0,0.6);
         }
-        .speed-btn {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            border: 1px solid rgba(255,255,255,0.2);
-            background: rgba(255,255,255,0.05);
-            color: rgba(255,255,255,0.65);
-            font-size: 10px;
-            cursor: pointer;
-            font-family: monospace;
-            font-weight: bold;
-            transition: all 0.2s;
-            padding: 0;
-            line-height: 1;
-        }
-        .speed-btn:active { transform: scale(0.9); }
-        .speed-btn.selected {
-            background: rgba(255,180,50,0.5);
-            border-color: rgba(255,200,80,0.8);
-            color: #fff;
-            box-shadow: 0 0 8px rgba(255,150,0,0.4);
-        }
-        .divider {
-            width: 1px;
-            height: 18px;
-            background: rgba(255,255,255,0.15);
-            border-radius: 1px;
-        }
+
         #game-over-screen {
             position: absolute;
             top: 0;
@@ -260,18 +214,6 @@
             font-weight: bold;
         }
         #splash-screen button:active { background: #ffaa00; transform: scale(0.95); }
-        #gyro-debug {
-            position: absolute;
-            top: 4px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: rgba(255,255,255,0.45);
-            font-size: 7px;
-            pointer-events: none;
-            z-index: 3;
-            display: none;
-            font-family: monospace;
-        }
     </style>
 </head>
 <body>
@@ -295,27 +237,19 @@
         </svg>
     </div>
     <div id="message"></div>
-    <div id="gyro-debug"></div>
-    <div id="steer-indicator"></div>
 
-    <div id="bottom-bar">
-        <button class="ctrl-btn" id="inv-steer-btn" title="Invertir giro">↻</button>
-        <div class="divider"></div>
-        <button class="speed-btn" data-speed="0">1</button>
-        <button class="speed-btn selected" data-speed="1">2</button>
-        <button class="speed-btn" data-speed="2">3</button>
-        <div class="divider"></div>
-        <button class="ctrl-btn" id="inv-pitch-btn" title="Invertir cabeceo">↕</button>
+    <!-- Joystick virtual -->
+    <div id="joystick-container">
+        <div id="joystick-thumb"></div>
     </div>
 
     <div id="splash-screen">
         <h1>⚓ BATALLA DE MIDWAY</h1>
         <div class="subtitle">ARTILLERO ANTIAÉREO</div>
         <div class="instructions">
-            🤲 SOSTÉN el móvil con dos manos<br>
-            🚗 INCLINA: trigger de giro | Centro = PARA<br>
-            ✈️ CABECEA: trigger de elevación<br>
-            👆 TOCA: ¡FUEGO!
+            🕹️ JOYSTICK para apuntar (giro + elevación)<br>
+            👆 TOCA en cualquier parte para DISPARAR<br>
+            🛡️ ¡Protege el buque!
         </div>
         <button id="start-btn">¡A LA BATALLA!</button>
     </div>
@@ -334,129 +268,163 @@
     <script type="module">
         import * as THREE from 'three';
 
-        // ==================== AUDIO (placeholder - sonidos reales en camino) ====================
+        // ==================== AUDIO (Síntesis grave realista) ====================
         class AudioSystem {
             constructor() { this.ctx = null;
                 this.initialized = false;
-                this.masterGain = null;
-                this.buffers = {}; }
-            async init() {
+                this.masterGain = null; }
+            init() {
                 if (this.initialized) return;
                 try {
                     this.ctx = new(window.AudioContext || window.webkitAudioContext)();
                     this.masterGain = this.ctx.createGain();
-                    this.masterGain.gain.value = 0.6;
+                    this.masterGain.gain.value = 0.65;
                     this.masterGain.connect(this.ctx.destination);
                     this.initialized = true;
                 } catch (e) {}
             }
-            synthFallback(name) {
+            playGunshot() {
                 if (!this.initialized) return;
                 const now = this.ctx.currentTime;
-                if (name === 'gunshot') {
-                    const o = this.ctx.createOscillator();
-                    const g = this.ctx.createGain();
-                    const f = this.ctx.createBiquadFilter();
-                    o.type = 'sawtooth';
-                    o.frequency.setValueAtTime(200, now);
-                    o.frequency.exponentialRampToValueAtTime(20, now + 0.1);
-                    f.type = 'lowpass';
-                    f.frequency.setValueAtTime(700, now);
-                    f.frequency.exponentialRampToValueAtTime(60, now + 0.1);
-                    g.gain.setValueAtTime(0.8, now);
-                    g.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
-                    o.connect(f);
-                    f.connect(g);
-                    g.connect(this.masterGain);
-                    o.start(now);
-                    o.stop(now + 0.15);
-                    const bs = this.ctx.sampleRate * 0.06;
-                    const b = this.ctx.createBuffer(1, bs, this.ctx.sampleRate);
-                    const d = b.getChannelData(0);
-                    for (let i = 0; i < bs; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bs * 0.2));
-                    const n = this.ctx.createBufferSource();
-                    const ng = this.ctx.createGain();
-                    n.buffer = b;
-                    ng.gain.setValueAtTime(0.6, now);
-                    ng.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
-                    n.connect(ng);
-                    ng.connect(this.masterGain);
-                    n.start(now);
-                } else if (name === 'explosion') {
-                    for (let i = 0; i < 3; i++) {
-                        const o = this.ctx.createOscillator();
-                        const g = this.ctx.createGain();
-                        o.type = ['sine', 'sine', 'sawtooth'][i];
-                        o.frequency.setValueAtTime([40, 15, 250][i], now);
-                        o.frequency.exponentialRampToValueAtTime([3, 1, 15][i], now + [2, 2.5, 0.7][i]);
-                        g.gain.setValueAtTime([1.2, 0.8, 0.5][i], now);
-                        g.gain.exponentialRampToValueAtTime(0.001, now + [2, 2.5, 0.7][i]);
-                        o.connect(g);
-                        g.connect(this.masterGain);
-                        o.start(now);
-                        o.stop(now + [2, 2.5, 0.7][i]);
-                    }
-                    const bs = this.ctx.sampleRate * 1.2;
-                    const b = this.ctx.createBuffer(1, bs, this.ctx.sampleRate);
-                    const d = b.getChannelData(0);
-                    for (let i = 0; i < bs; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bs * 0.12));
-                    const n = this.ctx.createBufferSource();
-                    const ng = this.ctx.createGain();
-                    n.buffer = b;
-                    ng.gain.setValueAtTime(0.7, now);
-                    ng.gain.exponentialRampToValueAtTime(0.001, now + 1);
-                    n.connect(ng);
-                    ng.connect(this.masterGain);
-                    n.start(now);
-                } else if (name === 'hit') {
-                    const o = this.ctx.createOscillator();
-                    const g = this.ctx.createGain();
-                    o.type = 'sine';
-                    o.frequency.setValueAtTime(50, now);
-                    o.frequency.exponentialRampToValueAtTime(8, now + 1.2);
-                    g.gain.setValueAtTime(1, now);
-                    g.gain.exponentialRampToValueAtTime(0.001, now + 1.4);
-                    o.connect(g);
-                    g.connect(this.masterGain);
-                    o.start(now);
-                    o.stop(now + 1.4);
-                } else if (name === 'alarm') {
-                    for (let i = 0; i < 4; i++) {
-                        const o = this.ctx.createOscillator();
-                        const g = this.ctx.createGain();
-                        o.type = 'sine';
-                        const t = now + i * 0.35;
-                        o.frequency.setValueAtTime(550, t);
-                        o.frequency.setValueAtTime(750, t + 0.18);
-                        g.gain.setValueAtTime(0.3, t);
-                        g.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
-                        o.connect(g);
-                        g.connect(this.masterGain);
-                        o.start(t);
-                        o.stop(t + 0.35);
-                    }
+                // Disparo seco y grave
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                const filter = this.ctx.createBiquadFilter();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(180, now);
+                osc.frequency.exponentialRampToValueAtTime(30, now + 0.08);
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(500, now);
+                filter.frequency.exponentialRampToValueAtTime(50, now + 0.08);
+                gain.gain.setValueAtTime(0.9, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+                osc.connect(filter);
+                filter.connect(gain);
+                gain.connect(this.masterGain);
+                osc.start(now);
+                osc.stop(now + 0.12);
+                const bs = this.ctx.sampleRate * 0.04;
+                const buf = this.ctx.createBuffer(1, bs, this.ctx.sampleRate);
+                const d = buf.getChannelData(0);
+                for (let i = 0; i < bs; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bs * 0.15));
+                const noise = this.ctx.createBufferSource();
+                const ng = this.ctx.createGain();
+                noise.buffer = buf;
+                ng.gain.setValueAtTime(0.7, now);
+                ng.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+                noise.connect(ng);
+                ng.connect(this.masterGain);
+                noise.start(now);
+            }
+            playExplosion() {
+                if (!this.initialized) return;
+                const now = this.ctx.currentTime;
+                // BOOM muy grave y corto
+                const osc1 = this.ctx.createOscillator();
+                const gain1 = this.ctx.createGain();
+                osc1.type = 'sine';
+                osc1.frequency.setValueAtTime(35, now);
+                osc1.frequency.exponentialRampToValueAtTime(5, now + 0.8);
+                gain1.gain.setValueAtTime(1.3, now);
+                gain1.gain.exponentialRampToValueAtTime(0.001, now + 1.0);
+                osc1.connect(gain1);
+                gain1.connect(this.masterGain);
+                osc1.start(now);
+                osc1.stop(now + 1.0);
+                // Subgrave
+                const osc2 = this.ctx.createOscillator();
+                const gain2 = this.ctx.createGain();
+                osc2.type = 'sine';
+                osc2.frequency.setValueAtTime(12, now);
+                osc2.frequency.exponentialRampToValueAtTime(1, now + 1.2);
+                gain2.gain.setValueAtTime(0.9, now);
+                gain2.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
+                osc2.connect(gain2);
+                gain2.connect(this.masterGain);
+                osc2.start(now);
+                osc2.stop(now + 1.2);
+                // Crujido
+                const osc3 = this.ctx.createOscillator();
+                const gain3 = this.ctx.createGain();
+                osc3.type = 'sawtooth';
+                osc3.frequency.setValueAtTime(200, now);
+                osc3.frequency.exponentialRampToValueAtTime(20, now + 0.5);
+                gain3.gain.setValueAtTime(0.5, now);
+                gain3.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+                osc3.connect(gain3);
+                gain3.connect(this.masterGain);
+                osc3.start(now);
+                osc3.stop(now + 0.5);
+                // Ruido explosivo
+                const bs = this.ctx.sampleRate * 0.6;
+                const buf = this.ctx.createBuffer(1, bs, this.ctx.sampleRate);
+                const d = buf.getChannelData(0);
+                for (let i = 0; i < bs; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bs * 0.1));
+                const noise = this.ctx.createBufferSource();
+                const ng = this.ctx.createGain();
+                noise.buffer = buf;
+                ng.gain.setValueAtTime(0.8, now);
+                ng.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+                noise.connect(ng);
+                ng.connect(this.masterGain);
+                noise.start(now);
+            }
+            playHit() {
+                if (!this.initialized) return;
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(45, now);
+                osc.frequency.exponentialRampToValueAtTime(10, now + 0.7);
+                gain.gain.setValueAtTime(1.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.9);
+                osc.connect(gain);
+                gain.connect(this.masterGain);
+                osc.start(now);
+                osc.stop(now + 0.9);
+                const bs = this.ctx.sampleRate * 0.3;
+                const buf = this.ctx.createBuffer(1, bs, this.ctx.sampleRate);
+                const d = buf.getChannelData(0);
+                for (let i = 0; i < bs; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bs * 0.15));
+                const noise = this.ctx.createBufferSource();
+                const ng = this.ctx.createGain();
+                noise.buffer = buf;
+                ng.gain.setValueAtTime(0.6, now);
+                ng.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+                noise.connect(ng);
+                ng.connect(this.masterGain);
+                noise.start(now);
+            }
+            playAlarm() {
+                if (!this.initialized) return;
+                const now = this.ctx.currentTime;
+                for (let i = 0; i < 3; i++) {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'sine';
+                    const t = now + i * 0.4;
+                    osc.frequency.setValueAtTime(500, t);
+                    osc.frequency.setValueAtTime(700, t + 0.2);
+                    gain.gain.setValueAtTime(0.3, t);
+                    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
+                    osc.connect(gain);
+                    gain.connect(this.masterGain);
+                    osc.start(t);
+                    osc.stop(t + 0.4);
                 }
             }
-            playGunshot() { this.synthFallback('gunshot'); }
-            playExplosion() { this.synthFallback('explosion'); }
-            playHit() { this.synthFallback('hit'); }
-            playAlarm() { this.synthFallback('alarm'); }
         }
 
         // ==================== VIBRACIÓN ====================
         class VibrationSystem {
             constructor() { this.enabled = false; }
-            requestPermission() {
-                if (navigator.vibrate) {
-                    try { navigator.vibrate(100);
-                        this.enabled = true; } catch (e) {}
-                }
-            }
-            vibrate(p) { if (this.enabled && navigator.vibrate) { try { navigator.vibrate(p); } catch (e) { this.enabled =
-                        false; } } }
-            gunshotVibrate() { this.vibrate([12, 8, 12]); }
-            explosionVibrate() { this.vibrate([50, 25, 50, 25, 80]); }
-            hitVibrate() { this.vibrate([80, 40, 80, 40, 150]); }
+            requestPermission() { if (navigator.vibrate) { try { navigator.vibrate(50);
+                        this.enabled = true; } catch (e) {} } }
+            vibrate(p) { if (this.enabled && navigator.vibrate) { try { navigator.vibrate(p); } catch (e) {} } }
+            gunshotVibrate() { this.vibrate([10, 8, 10]); }
+            explosionVibrate() { this.vibrate([40, 20, 40, 20, 60]); }
+            hitVibrate() { this.vibrate([60, 30, 60, 30, 100]); }
         }
 
         // ==================== JUEGO ====================
@@ -472,16 +440,9 @@
                 this.spawnTimer = 0;
                 this.spawnInterval = 3.5;
 
-                this.steerInput = 0;
-                this.pitchInput = 0;
-                this.gyroAvailable = false;
-                this.calibrated = false;
-                this.calibSteer = 0;
-                this.calibPitch = 0;
-                this.invertSteer = false;
-                this.invertPitch = false;
-                this.speedLevel = 1;
-                this.speedMultipliers = [0.3, 0.7, 1.4];
+                // Joystick
+                this.joystickActive = false;
+                this.joystickVector = { x: 0, y: 0 }; // -1..1
 
                 this.turretYaw = 0;
                 this.turretPitch = 0;
@@ -515,12 +476,10 @@
                 this.splashScreen = document.getElementById('splash-screen');
                 this.finalScoreEl = document.getElementById('final-score');
                 this.rankingEl = document.getElementById('ranking');
-                this.gyroDebug = document.getElementById('gyro-debug');
-                this.bottomBar = document.getElementById('bottom-bar');
-                this.invSteerBtn = document.getElementById('inv-steer-btn');
-                this.invPitchBtn = document.getElementById('inv-pitch-btn');
-                this.steerIndicator = document.getElementById('steer-indicator');
-                this.speedBtns = document.querySelectorAll('.speed-btn');
+
+                // Joystick elements
+                this.joystickContainer = document.getElementById('joystick-container');
+                this.joystickThumb = document.getElementById('joystick-thumb');
             }
 
             init() {
@@ -559,7 +518,7 @@
                 this.createShip();
                 this.createTurret();
                 this.setupEvents();
-                this.setupGyro();
+                this.setupJoystick();
 
                 this.lastTime = performance.now();
                 this.animate();
@@ -628,11 +587,81 @@
                 this.scene.add(this.turretGroup);
             }
 
+            setupJoystick() {
+                const container = this.joystickContainer;
+                const thumb = this.joystickThumb;
+                const rect = container.getBoundingClientRect();
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const maxDist = rect.width / 2 - 18;
+
+                const updateJoystickPosition = () => {
+                    const isLandscape = window.innerWidth > window.innerHeight;
+                    if (isLandscape) {
+                        container.style.left = '15px';
+                        container.style.top = '50%';
+                        container.style.transform = 'translateY(-50%)';
+                        container.style.bottom = 'auto';
+                    } else {
+                        container.style.left = '50%';
+                        container.style.top = 'auto';
+                        container.style.bottom = '20px';
+                        container.style.transform = 'translateX(-50%)';
+                    }
+                };
+                window.addEventListener('resize', updateJoystickPosition);
+                updateJoystickPosition();
+
+                const handleStart = (e) => {
+                    e.preventDefault();
+                    this.joystickActive = true;
+                    thumb.classList.add('active');
+                };
+                const handleMove = (e) => {
+                    if (!this.joystickActive || !this.gameRunning) return;
+                    e.preventDefault();
+                    const touch = e.touches ? e.touches[0] : e;
+                    const rect = container.getBoundingClientRect();
+                    const cx = rect.left + rect.width / 2;
+                    const cy = rect.top + rect.height / 2;
+                    let dx = touch.clientX - cx;
+                    let dy = touch.clientY - cy;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    const maxDist = rect.width / 2 - 18;
+                    if (dist > maxDist) {
+                        dx = (dx / dist) * maxDist;
+                        dy = (dy / dist) * maxDist;
+                    }
+                    thumb.style.left = `calc(50% + ${dx}px)`;
+                    thumb.style.top = `calc(50% + ${dy}px)`;
+                    this.joystickVector.x = dx / maxDist;
+                    this.joystickVector.y = -dy / maxDist;
+                };
+                const handleEnd = (e) => {
+                    this.joystickActive = false;
+                    this.joystickVector.x = 0;
+                    this.joystickVector.y = 0;
+                    thumb.style.left = '50%';
+                    thumb.style.top = '50%';
+                    thumb.classList.remove('active');
+                };
+
+                container.addEventListener('touchstart', handleStart, { passive: false });
+                container.addEventListener('touchmove', handleMove, { passive: false });
+                container.addEventListener('touchend', handleEnd);
+                container.addEventListener('touchcancel', handleEnd);
+                container.addEventListener('mousedown', handleStart);
+                window.addEventListener('mousemove', (e) => {
+                    if (this.joystickActive) handleMove(e);
+                });
+                window.addEventListener('mouseup', handleEnd);
+            }
+
             setupEvents() {
                 document.addEventListener('pointerdown', (e) => {
                     if (!this.gameRunning) return;
                     if (e.target.closest('#game-over-screen') || e.target.closest('#splash-screen') || e.target
-                        .closest('#bottom-bar')) return;
+                        .closest('#joystick-container')) return;
                     e.preventDefault();
                     this.isFiring = true;
                     this.audio.init();
@@ -640,7 +669,8 @@
                 });
                 document.addEventListener('pointerup', () => { this.isFiring = false; });
                 document.addEventListener('pointerleave', () => { this.isFiring = false; });
-                document.addEventListener('touchmove', (e) => { if (this.gameRunning) e.preventDefault(); }, { passive: false });
+                document.addEventListener('touchmove', (e) => { if (this.gameRunning && !e.target.closest(
+                        '#joystick-container')) e.preventDefault(); }, { passive: false });
                 document.addEventListener('gesturestart', (e) => e.preventDefault());
                 document.addEventListener('gesturechange', (e) => e.preventDefault());
                 document.addEventListener('gestureend', (e) => e.preventDefault());
@@ -651,26 +681,6 @@
                 });
                 document.getElementById('restart-btn').addEventListener('click', () => this.restartGame());
 
-                this.invSteerBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    this.invertSteer = !this.invertSteer;
-                    this.invSteerBtn.classList.toggle('active', this.invertSteer);
-                });
-                this.invPitchBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    this.invertPitch = !this.invertPitch;
-                    this.invPitchBtn.classList.toggle('active', this.invertPitch);
-                });
-
-                this.speedBtns.forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        this.speedLevel = parseInt(btn.dataset.speed);
-                        this.speedBtns.forEach(b => b.classList.remove('selected'));
-                        btn.classList.add('selected');
-                    });
-                });
-
                 window.addEventListener('resize', () => {
                     this.camera.aspect = window.innerWidth / window.innerHeight;
                     this.camera.updateProjectionMatrix();
@@ -678,137 +688,13 @@
                 });
             }
 
-            setupGyro() {
-                let smoothSteer = 0;
-                let smoothPitch = 0;
-
-                window.addEventListener('deviceorientation', (event) => {
-                    const beta = event.beta || 45;
-                    const gamma = event.gamma || 0;
-                    const isLandscape = window.innerWidth > window.innerHeight;
-
-                    let rawSteer, rawPitch;
-                    if (isLandscape) { rawSteer = -beta;
-                        rawPitch = gamma; } else { rawSteer = gamma;
-                        rawPitch = beta - 45; }
-
-                    smoothSteer += (rawSteer - smoothSteer) * 0.3;
-                    smoothPitch += (rawPitch - smoothPitch) * 0.3;
-
-                    if (!this.calibrated && this.gameRunning) {
-                        this.calibSteer = smoothSteer;
-                        this.calibPitch = smoothPitch;
-                        this.calibrated = true;
-                    }
-
-                    if (this.calibrated) {
-                        let dSteer = smoothSteer - this.calibSteer;
-                        let dPitch = smoothPitch - this.calibPitch;
-                        if (this.invertSteer) dSteer = -dSteer;
-                        if (this.invertPitch) dPitch = -dPitch;
-
-                        const deadZone = 10;
-                        const maxAngle = 45;
-                        const spd = this.speedMultipliers[this.speedLevel];
-
-                        // TRIGGER DE GIRO
-                        if (Math.abs(dSteer) < deadZone) {
-                            this.steerInput = 0;
-                        } else {
-                            const sign = dSteer > 0 ? 1 : -1;
-                            const mag = (Math.abs(dSteer) - deadZone) / (maxAngle - deadZone);
-                            const speed = Math.min(mag, 1);
-                            let v;
-                            if (speed < 0.33) v = 0.4;
-                            else if (speed < 0.66) v = 0.9;
-                            else v = 1.6;
-                            this.steerInput = sign * v * spd;
-                        }
-
-                        // TRIGGER DE CABECEO (mismo sistema)
-                        if (Math.abs(dPitch) < deadZone) {
-                            this.pitchInput = 0;
-                        } else {
-                            const sign = dPitch > 0 ? 1 : -1;
-                            const mag = (Math.abs(dPitch) - deadZone) / (maxAngle - deadZone);
-                            const speed = Math.min(mag, 1);
-                            let v;
-                            if (speed < 0.33) v = 0.25;
-                            else if (speed < 0.66) v = 0.55;
-                            else v = 0.9;
-                            this.pitchInput = sign * v * spd;
-                        }
-                    }
-                    this.gyroAvailable = true;
-
-                    if (this.gameRunning) {
-                        const dir = this.steerInput === 0 ? '⏸' : this.steerInput > 0 ? '↻' : '↺';
-                        const pdir = this.pitchInput === 0 ? '⏸' : this.pitchInput > 0 ? '↑' : '↓';
-                        const ss = Math.abs(this.steerInput).toFixed(1);
-                        const ps = Math.abs(this.pitchInput).toFixed(1);
-                        this.steerIndicator.textContent = `${dir} ${ss}x | ${pdir} ${ps}x`;
-                        this.gyroDebug.textContent =
-                            `${isLandscape?'LAND':'PORT'} | spd:${this.speedLevel+1}`;
-                    }
-                });
-
-                if (typeof DeviceOrientationEvent.requestPermission === 'function') this._iosGyro = true;
-                this.setupTouchFallback();
-            }
-
-            setupTouchFallback() {
-                let active = false;
-                let sx = 0,
-                    sy = 0;
-                let fy = 0,
-                    fp = 0;
-                document.addEventListener('touchstart', (e) => {
-                    if (!this.gameRunning) return;
-                    if (e.target.closest('#game-over-screen') || e.target.closest('#splash-screen') || e.target
-                        .closest('#bottom-bar')) return;
-                    if (e.touches.length === 2) { active = true;
-                        sx = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-                        sy = (e.touches[0].clientY + e.touches[1].clientY) / 2; }
-                });
-                document.addEventListener('touchmove', (e) => {
-                    if (!active || !this.gameRunning) return;
-                    if (e.touches.length === 2) {
-                        const cx = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-                        const cy = (e.touches[0].clientY + e.touches[1].clientY) / 2;
-                        fy += (cx - sx) * 0.003;
-                        fp += (cy - sy) * 0.004;
-                        fp = THREE.MathUtils.clamp(fp, -0.7, 0.5);
-                        sx = cx;
-                        sy = cy;
-                    }
-                });
-                document.addEventListener('touchend', () => { active = false; });
-                this._fbYaw = () => fy;
-                this._fbPitch = () => fp;
-            }
-
-            async requestGyroPermission() {
-                if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-                    try { if ((await DeviceOrientationEvent.requestPermission()) === 'granted') this.gyroAvailable =
-                            true; } catch (e) {}
-                }
-            }
-
             startGame() {
                 this.splashScreen.style.display = 'none';
                 this.audio.init();
                 this.vibration.requestPermission();
                 setTimeout(() => this.vibration.requestPermission(), 500);
-
-                if (this._iosGyro && typeof DeviceOrientationEvent.requestPermission === 'function') {
-                    this.requestGyroPermission().then(() => this.beginGameplay());
-                } else {
-                    this.beginGameplay();
-                }
-
-                this.gyroDebug.style.display = 'block';
-                this.bottomBar.style.display = 'flex';
-                this.steerIndicator.style.display = 'block';
+                this.beginGameplay();
+                this.joystickContainer.style.display = 'block';
             }
 
             beginGameplay() {
@@ -836,9 +722,6 @@
                 this.muzzleFlash = 0;
                 this.turretYaw = 0;
                 this.turretPitch = 0;
-                this.steerInput = 0;
-                this.pitchInput = 0;
-                this.calibrated = false;
                 this.gameRunning = true;
                 this.gameOverScreen.style.display = 'none';
                 this.updateHUD();
@@ -852,8 +735,8 @@
             gameOver() {
                 this.gameRunning = false;
                 this.isFiring = false;
-                this.steerInput = 0;
-                this.pitchInput = 0;
+                this.joystickVector.x = 0;
+                this.joystickVector.y = 0;
                 this.audio.playExplosion();
                 this.vibration.explosionVibrate();
                 this.createExplosion(new THREE.Vector3(0, 2, 0), 2.5);
@@ -862,18 +745,16 @@
                     this.gameOverScreen.style.display = 'flex';
                     this.finalScoreEl.textContent = `Puntuación: ${this.score}`;
                     this.updateRanking();
-                    this.gyroDebug.style.display = 'none';
-                    this.bottomBar.style.display = 'none';
-                    this.steerIndicator.style.display = 'none';
+                    this.joystickContainer.style.display = 'none';
                 }, 800);
             }
 
             updateRanking() {
-                let r = JSON.parse(localStorage.getItem('midway_v11') || '[]');
+                let r = JSON.parse(localStorage.getItem('midway_v12') || '[]');
                 r.push({ score: this.score, time: Math.floor(this.gameTime), date: new Date().toLocaleDateString() });
                 r.sort((a, b) => b.score - a.score);
                 r = r.slice(0, 10);
-                localStorage.setItem('midway_v11', JSON.stringify(r));
+                localStorage.setItem('midway_v12', JSON.stringify(r));
                 let h = '<h3>🏆 MEJORES ARTILLEROS</h3>';
                 r.forEach((x, i) => h +=
                     `<div>${i+1}. ${x.score} pts - ${x.time}s (${x.date})</div>`);
@@ -1084,6 +965,7 @@
                     this.updateExplosions(delta);
                     this.updateSmoke(delta);
                     this.updateDeckFires(delta); return; }
+
                 this.gameTime += delta;
                 this.fireCooldown = Math.max(0, this.fireCooldown - delta);
                 this.muzzleFlash = Math.max(0, this.muzzleFlash - delta);
@@ -1094,15 +976,15 @@
                     this.spawnPlane(); if (this.difficulty >= 3 && Math.random() < 0.5) setTimeout(() => { if (this.gameRunning)
                             this.spawnPlane(); }, Math.random() * 800); }
 
-                let steer = this.steerInput,
-                    pitch = this.pitchInput;
-                if (!this.gyroAvailable || !this.calibrated) { if (this._fbYaw) steer = this._fbYaw(); if (this._fbPitch)
-                        pitch = this._fbPitch(); }
-
-                // Aplicar velocidades de trigger
-                if (steer !== 0) this.turretYaw += steer * delta * 2.5;
-                if (pitch !== 0) {
-                    this.turretPitch += pitch * delta * 2.0;
+                // Aplicar joystick
+                const speedMultiplier = 2.5;
+                if (this.joystickVector.x !== 0) {
+                    this.turretYaw += this.joystickVector.x * delta * speedMultiplier * (0.5 + Math.abs(this.joystickVector
+                        .x));
+                }
+                if (this.joystickVector.y !== 0) {
+                    this.turretPitch += this.joystickVector.y * delta * speedMultiplier * 0.7 * (0.5 + Math.abs(this
+                        .joystickVector.y));
                     this.turretPitch = THREE.MathUtils.clamp(this.turretPitch, -0.4, 0.5);
                 }
 
@@ -1121,7 +1003,6 @@
                     0x8cc8e8), new THREE.Color(0xffcc66), this.muzzleFlash / 0.05), 0.00005 + (this.muzzleFlash / 0.05) *
                     0.0002) : new THREE.FogExp2(0x8cc8e8, 0.00005);
 
-                // Balas
                 for (let i = this.bullets.length - 1; i >= 0; i--) {
                     const b = this.bullets[i];
                     b.position.add(b.velocity.clone().multiplyScalar(delta));
@@ -1144,7 +1025,6 @@
                     }
                 }
 
-                // Aviones
                 for (let i = this.planes.length - 1; i >= 0; i--) {
                     const p = this.planes[i];
                     if (!p.alive) continue;
@@ -1188,7 +1068,6 @@
                 this.scene.remove(p.group); const idx = this.planeMeshes.indexOf(p); if (idx > -1) this.planeMeshes.splice(idx,
                     1);
                 this.planes.splice(i, 1); }
-
             removePlane(i) { const p = this.planes[i];
                 p.alive = false;
                 this.scene.remove(p.group); const idx = this.planeMeshes.indexOf(p); if (idx > -1) this.planeMeshes.splice(idx,
@@ -1278,7 +1157,7 @@
             self.addEventListener('fetch',e=>e.respondWith(fetch(e.request)));
           `], { type: 'application/javascript' }))).catch(() => {});
         }
-        console.log('⚓ Midway v11 - Doble TRIGGER (giro + cabeceo)');
+        console.log('⚓ Midway v12 - Joystick táctil + sonidos sintetizados graves');
     </script>
 </body>
 </html>
