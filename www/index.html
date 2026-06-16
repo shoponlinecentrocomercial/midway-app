@@ -102,10 +102,12 @@
         /* Joystick */
         #joystick-container {
             position: absolute;
-            width: 20vw;
-            height: 20vw;
-            min-width: 100px;
-            min-height: 100px;
+            width: 25vw;
+            height: 25vw;
+            min-width: 120px;
+            min-height: 120px;
+            max-width: 200px;
+            max-height: 200px;
             border-radius: 50%;
             pointer-events: all;
             z-index: 15;
@@ -114,26 +116,26 @@
             background: rgba(255,255,255,0.06);
             backdrop-filter: blur(4px);
             -webkit-backdrop-filter: blur(4px);
-            box-shadow: 0 0 15px rgba(0,0,0,0.4);
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
             touch-action: none;
         }
         #joystick-thumb {
             position: absolute;
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             background: rgba(255,255,255,0.25);
-            border: 1px solid rgba(255,255,255,0.5);
+            border: 2px solid rgba(255,255,255,0.5);
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             pointer-events: none;
-            box-shadow: 0 0 10px rgba(255,255,255,0.3);
+            box-shadow: 0 0 12px rgba(255,255,255,0.3);
             transition: background 0.15s;
         }
         #joystick-thumb.active {
             background: rgba(255,180,50,0.7);
-            box-shadow: 0 0 15px rgba(255,150,0,0.6);
+            box-shadow: 0 0 18px rgba(255,150,0,0.7);
         }
 
         #game-over-screen {
@@ -238,7 +240,6 @@
     </div>
     <div id="message"></div>
 
-    <!-- Joystick virtual -->
     <div id="joystick-container">
         <div id="joystick-thumb"></div>
     </div>
@@ -286,7 +287,6 @@
             playGunshot() {
                 if (!this.initialized) return;
                 const now = this.ctx.currentTime;
-                // Disparo seco y grave
                 const osc = this.ctx.createOscillator();
                 const gain = this.ctx.createGain();
                 const filter = this.ctx.createBiquadFilter();
@@ -319,7 +319,6 @@
             playExplosion() {
                 if (!this.initialized) return;
                 const now = this.ctx.currentTime;
-                // BOOM muy grave y corto
                 const osc1 = this.ctx.createOscillator();
                 const gain1 = this.ctx.createGain();
                 osc1.type = 'sine';
@@ -331,7 +330,6 @@
                 gain1.connect(this.masterGain);
                 osc1.start(now);
                 osc1.stop(now + 1.0);
-                // Subgrave
                 const osc2 = this.ctx.createOscillator();
                 const gain2 = this.ctx.createGain();
                 osc2.type = 'sine';
@@ -343,7 +341,6 @@
                 gain2.connect(this.masterGain);
                 osc2.start(now);
                 osc2.stop(now + 1.2);
-                // Crujido
                 const osc3 = this.ctx.createOscillator();
                 const gain3 = this.ctx.createGain();
                 osc3.type = 'sawtooth';
@@ -355,7 +352,6 @@
                 gain3.connect(this.masterGain);
                 osc3.start(now);
                 osc3.stop(now + 0.5);
-                // Ruido explosivo
                 const bs = this.ctx.sampleRate * 0.6;
                 const buf = this.ctx.createBuffer(1, bs, this.ctx.sampleRate);
                 const d = buf.getChannelData(0);
@@ -442,7 +438,7 @@
 
                 // Joystick
                 this.joystickActive = false;
-                this.joystickVector = { x: 0, y: 0 }; // -1..1
+                this.joystickVector = { x: 0, y: 0 };
 
                 this.turretYaw = 0;
                 this.turretPitch = 0;
@@ -476,8 +472,6 @@
                 this.splashScreen = document.getElementById('splash-screen');
                 this.finalScoreEl = document.getElementById('final-score');
                 this.rankingEl = document.getElementById('ranking');
-
-                // Joystick elements
                 this.joystickContainer = document.getElementById('joystick-container');
                 this.joystickThumb = document.getElementById('joystick-thumb');
             }
@@ -590,12 +584,8 @@
             setupJoystick() {
                 const container = this.joystickContainer;
                 const thumb = this.joystickThumb;
-                const rect = container.getBoundingClientRect();
-                const centerX = rect.width / 2;
-                const centerY = rect.height / 2;
-                const maxDist = rect.width / 2 - 18;
 
-                const updateJoystickPosition = () => {
+                const updatePosition = () => {
                     const isLandscape = window.innerWidth > window.innerHeight;
                     if (isLandscape) {
                         container.style.left = '15px';
@@ -609,8 +599,8 @@
                         container.style.transform = 'translateX(-50%)';
                     }
                 };
-                window.addEventListener('resize', updateJoystickPosition);
-                updateJoystickPosition();
+                window.addEventListener('resize', updatePosition);
+                updatePosition();
 
                 const handleStart = (e) => {
                     e.preventDefault();
@@ -627,17 +617,18 @@
                     let dx = touch.clientX - cx;
                     let dy = touch.clientY - cy;
                     const dist = Math.sqrt(dx * dx + dy * dy);
-                    const maxDist = rect.width / 2 - 18;
+                    const maxDist = rect.width / 2 - 20;
                     if (dist > maxDist) {
                         dx = (dx / dist) * maxDist;
                         dy = (dy / dist) * maxDist;
                     }
                     thumb.style.left = `calc(50% + ${dx}px)`;
                     thumb.style.top = `calc(50% + ${dy}px)`;
+                    // Invertir eje horizontal: arrastrar derecha -> girar derecha
                     this.joystickVector.x = dx / maxDist;
                     this.joystickVector.y = -dy / maxDist;
                 };
-                const handleEnd = (e) => {
+                const handleEnd = () => {
                     this.joystickActive = false;
                     this.joystickVector.x = 0;
                     this.joystickVector.y = 0;
@@ -651,9 +642,7 @@
                 container.addEventListener('touchend', handleEnd);
                 container.addEventListener('touchcancel', handleEnd);
                 container.addEventListener('mousedown', handleStart);
-                window.addEventListener('mousemove', (e) => {
-                    if (this.joystickActive) handleMove(e);
-                });
+                window.addEventListener('mousemove', (e) => { if (this.joystickActive) handleMove(e); });
                 window.addEventListener('mouseup', handleEnd);
             }
 
@@ -750,11 +739,11 @@
             }
 
             updateRanking() {
-                let r = JSON.parse(localStorage.getItem('midway_v12') || '[]');
+                let r = JSON.parse(localStorage.getItem('midway_v13') || '[]');
                 r.push({ score: this.score, time: Math.floor(this.gameTime), date: new Date().toLocaleDateString() });
                 r.sort((a, b) => b.score - a.score);
                 r = r.slice(0, 10);
-                localStorage.setItem('midway_v12', JSON.stringify(r));
+                localStorage.setItem('midway_v13', JSON.stringify(r));
                 let h = '<h3>🏆 MEJORES ARTILLEROS</h3>';
                 r.forEach((x, i) => h +=
                     `<div>${i+1}. ${x.score} pts - ${x.time}s (${x.date})</div>`);
@@ -976,7 +965,7 @@
                     this.spawnPlane(); if (this.difficulty >= 3 && Math.random() < 0.5) setTimeout(() => { if (this.gameRunning)
                             this.spawnPlane(); }, Math.random() * 800); }
 
-                // Aplicar joystick
+                // Aplicar joystick (eje horizontal ya corregido en setupJoystick)
                 const speedMultiplier = 2.5;
                 if (this.joystickVector.x !== 0) {
                     this.turretYaw += this.joystickVector.x * delta * speedMultiplier * (0.5 + Math.abs(this.joystickVector
@@ -1157,7 +1146,7 @@
             self.addEventListener('fetch',e=>e.respondWith(fetch(e.request)));
           `], { type: 'application/javascript' }))).catch(() => {});
         }
-        console.log('⚓ Midway v12 - Joystick táctil + sonidos sintetizados graves');
+        console.log('⚓ Midway v13 - Joystick 25% + eje horizontal corregido');
     </script>
 </body>
 </html>
