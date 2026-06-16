@@ -98,7 +98,6 @@
             z-index: 6;
         }
 
-        /* Radar */
         #radar-container {
             position: absolute;
             top: 50px;
@@ -113,11 +112,7 @@
             border: 1px solid rgba(0,255,100,0.4);
             box-shadow: 0 0 10px rgba(0,255,0,0.2);
         }
-        #radar-canvas {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-        }
+        #radar-canvas { width: 100%; height: 100%; border-radius: 50%; }
 
         #joystick-container {
             position: absolute;
@@ -171,68 +166,26 @@
             pointer-events: all;
             z-index: 20;
         }
-        #game-over-screen h1 {
-            color: #ff4444;
-            font-size: 30px;
-            margin-bottom: 8px;
-            text-shadow: 0 0 20px #ff0000;
-        }
+        #game-over-screen h1 { color: #ff4444; font-size: 30px; margin-bottom: 8px; text-shadow: 0 0 20px #ff0000; }
         #game-over-screen .final-score { color: #fff; font-size: 18px; margin: 8px 0; }
-        #game-over-screen .ranking {
-            color: #ffcc00;
-            font-size: 11px;
-            margin: 10px 0;
-            text-align: center;
-            max-height: 130px;
-            overflow-y: auto;
-            width: 90%;
-        }
+        #game-over-screen .ranking { color: #ffcc00; font-size: 11px; margin: 10px 0; text-align: center; max-height: 130px; overflow-y: auto; width: 90%; }
         #game-over-screen button {
-            background: #ff4444;
-            color: #fff;
-            border: none;
-            padding: 12px 28px;
-            font-size: 15px;
-            border-radius: 25px;
-            cursor: pointer;
-            margin-top: 10px;
-            font-family: 'Courier New', monospace;
-            font-weight: bold;
+            background: #ff4444; color: #fff; border: none; padding: 12px 28px; font-size: 15px;
+            border-radius: 25px; cursor: pointer; margin-top: 10px; font-family: 'Courier New', monospace; font-weight: bold;
         }
         #game-over-screen button:active { background: #cc0000; transform: scale(0.95); }
+
         #splash-screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.93);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            pointer-events: all;
-            z-index: 30;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.93); display: flex; flex-direction: column;
+            justify-content: center; align-items: center; pointer-events: all; z-index: 30;
         }
-        #splash-screen h1 {
-            color: #ffcc00;
-            font-size: 26px;
-            margin-bottom: 6px;
-            text-shadow: 0 0 30px #ff8800;
-            text-align: center;
-        }
+        #splash-screen h1 { color: #ffcc00; font-size: 26px; margin-bottom: 6px; text-shadow: 0 0 30px #ff8800; text-align: center; }
         #splash-screen .subtitle { color: #ccc; font-size: 10px; margin-bottom: 18px; text-align: center; }
         #splash-screen .instructions { color: #aaa; font-size: 9px; text-align: center; margin-bottom: 12px; line-height: 1.4; }
         #splash-screen button {
-            background: #ff8800;
-            color: #000;
-            border: none;
-            padding: 13px 32px;
-            font-size: 16px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-family: 'Courier New', monospace;
-            font-weight: bold;
+            background: #ff8800; color: #000; border: none; padding: 13px 32px; font-size: 16px;
+            border-radius: 25px; cursor: pointer; font-family: 'Courier New', monospace; font-weight: bold;
         }
         #splash-screen button:active { background: #ffaa00; transform: scale(0.95); }
     </style>
@@ -258,14 +211,8 @@
         </svg>
     </div>
     <div id="message"></div>
-
-    <div id="radar-container">
-        <canvas id="radar-canvas" width="90" height="90"></canvas>
-    </div>
-
-    <div id="joystick-container">
-        <div id="joystick-thumb"></div>
-    </div>
+    <div id="radar-container"><canvas id="radar-canvas" width="90" height="90"></canvas></div>
+    <div id="joystick-container"><div id="joystick-thumb"></div></div>
 
     <div id="splash-screen">
         <h1>⚓ BATALLA DE MIDWAY</h1>
@@ -286,163 +233,147 @@
     </div>
 
     <script type="importmap">
-        { "imports": { "three": "https://unpkg.com/three@0.157.0/build/three.module.js" } }
+        { "imports": { "three": "https://unpkg.com/three@0.157.0/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.157.0/examples/jsm/" } }
     </script>
 
     <script type="module">
         import * as THREE from 'three';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-        // ==================== AUDIO (Síntesis grave realista) ====================
+        // ==================== AUDIO (Carga desde archivos) ====================
+        // Base URL para los archivos de audio en tu repositorio
+        const AUDIO_BASE = 'https://raw.githubusercontent.com/shoponlinecentrocomercial/midway-app/main/www/audio/';
+        
+        // URLs de los sonidos
+        const SOUND_URLS = {
+            gunshot: AUDIO_BASE + 'gun_shot.wav',
+            explosion: AUDIO_BASE + 'bomb.wav',
+            hit: AUDIO_BASE + 'metal_hit.wav',
+            alarm: AUDIO_BASE + 'sirena.wav'
+        };
+
         class AudioSystem {
-            constructor() { this.ctx = null;
+            constructor() {
+                this.ctx = null;
                 this.initialized = false;
-                this.masterGain = null; }
-            init() {
+                this.masterGain = null;
+                this.buffers = {};
+                this.loaded = false;
+            }
+
+            async init() {
                 if (this.initialized) return;
                 try {
-                    this.ctx = new(window.AudioContext || window.webkitAudioContext)();
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
                     this.masterGain = this.ctx.createGain();
-                    this.masterGain.gain.value = 0.65;
+                    this.masterGain.gain.value = 0.7;
                     this.masterGain.connect(this.ctx.destination);
                     this.initialized = true;
-                } catch (e) {}
+                    await this.loadAllSounds();
+                } catch (e) {
+                    console.warn('Audio no disponible, usando síntesis:', e);
+                }
             }
-            playGunshot() {
-                if (!this.initialized) return;
-                const now = this.ctx.currentTime;
-                const osc = this.ctx.createOscillator();
+
+            async loadAllSounds() {
+                const promises = Object.entries(SOUND_URLS).map(async ([name, url]) => {
+                    try {
+                        const response = await fetch(url);
+                        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                        const arrayBuffer = await response.arrayBuffer();
+                        const audioBuffer = await this.ctx.decodeAudioData(arrayBuffer);
+                        this.buffers[name] = audioBuffer;
+                        console.log(`✅ Sonido cargado: ${name}`);
+                    } catch (e) {
+                        console.warn(`⚠️ No se pudo cargar ${name}: ${e.message}`);
+                    }
+                });
+                await Promise.all(promises);
+                this.loaded = Object.keys(this.buffers).length > 0;
+                console.log(`🔊 ${Object.keys(this.buffers).length}/4 sonidos cargados`);
+            }
+
+            play(name, volume = 0.7, rate = 1.0) {
+                if (!this.initialized || !this.buffers[name]) {
+                    this.synthFallback(name);
+                    return;
+                }
+                // Reanudar el contexto si está suspendido
+                if (this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+                const source = this.ctx.createBufferSource();
                 const gain = this.ctx.createGain();
-                const filter = this.ctx.createBiquadFilter();
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(180, now);
-                osc.frequency.exponentialRampToValueAtTime(30, now + 0.08);
-                filter.type = 'lowpass';
-                filter.frequency.setValueAtTime(500, now);
-                filter.frequency.exponentialRampToValueAtTime(50, now + 0.08);
-                gain.gain.setValueAtTime(0.9, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
-                osc.connect(filter);
-                filter.connect(gain);
+                source.buffer = this.buffers[name];
+                source.playbackRate.value = rate;
+                gain.gain.value = volume;
+                source.connect(gain);
                 gain.connect(this.masterGain);
-                osc.start(now);
-                osc.stop(now + 0.12);
-                const bs = this.ctx.sampleRate * 0.04;
-                const buf = this.ctx.createBuffer(1, bs, this.ctx.sampleRate);
-                const d = buf.getChannelData(0);
-                for (let i = 0; i < bs; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bs * 0.15));
-                const noise = this.ctx.createBufferSource();
-                const ng = this.ctx.createGain();
-                noise.buffer = buf;
-                ng.gain.setValueAtTime(0.7, now);
-                ng.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
-                noise.connect(ng);
-                ng.connect(this.masterGain);
-                noise.start(now);
+                source.start(0);
             }
-            playExplosion() {
+
+            resumeContext() {
+                if (this.ctx && this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            }
+
+            synthFallback(name) {
                 if (!this.initialized) return;
                 const now = this.ctx.currentTime;
-                const osc1 = this.ctx.createOscillator();
-                const gain1 = this.ctx.createGain();
-                osc1.type = 'sine';
-                osc1.frequency.setValueAtTime(35, now);
-                osc1.frequency.exponentialRampToValueAtTime(5, now + 0.8);
-                gain1.gain.setValueAtTime(1.3, now);
-                gain1.gain.exponentialRampToValueAtTime(0.001, now + 1.0);
-                osc1.connect(gain1);
-                gain1.connect(this.masterGain);
-                osc1.start(now);
-                osc1.stop(now + 1.0);
-                const osc2 = this.ctx.createOscillator();
-                const gain2 = this.ctx.createGain();
-                osc2.type = 'sine';
-                osc2.frequency.setValueAtTime(12, now);
-                osc2.frequency.exponentialRampToValueAtTime(1, now + 1.2);
-                gain2.gain.setValueAtTime(0.9, now);
-                gain2.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
-                osc2.connect(gain2);
-                gain2.connect(this.masterGain);
-                osc2.start(now);
-                osc2.stop(now + 1.2);
-                const osc3 = this.ctx.createOscillator();
-                const gain3 = this.ctx.createGain();
-                osc3.type = 'sawtooth';
-                osc3.frequency.setValueAtTime(200, now);
-                osc3.frequency.exponentialRampToValueAtTime(20, now + 0.5);
-                gain3.gain.setValueAtTime(0.5, now);
-                gain3.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
-                osc3.connect(gain3);
-                gain3.connect(this.masterGain);
-                osc3.start(now);
-                osc3.stop(now + 0.5);
-                const bs = this.ctx.sampleRate * 0.6;
-                const buf = this.ctx.createBuffer(1, bs, this.ctx.sampleRate);
-                const d = buf.getChannelData(0);
-                for (let i = 0; i < bs; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bs * 0.1));
-                const noise = this.ctx.createBufferSource();
-                const ng = this.ctx.createGain();
-                noise.buffer = buf;
-                ng.gain.setValueAtTime(0.8, now);
-                ng.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
-                noise.connect(ng);
-                ng.connect(this.masterGain);
-                noise.start(now);
-            }
-            playHit() {
-                if (!this.initialized) return;
-                const now = this.ctx.currentTime;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(45, now);
-                osc.frequency.exponentialRampToValueAtTime(10, now + 0.7);
-                gain.gain.setValueAtTime(1.1, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.9);
-                osc.connect(gain);
-                gain.connect(this.masterGain);
-                osc.start(now);
-                osc.stop(now + 0.9);
-                const bs = this.ctx.sampleRate * 0.3;
-                const buf = this.ctx.createBuffer(1, bs, this.ctx.sampleRate);
-                const d = buf.getChannelData(0);
-                for (let i = 0; i < bs; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bs * 0.15));
-                const noise = this.ctx.createBufferSource();
-                const ng = this.ctx.createGain();
-                noise.buffer = buf;
-                ng.gain.setValueAtTime(0.6, now);
-                ng.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
-                noise.connect(ng);
-                ng.connect(this.masterGain);
-                noise.start(now);
-            }
-            playAlarm() {
-                if (!this.initialized) return;
-                const now = this.ctx.currentTime;
-                for (let i = 0; i < 3; i++) {
+                // Síntesis simple de respaldo
+                if (name === 'gunshot') {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(200, now);
+                    osc.frequency.exponentialRampToValueAtTime(30, now + 0.1);
+                    gain.gain.setValueAtTime(0.5, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+                    osc.connect(gain);
+                    gain.connect(this.masterGain);
+                    osc.start(now);
+                    osc.stop(now + 0.15);
+                } else if (name === 'explosion' || name === 'hit') {
                     const osc = this.ctx.createOscillator();
                     const gain = this.ctx.createGain();
                     osc.type = 'sine';
-                    const t = now + i * 0.4;
-                    osc.frequency.setValueAtTime(500, t);
-                    osc.frequency.setValueAtTime(700, t + 0.2);
-                    gain.gain.setValueAtTime(0.3, t);
-                    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
+                    osc.frequency.setValueAtTime(50, now);
+                    osc.frequency.exponentialRampToValueAtTime(8, now + 1.0);
+                    gain.gain.setValueAtTime(0.6, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
                     osc.connect(gain);
                     gain.connect(this.masterGain);
-                    osc.start(t);
-                    osc.stop(t + 0.4);
+                    osc.start(now);
+                    osc.stop(now + 1.2);
+                } else if (name === 'alarm') {
+                    for (let i = 0; i < 3; i++) {
+                        const osc = this.ctx.createOscillator();
+                        const gain = this.ctx.createGain();
+                        osc.type = 'sine';
+                        const t = now + i * 0.4;
+                        osc.frequency.setValueAtTime(500, t);
+                        osc.frequency.setValueAtTime(700, t + 0.2);
+                        gain.gain.setValueAtTime(0.2, t);
+                        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+                        osc.connect(gain);
+                        gain.connect(this.masterGain);
+                        osc.start(t);
+                        osc.stop(t + 0.35);
+                    }
                 }
             }
+
+            playGunshot() { this.play('gunshot', 0.8, 0.9 + Math.random() * 0.2); }
+            playExplosion() { this.play('explosion', 0.9, 0.8 + Math.random() * 0.4); }
+            playHit() { this.play('hit', 0.85, 0.85 + Math.random() * 0.3); }
+            playAlarm() { this.play('alarm', 0.6, 1.0); }
         }
 
-        // ==================== VIBRACIÓN DIRECTA ====================
+        // ==================== VIBRACIÓN ====================
         function vibrate(pattern) {
             if (navigator.vibrate) {
-                try {
-                    navigator.vibrate(pattern);
-                } catch (e) {
-                    // ignorar
-                }
+                try { navigator.vibrate(pattern); } catch (e) {}
             }
         }
 
@@ -453,84 +384,39 @@
                 this.ctx = canvas.getContext('2d');
                 this.range = 55;
             }
-
             draw(planes) {
                 const ctx = this.ctx;
-                const w = this.canvas.width;
-                const h = this.canvas.height;
-                const cx = w / 2;
-                const cy = h / 2;
-                const r = w / 2 - 2;
-
+                const w = this.canvas.width, h = this.canvas.height;
+                const cx = w / 2, cy = h / 2, r = w / 2 - 2;
                 ctx.clearRect(0, 0, w, h);
-
                 ctx.fillStyle = 'rgba(0,10,0,0.7)';
-                ctx.beginPath();
-                ctx.arc(cx, cy, r, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.strokeStyle = 'rgba(0,255,100,0.3)';
-                ctx.lineWidth = 0.5;
-                for (let i = 1; i <= 3; i++) {
-                    ctx.beginPath();
-                    ctx.arc(cx, cy, r * (i / 3), 0, Math.PI * 2);
-                    ctx.stroke();
-                }
-
+                ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
+                ctx.strokeStyle = 'rgba(0,255,100,0.3)'; ctx.lineWidth = 0.5;
+                for (let i = 1; i <= 3; i++) { ctx.beginPath(); ctx.arc(cx, cy, r * (i/3), 0, Math.PI*2); ctx.stroke(); }
                 ctx.strokeStyle = 'rgba(0,255,100,0.2)';
-                ctx.beginPath();
-                ctx.moveTo(cx, cy - r);
-                ctx.lineTo(cx, cy + r);
-                ctx.moveTo(cx - r, cy);
-                ctx.lineTo(cx + r, cy);
-                ctx.stroke();
-
+                ctx.beginPath(); ctx.moveTo(cx, cy - r); ctx.lineTo(cx, cy + r);
+                ctx.moveTo(cx - r, cy); ctx.lineTo(cx + r, cy); ctx.stroke();
                 ctx.fillStyle = '#00ff66';
-                ctx.beginPath();
-                ctx.arc(cx, cy, 2.5, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.strokeStyle = '#fff';
-                ctx.lineWidth = 0.8;
-                ctx.stroke();
-
-                for (const plane of planes) {
-                    if (!plane.alive) continue;
-                    const dx = plane.position.x;
-                    const dz = plane.position.z;
-                    const dist = Math.sqrt(dx * dx + dz * dz);
+                ctx.beginPath(); ctx.arc(cx, cy, 2.5, 0, Math.PI*2); ctx.fill();
+                ctx.strokeStyle = '#fff'; ctx.lineWidth = 0.8; ctx.stroke();
+                for (const p of planes) {
+                    if (!p.alive) continue;
+                    const dx = p.position.x, dz = p.position.z;
+                    const dist = Math.sqrt(dx*dx + dz*dz);
                     if (dist < this.range) {
-                        const scale = r / this.range;
-                        const px = cx + dx * scale;
-                        const py = cy + dz * scale;
-                        const angle = Math.atan2(dz, dx);
-
-                        ctx.fillStyle = '#ff3333';
-                        ctx.beginPath();
-                        ctx.save();
-                        ctx.translate(px, py);
-                        ctx.rotate(angle);
-                        ctx.moveTo(3, 0);
-                        ctx.lineTo(-2, -1.5);
-                        ctx.lineTo(-2, 1.5);
-                        ctx.closePath();
-                        ctx.fill();
-                        ctx.restore();
+                        const s = r / this.range, px = cx + dx*s, py = cy + dz*s, a = Math.atan2(dz, dx);
+                        ctx.fillStyle = '#ff3333'; ctx.beginPath();
+                        ctx.save(); ctx.translate(px, py); ctx.rotate(a);
+                        ctx.moveTo(3,0); ctx.lineTo(-2,-1.5); ctx.lineTo(-2,1.5); ctx.closePath();
+                        ctx.fill(); ctx.restore();
                     } else {
-                        const angle = Math.atan2(dz, dx);
-                        const px = cx + Math.cos(angle) * r;
-                        const py = cy + Math.sin(angle) * r;
+                        const a = Math.atan2(dz, dx), px = cx + Math.cos(a)*r, py = cy + Math.sin(a)*r;
                         ctx.fillStyle = '#ff6666';
-                        ctx.beginPath();
-                        ctx.arc(px, py, 1.5, 0, Math.PI * 2);
-                        ctx.fill();
+                        ctx.beginPath(); ctx.arc(px, py, 1.5, 0, Math.PI*2); ctx.fill();
                     }
                 }
-
-                ctx.strokeStyle = 'rgba(0,255,100,0.5)';
-                ctx.lineWidth = 1;
-                ctx.beginPath();
-                ctx.arc(cx, cy, r, 0, Math.PI * 2);
-                ctx.stroke();
+                ctx.strokeStyle = 'rgba(0,255,100,0.5)'; ctx.lineWidth = 1;
+                ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.stroke();
             }
         }
 
@@ -574,6 +460,10 @@
                 this.explosionParticles = [];
                 this.smokeParticles = [];
 
+                // Modelos 3D
+                this.planeModels = {}; // Cache de modelos GLB
+                this.gltfLoader = new GLTFLoader();
+
                 this.scoreEl = document.getElementById('score');
                 this.healthBar = document.getElementById('health-bar');
                 this.messageEl = document.getElementById('message');
@@ -585,7 +475,6 @@
                 this.joystickThumb = document.getElementById('joystick-thumb');
                 this.radarContainer = document.getElementById('radar-container');
                 this.radarCanvas = document.getElementById('radar-canvas');
-
                 this.radar = new Radar(this.radarCanvas);
             }
 
@@ -608,16 +497,11 @@
 
                 this.scene.add(new THREE.AmbientLight(0x8899bb, 0.8));
                 const sun = new THREE.DirectionalLight(0xffeedd, 3.5);
-                sun.position.set(60, 50, 30);
-                sun.castShadow = true;
-                sun.shadow.mapSize.width = 2048;
-                sun.shadow.mapSize.height = 2048;
-                sun.shadow.camera.near = 0.5;
-                sun.shadow.camera.far = 250;
-                sun.shadow.camera.left = -100;
-                sun.shadow.camera.right = 100;
-                sun.shadow.camera.top = 100;
-                sun.shadow.camera.bottom = -100;
+                sun.position.set(60, 50, 30); sun.castShadow = true;
+                sun.shadow.mapSize.width = sun.shadow.mapSize.height = 2048;
+                sun.shadow.camera.near = 0.5; sun.shadow.camera.far = 250;
+                sun.shadow.camera.left = sun.shadow.camera.bottom = -100;
+                sun.shadow.camera.right = sun.shadow.camera.top = 100;
                 this.scene.add(sun);
                 this.scene.add(new THREE.HemisphereLight(0x87ceeb, 0x334466, 0.5));
 
@@ -626,6 +510,7 @@
                 this.createTurret();
                 this.setupEvents();
                 this.setupJoystick();
+                this.preloadModels();
 
                 this.lastTime = performance.now();
                 this.animate();
@@ -633,122 +518,120 @@
 
             createOcean() {
                 const g = new THREE.PlaneGeometry(500, 500, 150, 150);
-                const m = new THREE.MeshStandardMaterial({ color: 0x1a3a5c, roughness: 0.2, metalness: 0.75 });
-                this.ocean = new THREE.Mesh(g, m);
-                this.ocean.rotation.x = -Math.PI / 2;
-                this.ocean.position.y = -2;
-                this.ocean.receiveShadow = true;
-                this.scene.add(this.ocean);
+                this.ocean = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ color: 0x1a3a5c, roughness: 0.2, metalness: 0.75 }));
+                this.ocean.rotation.x = -Math.PI / 2; this.ocean.position.y = -2;
+                this.ocean.receiveShadow = true; this.scene.add(this.ocean);
                 this.oceanVerts = g.attributes.position.array.slice();
             }
-
             createShip() {
                 this.ship = new THREE.Group();
-                const d = new THREE.Mesh(new THREE.BoxGeometry(30, 1.2, 70), new THREE.MeshStandardMaterial({ color: 0x5a5a5a,
-                    roughness: 0.6, metalness: 0.35 }));
-                d.position.y = 1.2;
-                d.castShadow = true;
-                d.receiveShadow = true;
-                this.ship.add(d);
+                const d = new THREE.Mesh(new THREE.BoxGeometry(30, 1.2, 70), new THREE.MeshStandardMaterial({ color: 0x5a5a5a, roughness: 0.6, metalness: 0.35 }));
+                d.position.y = 1.2; d.castShadow = d.receiveShadow = true; this.ship.add(d);
                 for (let z = -32; z <= 32; z += 8) {
-                    const l = new THREE.Mesh(new THREE.BoxGeometry(28, 0.05, 0.3), new THREE.MeshStandardMaterial({ color: 0xcccccc,
-                        roughness: 0.5 }));
-                    l.position.set(0, 1.85, z);
-                    this.ship.add(l);
+                    const l = new THREE.Mesh(new THREE.BoxGeometry(28, 0.05, 0.3), new THREE.MeshStandardMaterial({ color: 0xcccccc, roughness: 0.5 }));
+                    l.position.set(0, 1.85, z); this.ship.add(l);
                 }
-                const h = new THREE.Mesh(new THREE.BoxGeometry(25, 3.5, 65), new THREE.MeshStandardMaterial({ color: 0x883333,
-                    roughness: 0.7, metalness: 0.25 }));
-                h.position.y = -1.2;
-                this.ship.add(h);
-                this.ship.position.set(0, 0, 0);
-                this.scene.add(this.ship);
+                const h = new THREE.Mesh(new THREE.BoxGeometry(25, 3.5, 65), new THREE.MeshStandardMaterial({ color: 0x883333, roughness: 0.7, metalness: 0.25 }));
+                h.position.y = -1.2; this.ship.add(h);
+                this.ship.position.set(0, 0, 0); this.scene.add(this.ship);
+            }
+            createTurret() {
+                this.turretGroup = new THREE.Group(); this.turretGroup.position.set(0, 1.9, 5);
+                const b = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.9, 0.6, 20), new THREE.MeshStandardMaterial({ color: 0x5a5a5a, roughness: 0.4, metalness: 0.75 }));
+                b.position.y = 0; b.castShadow = true; this.turretGroup.add(b);
+                this.gunsGroup = new THREE.Group(); this.gunsGroup.position.set(0, 0.2, -0.5);
+                this.gunsGroup.add(new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.25, 0.5), new THREE.MeshStandardMaterial({ color: 0x555555, roughness: 0.4, metalness: 0.7 })));
+                for (let i = 0; i < 2; i++) {
+                    const br = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.13, 4.0, 8), new THREE.MeshStandardMaterial({ color: 0x2a2a2a, roughness: 0.25, metalness: 0.9 }));
+                    br.rotation.x = Math.PI / 2; br.position.set((i-0.5)*0.5, 0, -2); br.castShadow = true; this.gunsGroup.add(br);
+                    const mz = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.12, 0.3, 8), new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.2, metalness: 1.0 }));
+                    mz.rotation.x = Math.PI / 2; mz.position.set((i-0.5)*0.5, 0, -4.0); this.gunsGroup.add(mz);
+                }
+                this.turretGroup.add(this.gunsGroup); this.scene.add(this.turretGroup);
             }
 
-            createTurret() {
-                this.turretGroup = new THREE.Group();
-                this.turretGroup.position.set(0, 1.9, 5);
-                const b = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.9, 0.6, 20), new THREE.MeshStandardMaterial({ color: 0x5a5a5a,
-                    roughness: 0.4, metalness: 0.75 }));
-                b.position.y = 0;
-                b.castShadow = true;
-                this.turretGroup.add(b);
-                this.gunsGroup = new THREE.Group();
-                this.gunsGroup.position.set(0, 0.2, -0.5);
-                const mt = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.25, 0.5), new THREE.MeshStandardMaterial({ color: 0x555555,
-                    roughness: 0.4, metalness: 0.7 }));
-                this.gunsGroup.add(mt);
-                for (let i = 0; i < 2; i++) {
-                    const br = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.13, 4.0, 8), new THREE.MeshStandardMaterial({ color: 0x2a2a2a,
-                        roughness: 0.25, metalness: 0.9 }));
-                    br.rotation.x = Math.PI / 2;
-                    br.position.set((i - 0.5) * 0.5, 0, -2);
-                    br.castShadow = true;
-                    this.gunsGroup.add(br);
-                    const mz = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.12, 0.3, 8), new THREE.MeshStandardMaterial({ color: 0x1a1a1a,
-                        roughness: 0.2, metalness: 1.0 }));
-                    mz.rotation.x = Math.PI / 2;
-                    mz.position.set((i - 0.5) * 0.5, 0, -4.0);
-                    this.gunsGroup.add(mz);
-                }
-                this.turretGroup.add(this.gunsGroup);
-                this.scene.add(this.turretGroup);
+            preloadModels() {
+                // Mapeo de tipos de avión a archivos GLB (ajusta los nombres según tus archivos reales)
+                const modelMap = {
+                    'fighter': 'zero.glb',
+                    'dive_bomber': 'val.glb',
+                    'torpedo_bomber': 'kate.glb'
+                };
+                const baseModelUrl = 'https://raw.githubusercontent.com/shoponlinecentrocomercial/midway-app/main/www/images/';
+                
+                Object.entries(modelMap).forEach(([type, filename]) => {
+                    const url = baseModelUrl + filename;
+                    this.gltfLoader.load(url, (gltf) => {
+                        const model = gltf.scene;
+                        // Eliminar trípode (buscar mesh por nombre o posición Y negativa)
+                        model.traverse((child) => {
+                            if (child.isMesh) {
+                                // Si el mesh está muy abajo, es parte del trípode
+                                const worldPos = new THREE.Vector3();
+                                child.getWorldPosition(worldPos);
+                                if (worldPos.y < -0.5 || child.name.toLowerCase().includes('base') || child.name.toLowerCase().includes('stand')) {
+                                    child.visible = false;
+                                }
+                                child.castShadow = true;
+                                child.receiveShadow = true;
+                            }
+                        });
+                        // Escalar el modelo a un tamaño razonable
+                        model.scale.set(0.5, 0.5, 0.5);
+                        this.planeModels[type] = model;
+                        console.log(`✅ Modelo 3D cargado: ${type} (${filename})`);
+                    }, undefined, (err) => {
+                        console.warn(`⚠️ No se pudo cargar ${filename}, usando geometría básica para ${type}`);
+                    });
+                });
             }
 
             setupJoystick() {
                 const container = this.joystickContainer;
                 const thumb = this.joystickThumb;
-
                 const updatePosition = () => {
                     const isLandscape = window.innerWidth > window.innerHeight;
                     if (isLandscape) {
-                        container.style.left = '15px';
-                        container.style.top = '50%';
-                        container.style.transform = 'translateY(-50%)';
-                        container.style.bottom = 'auto';
+                        container.style.left = '15px'; container.style.top = '50%';
+                        container.style.transform = 'translateY(-50%)'; container.style.bottom = 'auto';
                     } else {
-                        container.style.left = '50%';
-                        container.style.top = 'auto';
-                        container.style.bottom = '20px';
-                        container.style.transform = 'translateX(-50%)';
+                        container.style.left = '50%'; container.style.top = 'auto';
+                        container.style.bottom = '20px'; container.style.transform = 'translateX(-50%)';
                     }
                 };
-                window.addEventListener('resize', updatePosition);
-                updatePosition();
+                window.addEventListener('resize', updatePosition); updatePosition();
 
-                const handleStart = (e) => {
-                    e.preventDefault();
-                    this.joystickActive = true;
-                    thumb.classList.add('active');
-                };
-                const handleMove = (e) => {
-                    if (!this.joystickActive || !this.gameRunning) return;
-                    e.preventDefault();
+                const updateThumbFromEvent = (e) => {
                     const touch = e.touches ? e.touches[0] : e;
                     const rect = container.getBoundingClientRect();
-                    const cx = rect.left + rect.width / 2;
-                    const cy = rect.top + rect.height / 2;
-                    let dx = touch.clientX - cx;
-                    let dy = touch.clientY - cy;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    const maxDist = rect.width / 2 - 22;
-                    if (dist > maxDist) {
-                        dx = (dx / dist) * maxDist;
-                        dy = (dy / dist) * maxDist;
-                    }
+                    const cx = rect.left + rect.width/2, cy = rect.top + rect.height/2;
+                    let dx = touch.clientX - cx, dy = touch.clientY - cy;
+                    const dist = Math.sqrt(dx*dx + dy*dy);
+                    const maxDist = rect.width/2 - 22;
+                    if (dist > maxDist) { dx = (dx/dist)*maxDist; dy = (dy/dist)*maxDist; }
                     thumb.style.left = `calc(50% + ${dx}px)`;
                     thumb.style.top = `calc(50% + ${dy}px)`;
                     this.joystickVector.x = -dx / maxDist;
                     this.joystickVector.y = -dy / maxDist;
                 };
+                const handleStart = (e) => {
+                    e.preventDefault();
+                    this.joystickActive = true;
+                    thumb.classList.add('active');
+                    updateThumbFromEvent(e);
+                    this.audio.resumeContext(); // Reanudar audio en gesto del usuario
+                };
+                const handleMove = (e) => {
+                    if (!this.joystickActive || !this.gameRunning) return;
+                    e.preventDefault();
+                    updateThumbFromEvent(e);
+                };
                 const handleEnd = () => {
                     this.joystickActive = false;
-                    this.joystickVector.x = 0;
-                    this.joystickVector.y = 0;
-                    thumb.style.left = '50%';
-                    thumb.style.top = '50%';
+                    this.joystickVector.x = 0; this.joystickVector.y = 0;
+                    thumb.style.left = '50%'; thumb.style.top = '50%';
                     thumb.classList.remove('active');
                 };
-
                 container.addEventListener('touchstart', handleStart, { passive: false });
                 container.addEventListener('touchmove', handleMove, { passive: false });
                 container.addEventListener('touchend', handleEnd);
@@ -761,28 +644,25 @@
             setupEvents() {
                 document.addEventListener('pointerdown', (e) => {
                     if (!this.gameRunning) return;
-                    if (e.target.closest('#game-over-screen') || e.target.closest('#splash-screen') || e.target
-                        .closest('#joystick-container')) return;
+                    if (e.target.closest('#game-over-screen') || e.target.closest('#splash-screen') || e.target.closest('#joystick-container')) return;
                     e.preventDefault();
                     this.isFiring = true;
-                    this.audio.init();
-                    // vibrar directamente al disparar
+                    this.audio.init().then(() => this.audio.resumeContext());
                     vibrate([12, 8, 12]);
                 });
                 document.addEventListener('pointerup', () => { this.isFiring = false; });
                 document.addEventListener('pointerleave', () => { this.isFiring = false; });
-                document.addEventListener('touchmove', (e) => { if (this.gameRunning && !e.target.closest(
-                        '#joystick-container')) e.preventDefault(); }, { passive: false });
+                document.addEventListener('touchmove', (e) => { if (this.gameRunning && !e.target.closest('#joystick-container')) e.preventDefault(); }, { passive: false });
                 document.addEventListener('gesturestart', (e) => e.preventDefault());
                 document.addEventListener('gesturechange', (e) => e.preventDefault());
                 document.addEventListener('gestureend', (e) => e.preventDefault());
 
                 document.getElementById('start-btn').addEventListener('click', () => {
-                    vibrate(200); // vibración de feedback al iniciar
+                    vibrate(200);
+                    this.audio.init().then(() => this.audio.resumeContext());
                     this.startGame();
                 });
                 document.getElementById('restart-btn').addEventListener('click', () => this.restartGame());
-
                 window.addEventListener('resize', () => {
                     this.camera.aspect = window.innerWidth / window.innerHeight;
                     this.camera.updateProjectionMatrix();
@@ -792,37 +672,21 @@
 
             startGame() {
                 this.splashScreen.style.display = 'none';
-                this.audio.init();
                 this.beginGameplay();
                 this.joystickContainer.style.display = 'block';
                 this.radarContainer.style.display = 'block';
             }
 
             beginGameplay() {
-                this.score = 0;
-                this.health = 100;
-                this.gameTime = 0;
-                this.difficulty = 1;
-                this.spawnTimer = 0;
-                this.spawnInterval = 3.5;
-                this.bullets = [];
-                this.planes = [];
-                this.explosions = [];
-                this.hitEffects = [];
-                this.deckFires = [];
-                this.bulletMeshes.forEach(m => this.scene.remove(m));
-                this.bulletMeshes = [];
-                this.planeMeshes.forEach(p => this.scene.remove(p.group));
-                this.planeMeshes = [];
-                this.explosionParticles.forEach(ep => ep.particles.forEach(p => this.scene.remove(p)));
-                this.explosionParticles = [];
-                this.smokeParticles.forEach(sp => sp.particles.forEach(p => this.scene.remove(p)));
-                this.smokeParticles = [];
-                this.isFiring = false;
-                this.fireCooldown = 0;
-                this.muzzleFlash = 0;
-                this.turretYaw = 0;
-                this.turretPitch = 0;
+                this.score = 0; this.health = 100; this.gameTime = 0; this.difficulty = 1;
+                this.spawnTimer = 0; this.spawnInterval = 3.5;
+                this.bullets = []; this.planes = []; this.explosions = []; this.hitEffects = []; this.deckFires = [];
+                this.bulletMeshes.forEach(m => this.scene.remove(m)); this.bulletMeshes = [];
+                this.planeMeshes.forEach(p => this.scene.remove(p.group)); this.planeMeshes = [];
+                this.explosionParticles.forEach(ep => ep.particles.forEach(p => this.scene.remove(p))); this.explosionParticles = [];
+                this.smokeParticles.forEach(sp => sp.particles.forEach(p => this.scene.remove(p))); this.smokeParticles = [];
+                this.isFiring = false; this.fireCooldown = 0; this.muzzleFlash = 0;
+                this.turretYaw = 0; this.turretPitch = 0;
                 this.gameRunning = true;
                 this.gameOverScreen.style.display = 'none';
                 this.joystickContainer.style.display = 'block';
@@ -836,12 +700,9 @@
             restartGame() { this.beginGameplay(); }
 
             gameOver() {
-                this.gameRunning = false;
-                this.isFiring = false;
-                this.joystickVector.x = 0;
-                this.joystickVector.y = 0;
-                this.audio.playExplosion();
-                vibrate([60, 30, 60, 30, 100]);
+                this.gameRunning = false; this.isFiring = false;
+                this.joystickVector.x = 0; this.joystickVector.y = 0;
+                this.audio.playExplosion(); vibrate([60, 30, 60, 30, 100]);
                 this.createExplosion(new THREE.Vector3(0, 2, 0), 2.5);
                 this.createSmoke(new THREE.Vector3(0, 3, 0), 3.0);
                 setTimeout(() => {
@@ -854,14 +715,12 @@
             }
 
             updateRanking() {
-                let r = JSON.parse(localStorage.getItem('midway_v18') || '[]');
+                let r = JSON.parse(localStorage.getItem('midway_v20') || '[]');
                 r.push({ score: this.score, time: Math.floor(this.gameTime), date: new Date().toLocaleDateString() });
-                r.sort((a, b) => b.score - a.score);
-                r = r.slice(0, 10);
-                localStorage.setItem('midway_v18', JSON.stringify(r));
+                r.sort((a,b) => b.score - a.score); r = r.slice(0, 10);
+                localStorage.setItem('midway_v20', JSON.stringify(r));
                 let h = '<h3>🏆 MEJORES ARTILLEROS</h3>';
-                r.forEach((x, i) => h +=
-                    `<div>${i+1}. ${x.score} pts - ${x.time}s (${x.date})</div>`);
+                r.forEach((x,i) => h += `<div>${i+1}. ${x.score} pts - ${x.time}s (${x.date})</div>`);
                 this.rankingEl.innerHTML = h;
             }
 
@@ -877,61 +736,44 @@
                 this.scoreEl.textContent = `PTS: ${this.score}`;
                 this.healthBar.style.width = `${this.health}%`;
                 this.healthBar.style.background = this.health < 30 ? 'linear-gradient(90deg, #ff0000, #ff6600)' :
-                    this.health < 60 ? 'linear-gradient(90deg, #ff6600, #ffaa00)' :
-                    'linear-gradient(90deg, #ff0000, #ff4444)';
+                    this.health < 60 ? 'linear-gradient(90deg, #ff6600, #ffaa00)' : 'linear-gradient(90deg, #ff0000, #ff4444)';
             }
 
             spawnPlane() {
                 const types = ['fighter', 'dive_bomber', 'torpedo_bomber'];
-                const w = [0.5, 0.3, 0.2];
-                const rand = Math.random();
-                let type = types[0],
-                    cum = 0;
-                for (let i = 0; i < types.length; i++) { cum += w[i]; if (rand <= cum) { type = types[i]; break; } }
-                const a = Math.random() * Math.PI * 2;
-                const d = 30 + Math.random() * 40;
-                const h = 3 + Math.random() * 25;
+                const w = [0.5, 0.3, 0.2]; const rand = Math.random();
+                let type = types[0], cum = 0;
+                for (let i=0; i<types.length; i++) { cum += w[i]; if (rand <= cum) { type = types[i]; break; } }
+                const a = Math.random() * Math.PI * 2, d = 30 + Math.random()*40, h = 3 + Math.random()*25;
                 const plane = {
-                    type,
-                    position: new THREE.Vector3(Math.cos(a) * d, h, Math.sin(a) * d),
-                    velocity: new THREE.Vector3(),
-                    speed: 7 + Math.random() * 7 + this.difficulty * 2.5,
-                    health: type === 'fighter' ? 2 : 3,
-                    attackCooldown: 0,
-                    alive: true,
-                    group: null,
+                    type, position: new THREE.Vector3(Math.cos(a)*d, h, Math.sin(a)*d),
+                    velocity: new THREE.Vector3(), speed: 7 + Math.random()*7 + this.difficulty*2.5,
+                    health: type === 'fighter' ? 2 : 3, attackCooldown: 0, alive: true, group: null,
                 };
                 const ts = new THREE.Vector3(0, 1.5, 0).sub(plane.position).normalize();
                 plane.velocity.copy(ts.multiplyScalar(plane.speed));
                 plane.group = new THREE.Group();
                 plane.group.position.copy(plane.position);
-                const f = new THREE.Mesh(new THREE.ConeGeometry(0.35, 2.2, 6), new THREE.MeshStandardMaterial({
-                    color: type === 'fighter' ? 0x5a6a4a : type === 'dive_bomber' ? 0x6a4a3a : 0x4a5a3a,
-                    roughness: 0.45,
-                    metalness: 0.4
-                }));
-                f.rotation.x = Math.PI / 2;
-                f.position.z = -0.9;
-                f.castShadow = true;
-                plane.group.add(f);
-                const wg = new THREE.Mesh(new THREE.BoxGeometry(3.5, 0.08, 1), new THREE.MeshStandardMaterial({ color: 0x4a4a3a,
-                    roughness: 0.55, metalness: 0.3 }));
-                wg.position.z = -0.7;
-                wg.castShadow = true;
-                plane.group.add(wg);
-                const t = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.25, 0.4), new THREE.MeshStandardMaterial({ color: 0x4a4a3a,
-                    roughness: 0.55, metalness: 0.3 }));
-                t.position.set(0, 0.15, 0.4);
-                plane.group.add(t);
-                plane.propeller = new THREE.Mesh(new THREE.BoxGeometry(0.08, 1.3, 0.08), new THREE.MeshStandardMaterial({ color: 0x999999,
-                    roughness: 0.25, metalness: 0.8 }));
-                plane.propeller.position.z = -2;
-                plane.group.add(plane.propeller);
-                const hm = new THREE.Mesh(new THREE.CircleGeometry(0.25, 16), new THREE.MeshBasicMaterial({ color: 0xff0000,
-                    side: THREE.DoubleSide }));
-                hm.position.set(0, 0, -0.4);
-                hm.rotation.y = Math.PI;
-                plane.group.add(hm);
+
+                // Usar modelo 3D si está disponible, si no, geometría básica
+                if (this.planeModels[type]) {
+                    const modelClone = this.planeModels[type].clone();
+                    plane.group.add(modelClone);
+                } else {
+                    // Fallback geométrico
+                    const f = new THREE.Mesh(new THREE.ConeGeometry(0.35, 2.2, 6), new THREE.MeshStandardMaterial({
+                        color: type==='fighter'?0x5a6a4a:type==='dive_bomber'?0x6a4a3a:0x4a5a3a, roughness:0.45, metalness:0.4 }));
+                    f.rotation.x = Math.PI/2; f.position.z = -0.9; f.castShadow = true; plane.group.add(f);
+                    const wg = new THREE.Mesh(new THREE.BoxGeometry(3.5,0.08,1), new THREE.MeshStandardMaterial({ color:0x4a4a3a, roughness:0.55, metalness:0.3 }));
+                    wg.position.z = -0.7; wg.castShadow = true; plane.group.add(wg);
+                    const t = new THREE.Mesh(new THREE.BoxGeometry(1.3,0.25,0.4), new THREE.MeshStandardMaterial({ color:0x4a4a3a, roughness:0.55, metalness:0.3 }));
+                    t.position.set(0,0.15,0.4); plane.group.add(t);
+                    plane.propeller = new THREE.Mesh(new THREE.BoxGeometry(0.08,1.3,0.08), new THREE.MeshStandardMaterial({ color:0x999999, roughness:0.25, metalness:0.8 }));
+                    plane.propeller.position.z = -2; plane.group.add(plane.propeller);
+                    const hm = new THREE.Mesh(new THREE.CircleGeometry(0.25,16), new THREE.MeshBasicMaterial({ color:0xff0000, side:THREE.DoubleSide }));
+                    hm.position.set(0,0,-0.4); hm.rotation.y = Math.PI; plane.group.add(hm);
+                }
+
                 plane.group.lookAt(new THREE.Vector3().addVectors(plane.position, plane.velocity));
                 this.scene.add(plane.group);
                 this.planes.push(plane);
@@ -943,137 +785,81 @@
                 const bs = 55;
                 const dir = new THREE.Vector3(0, 0, -1);
                 dir.applyQuaternion(this.gunsGroup.getWorldQuaternion(new THREE.Quaternion()));
-                for (let i = 0; i < 2; i++) {
-                    const off = (i - 0.5) * 0.35;
+                for (let i=0; i<2; i++) {
+                    const off = (i-0.5)*0.35;
                     const tip = new THREE.Vector3(off, 0, -4.0);
                     tip.applyQuaternion(this.gunsGroup.getWorldQuaternion(new THREE.Quaternion()));
                     tip.add(this.gunsGroup.getWorldPosition(new THREE.Vector3()));
-                    const sp = new THREE.Vector3((Math.random() - 0.5) * 0.04, (Math.random() - 0.5) * 0.04, (Math.random() -
-                        0.5) * 0.04);
+                    const sp = new THREE.Vector3((Math.random()-0.5)*0.04, (Math.random()-0.5)*0.04, (Math.random()-0.5)*0.04);
                     const fd = dir.clone().add(sp).normalize();
                     const bullet = { position: tip.clone(), velocity: fd.multiplyScalar(bs), life: 1.8, tracer: null };
-                    const tg = new THREE.SphereGeometry(0.06, 4, 4);
-                    bullet.tracer = new THREE.Mesh(tg, new THREE.MeshBasicMaterial({ color: 0xffff44 }));
+                    bullet.tracer = new THREE.Mesh(new THREE.SphereGeometry(0.06,4,4), new THREE.MeshBasicMaterial({ color:0xffff44 }));
                     bullet.tracer.position.copy(bullet.position);
-                    this.scene.add(bullet.tracer);
-                    this.bulletMeshes.push(bullet.tracer);
-                    this.bullets.push(bullet);
+                    this.scene.add(bullet.tracer); this.bulletMeshes.push(bullet.tracer); this.bullets.push(bullet);
                 }
-                this.fireCooldown = this.fireRate;
-                this.muzzleFlash = 0.05;
-                this.audio.playGunshot();
-                vibrate([12, 8, 12]);
+                this.fireCooldown = this.fireRate; this.muzzleFlash = 0.05;
+                this.audio.playGunshot(); vibrate([12, 8, 12]);
             }
 
-            createExplosion(pos, size = 1) {
+            createExplosion(pos, size=1) {
                 const parts = [];
-                const fc = Math.floor(35 * size);
-                for (let i = 0; i < fc; i++) {
-                    const p = new THREE.Mesh(new THREE.SphereGeometry(0.12 * size * (0.5 + Math.random()), 6, 6),
-                        new THREE.MeshBasicMaterial({
-                            color: new THREE.Color().setHSL(0.06 + Math.random() * 0.12, 1, 0.4 + Math.random() *
-                                0.6),
-                            transparent: true,
-                            opacity: 1
-                        }));
+                for (let i=0; i<Math.floor(35*size); i++) {
+                    const p = new THREE.Mesh(new THREE.SphereGeometry(0.12*size*(0.5+Math.random()),6,6),
+                        new THREE.MeshBasicMaterial({ color: new THREE.Color().setHSL(0.06+Math.random()*0.12,1,0.4+Math.random()*0.6), transparent:true, opacity:1 }));
                     p.position.copy(pos);
-                    p.velocity = new THREE.Vector3((Math.random() - 0.5) * 15 * size, (Math.random() - 0.5) * 15 * size, (Math
-                        .random() - 0.5) * 15 * size);
-                    p.life = 0.4 + Math.random() * 0.8;
-                    p.age = 0;
-                    p.isFire = true;
-                    this.scene.add(p);
-                    parts.push(p);
+                    p.velocity = new THREE.Vector3((Math.random()-0.5)*15*size, (Math.random()-0.5)*15*size, (Math.random()-0.5)*15*size);
+                    p.life = 0.4+Math.random()*0.8; p.age = 0; p.isFire = true;
+                    this.scene.add(p); parts.push(p);
                 }
-                const core = new THREE.Mesh(new THREE.SphereGeometry(0.5 * size, 16, 16), new THREE.MeshBasicMaterial({ color: 0xffffff,
-                    transparent: true, opacity: 0.9 }));
-                core.position.copy(pos);
-                core.life = 0.2;
-                core.age = 0;
-                core.isCore = true;
-                this.scene.add(core);
-                parts.push(core);
-                const light = new THREE.PointLight(0xff6600, 8 * size, 20 * size);
-                light.position.copy(pos);
-                light.life = 0.4;
-                light.age = 0;
-                light.isLight = true;
-                this.scene.add(light);
-                parts.push(light);
-                this.explosionParticles.push({ particles: parts, age: 0, life: 1.2 });
+                const core = new THREE.Mesh(new THREE.SphereGeometry(0.5*size,16,16), new THREE.MeshBasicMaterial({ color:0xffffff, transparent:true, opacity:0.9 }));
+                core.position.copy(pos); core.life=0.2; core.age=0; core.isCore=true; this.scene.add(core); parts.push(core);
+                const light = new THREE.PointLight(0xff6600, 8*size, 20*size);
+                light.position.copy(pos); light.life=0.4; light.age=0; light.isLight=true; this.scene.add(light); parts.push(light);
+                this.explosionParticles.push({ particles: parts, age:0, life:1.2 });
                 setTimeout(() => this.createSmoke(pos, size), 150);
-                this.audio.playExplosion();
-                vibrate([60, 30, 60, 30, 100]);
+                this.audio.playExplosion(); vibrate([60,30,60,30,100]);
             }
 
-            createSmoke(pos, size = 1) {
+            createSmoke(pos, size=1) {
                 const parts = [];
-                const sc = Math.floor(20 * size);
-                for (let i = 0; i < sc; i++) {
-                    const p = new THREE.Mesh(new THREE.SphereGeometry(0.2 * size * (0.5 + Math.random()), 8, 8),
-                        new THREE.MeshBasicMaterial({ color: 0x222222, transparent: true, opacity: 0.7 }));
-                    p.position.copy(pos);
-                    p.position.x += (Math.random() - 0.5) * 2 * size;
-                    p.position.z += (Math.random() - 0.5) * 2 * size;
-                    p.velocity = new THREE.Vector3((Math.random() - 0.5) * 3 * size, 2 + Math.random() * 5 * size, (Math.random() -
-                        0.5) * 3 * size);
-                    p.life = 1 + Math.random() * 2;
-                    p.age = 0;
-                    p.isSmoke = true;
-                    this.scene.add(p);
-                    parts.push(p);
+                for (let i=0; i<Math.floor(20*size); i++) {
+                    const p = new THREE.Mesh(new THREE.SphereGeometry(0.2*size*(0.5+Math.random()),8,8),
+                        new THREE.MeshBasicMaterial({ color:0x222222, transparent:true, opacity:0.7 }));
+                    p.position.copy(pos); p.position.x += (Math.random()-0.5)*2*size; p.position.z += (Math.random()-0.5)*2*size;
+                    p.velocity = new THREE.Vector3((Math.random()-0.5)*3*size, 2+Math.random()*5*size, (Math.random()-0.5)*3*size);
+                    p.life = 1+Math.random()*2; p.age=0; p.isSmoke=true; this.scene.add(p); parts.push(p);
                 }
-                this.smokeParticles.push({ particles: parts, age: 0, life: 3 });
+                this.smokeParticles.push({ particles: parts, age:0, life:3 });
             }
 
             createDeckFire(pos) {
-                const fg = new THREE.Group();
-                fg.position.copy(pos);
-                fg.position.y = 1.9;
-                for (let i = 0; i < 8; i++) {
-                    const fl = new THREE.Mesh(new THREE.ConeGeometry(0.15 + Math.random() * 0.2, 0.5 + Math.random() * 0.8, 6),
-                        new THREE.MeshBasicMaterial({
-                            color: new THREE.Color().setHSL(0.06 + Math.random() * 0.1, 1, 0.4 + Math.random() *
-                                0.5),
-                            transparent: true,
-                            opacity: 0.8
-                        }));
-                    fl.position.set((Math.random() - 0.5) * 1.5, 0.3, (Math.random() - 0.5) * 1.5);
-                    fl.userData = { speed: 0.5 + Math.random() * 1.5, offset: Math.random() * Math.PI * 2 };
+                const fg = new THREE.Group(); fg.position.copy(pos); fg.position.y = 1.9;
+                for (let i=0; i<8; i++) {
+                    const fl = new THREE.Mesh(new THREE.ConeGeometry(0.15+Math.random()*0.2, 0.5+Math.random()*0.8, 6),
+                        new THREE.MeshBasicMaterial({ color: new THREE.Color().setHSL(0.06+Math.random()*0.1,1,0.4+Math.random()*0.5), transparent:true, opacity:0.8 }));
+                    fl.position.set((Math.random()-0.5)*1.5, 0.3, (Math.random()-0.5)*1.5);
+                    fl.userData = { speed: 0.5+Math.random()*1.5, offset: Math.random()*Math.PI*2 };
                     fg.add(fl);
                 }
-                const fl = new THREE.PointLight(0xff4400, 2, 6);
-                fl.position.y = 0.5;
-                fg.add(fl);
-                this.scene.add(fg);
-                this.deckFires.push({ group: fg, life: 4 + Math.random() * 6, age: 0 });
+                const fl = new THREE.PointLight(0xff4400, 2, 6); fl.position.y = 0.5; fg.add(fl);
+                this.scene.add(fg); this.deckFires.push({ group: fg, life: 4+Math.random()*6, age:0 });
             }
 
             damageShip(amount) {
                 this.health -= amount;
-                if (this.health <= 0) { this.health = 0;
-                    this.updateHUD();
-                    this.gameOver(); return; }
-                const ip = new THREE.Vector3((Math.random() - 0.5) * 12, 2, (Math.random() - 0.5) * 25);
-                this.createExplosion(ip, 1 + amount / 20);
-                this.createSmoke(ip, 0.8);
-                this.createDeckFire(ip);
-                this.audio.playHit();
-                vibrate([100, 50, 100, 50, 200]);
-                this.showMessage('¡IMPACTO! -' + amount, 1200, '#ff4444');
-                this.updateHUD();
-                this.hitEffects.push({ timer: 0.5, intensity: amount / 20 });
+                if (this.health <= 0) { this.health=0; this.updateHUD(); this.gameOver(); return; }
+                const ip = new THREE.Vector3((Math.random()-0.5)*12, 2, (Math.random()-0.5)*25);
+                this.createExplosion(ip, 1+amount/20); this.createSmoke(ip, 0.8); this.createDeckFire(ip);
+                this.audio.playHit(); vibrate([100,50,100,50,200]);
+                this.showMessage('¡IMPACTO! -'+amount, 1200, '#ff4444');
+                this.updateHUD(); this.hitEffects.push({ timer:0.5, intensity:amount/20 });
             }
 
             update(delta) {
                 if (!this.gameRunning) {
-                    this.updateOcean(delta);
-                    this.updateExplosions(delta);
-                    this.updateSmoke(delta);
-                    this.updateDeckFires(delta);
+                    this.updateOcean(delta); this.updateExplosions(delta); this.updateSmoke(delta); this.updateDeckFires(delta);
                     return;
                 }
-
                 this.gameTime += delta;
                 this.fireCooldown = Math.max(0, this.fireCooldown - delta);
                 this.muzzleFlash = Math.max(0, this.muzzleFlash - delta);
@@ -1081,66 +867,49 @@
                 this.spawnInterval = Math.max(0.7, 3.5 - this.difficulty * 0.35);
                 this.spawnTimer += delta;
                 if (this.spawnTimer >= this.spawnInterval) {
-                    this.spawnTimer = 0;
-                    this.spawnPlane();
-                    if (this.difficulty >= 3 && Math.random() < 0.5) setTimeout(() => { if (this.gameRunning) this
-                            .spawnPlane(); }, Math.random() * 800);
+                    this.spawnTimer = 0; this.spawnPlane();
+                    if (this.difficulty >= 3 && Math.random() < 0.5) setTimeout(() => { if (this.gameRunning) this.spawnPlane(); }, Math.random()*800);
                 }
 
-                const speedMultiplier = 2.5;
-                if (this.joystickVector.x !== 0) {
-                    this.turretYaw += this.joystickVector.x * delta * speedMultiplier * (0.5 + Math.abs(this.joystickVector
-                        .x));
-                }
+                const sm = 2.5;
+                if (this.joystickVector.x !== 0) this.turretYaw += this.joystickVector.x * delta * sm * (0.5 + Math.abs(this.joystickVector.x));
                 if (this.joystickVector.y !== 0) {
-                    this.turretPitch += this.joystickVector.y * delta * speedMultiplier * 0.7 * (0.5 + Math.abs(this
-                        .joystickVector.y));
+                    this.turretPitch += this.joystickVector.y * delta * sm * 0.7 * (0.5 + Math.abs(this.joystickVector.y));
                     this.turretPitch = THREE.MathUtils.clamp(this.turretPitch, -0.4, 0.5);
                 }
-
                 this.turretGroup.rotation.y = this.turretYaw;
                 this.gunsGroup.rotation.x = this.turretPitch;
 
-                const co = new THREE.Vector3(0, 2.2, 1.5);
-                co.applyQuaternion(this.turretGroup.quaternion);
+                const co = new THREE.Vector3(0, 2.2, 1.5); co.applyQuaternion(this.turretGroup.quaternion);
                 this.camera.position.copy(this.turretGroup.position.clone().add(co));
-                const ld = new THREE.Vector3(0, 0.2, -20);
-                ld.applyQuaternion(this.gunsGroup.getWorldQuaternion(new THREE.Quaternion()));
+                const ld = new THREE.Vector3(0, 0.2, -20); ld.applyQuaternion(this.gunsGroup.getWorldQuaternion(new THREE.Quaternion()));
                 this.camera.lookAt(this.gunsGroup.getWorldPosition(new THREE.Vector3()).add(ld));
 
                 if (this.isFiring && this.fireCooldown <= 0) this.fireBullet();
-                this.scene.fog = this.muzzleFlash > 0 ? new THREE.FogExp2(new THREE.Color().lerpColors(new THREE.Color(
-                    0x8cc8e8), new THREE.Color(0xffcc66), this.muzzleFlash / 0.05), 0.00005 + (this.muzzleFlash / 0.05) *
-                    0.0002) : new THREE.FogExp2(0x8cc8e8, 0.00005);
+                this.scene.fog = this.muzzleFlash > 0 ? new THREE.FogExp2(new THREE.Color().lerpColors(new THREE.Color(0x8cc8e8), new THREE.Color(0xffcc66), this.muzzleFlash/0.05), 0.00005+(this.muzzleFlash/0.05)*0.0002) : new THREE.FogExp2(0x8cc8e8, 0.00005);
 
-                // Balas
-                for (let i = this.bullets.length - 1; i >= 0; i--) {
+                for (let i=this.bullets.length-1; i>=0; i--) {
                     const b = this.bullets[i];
-                    b.position.add(b.velocity.clone().multiplyScalar(delta));
-                    b.life -= delta;
+                    b.position.add(b.velocity.clone().multiplyScalar(delta)); b.life -= delta;
                     b.tracer.position.copy(b.position);
-                    if (b.life <= 0 || b.position.y < -3 || Math.abs(b.position.x) > 80 || Math.abs(b.position.z) > 80) { this
-                            .scene.remove(b.tracer); const idx = this.bulletMeshes.indexOf(b.tracer); if (idx > -1) this
-                            .bulletMeshes.splice(idx, 1);
-                        this.bullets.splice(i, 1); continue; }
-                    for (let j = this.planes.length - 1; j >= 0; j--) {
-                        const p = this.planes[j];
-                        if (!p.alive) continue;
-                        if (b.position.distanceTo(p.group.position) < 2.2) { p.health--; if (p.health <= 0) { this.destroyPlane(
-                                    j);
-                                this.score += 100;
-                                this.showMessage('¡DERRIBADO! +100', 1200, '#00ff88'); } else { this.showMessage(
-                                    '¡IMPACTO!', 500, '#ff4444');
-                                this.audio.playHit(); } this.scene.remove(b.tracer); const idx = this.bulletMeshes.indexOf(
-                                    b.tracer); if (idx > -1) this.bulletMeshes.splice(idx, 1);
-                            this.bullets.splice(i, 1); break; }
+                    if (b.life <= 0 || b.position.y < -3 || Math.abs(b.position.x) > 80 || Math.abs(b.position.z) > 80) {
+                        this.scene.remove(b.tracer); const idx = this.bulletMeshes.indexOf(b.tracer);
+                        if (idx > -1) this.bulletMeshes.splice(idx, 1); this.bullets.splice(i, 1); continue;
+                    }
+                    for (let j=this.planes.length-1; j>=0; j--) {
+                        const p = this.planes[j]; if (!p.alive) continue;
+                        if (b.position.distanceTo(p.group.position) < 2.2) {
+                            p.health--;
+                            if (p.health <= 0) { this.destroyPlane(j); this.score += 100; this.showMessage('¡DERRIBADO! +100', 1200, '#00ff88'); }
+                            else { this.showMessage('¡IMPACTO!', 500, '#ff4444'); this.audio.playHit(); }
+                            this.scene.remove(b.tracer); const idx = this.bulletMeshes.indexOf(b.tracer);
+                            if (idx > -1) this.bulletMeshes.splice(idx, 1); this.bullets.splice(i, 1); break;
+                        }
                     }
                 }
 
-                // Aviones
-                for (let i = this.planes.length - 1; i >= 0; i--) {
-                    const p = this.planes[i];
-                    if (!p.alive) continue;
+                for (let i=this.planes.length-1; i>=0; i--) {
+                    const p = this.planes[i]; if (!p.alive) continue;
                     p.position.add(p.velocity.clone().multiplyScalar(delta));
                     p.group.position.copy(p.position);
                     p.group.lookAt(new THREE.Vector3().addVectors(p.position, p.velocity));
@@ -1148,116 +917,81 @@
                     p.attackCooldown = Math.max(0, p.attackCooldown - delta);
                     const dist = p.position.length();
                     if (dist < 28 && p.attackCooldown <= 0) {
-                        if (p.type === 'fighter') { p.attackCooldown = 1.8;
-                            this.damageShip(2 + Math.floor(this.difficulty / 2)); } else if (p.type === 'dive_bomber' && p
-                            .position.y > 7 && dist < 18) { p.attackCooldown = 3.5;
-                            p.velocity.y = -18;
-                            setTimeout(() => { if (p.alive && this.gameRunning) { this.damageShip(12 + this.difficulty * 2);
-                                    this.createExplosion(new THREE.Vector3((Math.random() - 0.5) * 12, 1.5, (Math.random() -
-                                        0.5) * 22), 0.8); } }, 700); } else if (p.type === 'torpedo_bomber' && p.position.y <
-                            2.5 && dist < 22) { p.attackCooldown = 5;
-                            this.damageShip(18 + this.difficulty * 3);
-                            this.createExplosion(new THREE.Vector3(0, -0.5, (Math.random() - 0.5) * 18), 1.2);
-                            this.showMessage('¡TORPEDO! -' + (18 + this.difficulty * 3), 1500, '#ff4444'); }
+                        if (p.type === 'fighter') { p.attackCooldown = 1.8; this.damageShip(2+Math.floor(this.difficulty/2)); }
+                        else if (p.type === 'dive_bomber' && p.position.y > 7 && dist < 18) {
+                            p.attackCooldown = 3.5; p.velocity.y = -18;
+                            setTimeout(() => { if (p.alive && this.gameRunning) { this.damageShip(12+this.difficulty*2); this.createExplosion(new THREE.Vector3((Math.random()-0.5)*12, 1.5, (Math.random()-0.5)*22), 0.8); } }, 700);
+                        } else if (p.type === 'torpedo_bomber' && p.position.y < 2.5 && dist < 22) {
+                            p.attackCooldown = 5; this.damageShip(18+this.difficulty*3);
+                            this.createExplosion(new THREE.Vector3(0, -0.5, (Math.random()-0.5)*18), 1.2);
+                            this.showMessage('¡TORPEDO! -'+(18+this.difficulty*3), 1500, '#ff4444');
+                        }
                     }
-                    if (Math.abs(p.position.x) > 70 || Math.abs(p.position.z) > 70 || p.position.y > 40 || p.position.y < -8)
-                        this.removePlane(i);
+                    if (Math.abs(p.position.x) > 70 || Math.abs(p.position.z) > 70 || p.position.y > 40 || p.position.y < -8) this.removePlane(i);
                 }
-
                 this.radar.draw(this.planes);
-
                 if (Math.floor(this.gameTime) > Math.floor(this.gameTime - delta)) this.score += 10;
-                this.updateExplosions(delta);
-                this.updateSmoke(delta);
-                this.updateDeckFires(delta);
-                for (let i = this.hitEffects.length - 1; i >= 0; i--) { this.hitEffects[i].timer -= delta; if (this.hitEffects[
-                        i].timer <= 0) this.hitEffects.splice(i, 1); }
-                this.updateOcean(delta);
-                this.updateHUD();
+                this.updateExplosions(delta); this.updateSmoke(delta); this.updateDeckFires(delta);
+                for (let i=this.hitEffects.length-1; i>=0; i--) { this.hitEffects[i].timer -= delta; if (this.hitEffects[i].timer <= 0) this.hitEffects.splice(i, 1); }
+                this.updateOcean(delta); this.updateHUD();
             }
 
-            destroyPlane(i) { const p = this.planes[i];
-                p.alive = false;
-                this.createExplosion(p.group.position.clone(), 0.7);
-                this.createSmoke(p.group.position.clone(), 0.8);
-                this.scene.remove(p.group); const idx = this.planeMeshes.indexOf(p); if (idx > -1) this.planeMeshes.splice(idx,
-                    1);
-                this.planes.splice(i, 1); }
-            removePlane(i) { const p = this.planes[i];
-                p.alive = false;
-                this.scene.remove(p.group); const idx = this.planeMeshes.indexOf(p); if (idx > -1) this.planeMeshes.splice(idx,
-                    1);
-                this.planes.splice(i, 1); }
+            destroyPlane(i) {
+                const p = this.planes[i]; p.alive = false;
+                this.createExplosion(p.group.position.clone(), 0.7); this.createSmoke(p.group.position.clone(), 0.8);
+                this.scene.remove(p.group); const idx = this.planeMeshes.indexOf(p);
+                if (idx > -1) this.planeMeshes.splice(idx, 1); this.planes.splice(i, 1);
+            }
+            removePlane(i) {
+                const p = this.planes[i]; p.alive = false;
+                this.scene.remove(p.group); const idx = this.planeMeshes.indexOf(p);
+                if (idx > -1) this.planeMeshes.splice(idx, 1); this.planes.splice(i, 1);
+            }
 
             updateExplosions(delta) {
-                for (let i = this.explosionParticles.length - 1; i >= 0; i--) {
-                    const e = this.explosionParticles[i];
-                    e.age += delta;
-                    for (let j = e.particles.length - 1; j >= 0; j--) {
+                for (let i=this.explosionParticles.length-1; i>=0; i--) {
+                    const e = this.explosionParticles[i]; e.age += delta;
+                    for (let j=e.particles.length-1; j>=0; j--) {
                         const p = e.particles[j];
-                        if (p.isLight) { p.age += delta;
-                            p.intensity = 8 * (1 - p.age / p.life); if (p.age >= p.life) { this.scene.remove(p);
-                                e.particles.splice(j, 1); } } else if (p.isCore) { p.age += delta;
-                            p.material.opacity = 1 - p.age / p.life;
-                            p.scale.setScalar(1 + p.age * 5); if (p.age >= p.life) { this.scene.remove(p);
-                                e.particles.splice(j, 1); } } else { p.age += delta;
-                            p.position.add(p.velocity.clone().multiplyScalar(delta));
-                            p.velocity.y += 1.5 * delta;
-                            p.material.opacity = Math.max(0, 1 - p.age / p.life);
-                            p.scale.setScalar(Math.max(0.05, 1 - p.age / p.life)); if (p.age >= p.life) { this.scene.remove(
-                                    p);
-                                e.particles.splice(j, 1); } }
+                        if (p.isLight) { p.age+=delta; p.intensity=8*(1-p.age/p.life); if (p.age>=p.life) { this.scene.remove(p); e.particles.splice(j,1); } }
+                        else if (p.isCore) { p.age+=delta; p.material.opacity=1-p.age/p.life; p.scale.setScalar(1+p.age*5); if (p.age>=p.life) { this.scene.remove(p); e.particles.splice(j,1); } }
+                        else { p.age+=delta; p.position.add(p.velocity.clone().multiplyScalar(delta)); p.velocity.y+=1.5*delta; p.material.opacity=Math.max(0,1-p.age/p.life); p.scale.setScalar(Math.max(0.05,1-p.age/p.life)); if (p.age>=p.life) { this.scene.remove(p); e.particles.splice(j,1); } }
                     }
-                    if (e.particles.length === 0) this.explosionParticles.splice(i, 1);
+                    if (e.particles.length===0) this.explosionParticles.splice(i,1);
                 }
             }
             updateSmoke(delta) {
-                for (let i = this.smokeParticles.length - 1; i >= 0; i--) {
-                    const s = this.smokeParticles[i];
-                    s.age += delta;
-                    for (let j = s.particles.length - 1; j >= 0; j--) {
-                        const p = s.particles[j];
-                        p.age += delta;
-                        p.position.add(p.velocity.clone().multiplyScalar(delta));
-                        p.velocity.y += 0.5 * delta;
-                        p.material.opacity = Math.max(0, 0.7 * (1 - p.age / p.life));
-                        p.scale.setScalar(1 + p.age * 2);
-                        if (p.age >= p.life) { this.scene.remove(p);
-                            s.particles.splice(j, 1); }
+                for (let i=this.smokeParticles.length-1; i>=0; i--) {
+                    const s = this.smokeParticles[i]; s.age += delta;
+                    for (let j=s.particles.length-1; j>=0; j--) {
+                        const p = s.particles[j]; p.age+=delta; p.position.add(p.velocity.clone().multiplyScalar(delta)); p.velocity.y+=0.5*delta;
+                        p.material.opacity=Math.max(0,0.7*(1-p.age/p.life)); p.scale.setScalar(1+p.age*2);
+                        if (p.age>=p.life) { this.scene.remove(p); s.particles.splice(j,1); }
                     }
-                    if (s.particles.length === 0) this.smokeParticles.splice(i, 1);
+                    if (s.particles.length===0) this.smokeParticles.splice(i,1);
                 }
             }
             updateDeckFires(delta) {
-                for (let i = this.deckFires.length - 1; i >= 0; i--) {
-                    const d = this.deckFires[i];
-                    d.age += delta;
+                for (let i=this.deckFires.length-1; i>=0; i--) {
+                    const d = this.deckFires[i]; d.age += delta;
                     d.group.children.forEach(c => {
-                        if (c.isPointLight) c.intensity = 2 * (1 - d.age / d.life);
-                        else if (c.userData && c.userData.speed) {
-                            c.scale.y = 0.5 + Math.sin(d.age * c.userData.speed + c.userData.offset) * 0.5;
-                            c.material.opacity = Math.max(0, 0.8 * (1 - d.age / d.life));
-                        }
+                        if (c.isPointLight) c.intensity=2*(1-d.age/d.life);
+                        else if (c.userData && c.userData.speed) { c.scale.y=0.5+Math.sin(d.age*c.userData.speed+c.userData.offset)*0.5; c.material.opacity=Math.max(0,0.8*(1-d.age/d.life)); }
                     });
-                    if (d.age >= d.life) { d.group.children.forEach(c => { if (c.isPointLight) this.scene.remove(c); });
-                        this.scene.remove(d.group);
-                        this.deckFires.splice(i, 1); }
+                    if (d.age>=d.life) { d.group.children.forEach(c=>{if(c.isPointLight)this.scene.remove(c)}); this.scene.remove(d.group); this.deckFires.splice(i,1); }
                 }
             }
             updateOcean(delta) {
                 if (!this.ocean || !this.oceanVerts) return;
                 const pos = this.ocean.geometry.attributes.position.array;
-                const t = performance.now() * 0.001;
-                for (let i = 0; i < pos.length; i += 3) {
-                    pos[i + 2] = Math.sin(this.oceanVerts[i] * 0.2 + t) * Math.cos(this.oceanVerts[i + 1] * 0.2 + t * 0.7) *
-                        0.6 + Math.sin(this.oceanVerts[i] * 0.1 + t * 1.2) * 0.3;
-                }
-                this.ocean.geometry.attributes.position.needsUpdate = true;
+                const t = performance.now()*0.001;
+                for (let i=0; i<pos.length; i+=3) pos[i+2]=Math.sin(this.oceanVerts[i]*0.2+t)*Math.cos(this.oceanVerts[i+1]*0.2+t*0.7)*0.6+Math.sin(this.oceanVerts[i]*0.1+t*1.2)*0.3;
+                this.ocean.geometry.attributes.position.needsUpdate=true;
             }
             animate() {
                 requestAnimationFrame(() => this.animate());
                 const now = performance.now();
-                this.update(Math.min((now - this.lastTime) / 1000, 0.1));
+                this.update(Math.min((now-this.lastTime)/1000, 0.1));
                 this.lastTime = now;
                 this.renderer.render(this.scene, this.camera);
             }
@@ -1266,13 +1000,9 @@
         const game = new MidwayGame();
         game.init();
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register(URL.createObjectURL(new Blob([`
-            self.addEventListener('install',()=>self.skipWaiting());
-            self.addEventListener('activate',e=>e.waitUntil(clients.claim()));
-            self.addEventListener('fetch',e=>e.respondWith(fetch(e.request)));
-          `], { type: 'application/javascript' }))).catch(() => {});
+            navigator.serviceWorker.register(URL.createObjectURL(new Blob([`self.addEventListener('install',()=>self.skipWaiting());self.addEventListener('activate',e=>e.waitUntil(clients.claim()));self.addEventListener('fetch',e=>e.respondWith(fetch(e.request)));`],{type:'application/javascript'}))).catch(()=>{});
         }
-        console.log('⚓ Midway v18 - Vibración directa (sin enabled)');
+        console.log('⚓ Midway v20 - Sonidos reales + Modelos 3D desde repositorio');
     </script>
 </body>
 </html>
