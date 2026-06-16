@@ -259,7 +259,6 @@
     </div>
     <div id="message"></div>
 
-    <!-- Radar -->
     <div id="radar-container">
         <canvas id="radar-canvas" width="90" height="90"></canvas>
     </div>
@@ -436,15 +435,15 @@
             }
         }
 
-        // ==================== VIBRACIÓN ====================
-        class VibrationSystem {
-            constructor() { this.enabled = false; }
-            requestPermission() { if (navigator.vibrate) { try { navigator.vibrate(50);
-                        this.enabled = true; } catch (e) {} } }
-            vibrate(p) { if (this.enabled && navigator.vibrate) { try { navigator.vibrate(p); } catch (e) {} } }
-            gunshotVibrate() { this.vibrate([10, 8, 10]); }
-            explosionVibrate() { this.vibrate([40, 20, 40, 20, 60]); }
-            hitVibrate() { this.vibrate([60, 30, 60, 30, 100]); }
+        // ==================== VIBRACIÓN DIRECTA ====================
+        function vibrate(pattern) {
+            if (navigator.vibrate) {
+                try {
+                    navigator.vibrate(pattern);
+                } catch (e) {
+                    // ignorar
+                }
+            }
         }
 
         // ==================== RADAR ====================
@@ -452,7 +451,7 @@
             constructor(canvas) {
                 this.canvas = canvas;
                 this.ctx = canvas.getContext('2d');
-                this.range = 55; // Alcance en unidades del mundo
+                this.range = 55;
             }
 
             draw(planes) {
@@ -465,13 +464,11 @@
 
                 ctx.clearRect(0, 0, w, h);
 
-                // Fondo
                 ctx.fillStyle = 'rgba(0,10,0,0.7)';
                 ctx.beginPath();
                 ctx.arc(cx, cy, r, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Anillos
                 ctx.strokeStyle = 'rgba(0,255,100,0.3)';
                 ctx.lineWidth = 0.5;
                 for (let i = 1; i <= 3; i++) {
@@ -480,7 +477,6 @@
                     ctx.stroke();
                 }
 
-                // Cruz central
                 ctx.strokeStyle = 'rgba(0,255,100,0.2)';
                 ctx.beginPath();
                 ctx.moveTo(cx, cy - r);
@@ -489,7 +485,6 @@
                 ctx.lineTo(cx + r, cy);
                 ctx.stroke();
 
-                // Barco (centro)
                 ctx.fillStyle = '#00ff66';
                 ctx.beginPath();
                 ctx.arc(cx, cy, 2.5, 0, Math.PI * 2);
@@ -498,7 +493,6 @@
                 ctx.lineWidth = 0.8;
                 ctx.stroke();
 
-                // Aviones enemigos
                 for (const plane of planes) {
                     if (!plane.alive) continue;
                     const dx = plane.position.x;
@@ -512,7 +506,6 @@
 
                         ctx.fillStyle = '#ff3333';
                         ctx.beginPath();
-                        // Pequeña forma de avión
                         ctx.save();
                         ctx.translate(px, py);
                         ctx.rotate(angle);
@@ -523,7 +516,6 @@
                         ctx.fill();
                         ctx.restore();
                     } else {
-                        // Fuera de rango: dibujar en el borde
                         const angle = Math.atan2(dz, dx);
                         const px = cx + Math.cos(angle) * r;
                         const py = cy + Math.sin(angle) * r;
@@ -534,7 +526,6 @@
                     }
                 }
 
-                // Borde
                 ctx.strokeStyle = 'rgba(0,255,100,0.5)';
                 ctx.lineWidth = 1;
                 ctx.beginPath();
@@ -547,7 +538,6 @@
         class MidwayGame {
             constructor() {
                 this.audio = new AudioSystem();
-                this.vibration = new VibrationSystem();
                 this.score = 0;
                 this.health = 100;
                 this.gameRunning = false;
@@ -776,7 +766,8 @@
                     e.preventDefault();
                     this.isFiring = true;
                     this.audio.init();
-                    if (!this.vibration.enabled) this.vibration.requestPermission();
+                    // vibrar directamente al disparar
+                    vibrate([12, 8, 12]);
                 });
                 document.addEventListener('pointerup', () => { this.isFiring = false; });
                 document.addEventListener('pointerleave', () => { this.isFiring = false; });
@@ -787,7 +778,7 @@
                 document.addEventListener('gestureend', (e) => e.preventDefault());
 
                 document.getElementById('start-btn').addEventListener('click', () => {
-                    this.vibration.requestPermission();
+                    vibrate(200); // vibración de feedback al iniciar
                     this.startGame();
                 });
                 document.getElementById('restart-btn').addEventListener('click', () => this.restartGame());
@@ -802,8 +793,6 @@
             startGame() {
                 this.splashScreen.style.display = 'none';
                 this.audio.init();
-                this.vibration.requestPermission();
-                setTimeout(() => this.vibration.requestPermission(), 500);
                 this.beginGameplay();
                 this.joystickContainer.style.display = 'block';
                 this.radarContainer.style.display = 'block';
@@ -852,7 +841,7 @@
                 this.joystickVector.x = 0;
                 this.joystickVector.y = 0;
                 this.audio.playExplosion();
-                this.vibration.explosionVibrate();
+                vibrate([60, 30, 60, 30, 100]);
                 this.createExplosion(new THREE.Vector3(0, 2, 0), 2.5);
                 this.createSmoke(new THREE.Vector3(0, 3, 0), 3.0);
                 setTimeout(() => {
@@ -865,11 +854,11 @@
             }
 
             updateRanking() {
-                let r = JSON.parse(localStorage.getItem('midway_v17') || '[]');
+                let r = JSON.parse(localStorage.getItem('midway_v18') || '[]');
                 r.push({ score: this.score, time: Math.floor(this.gameTime), date: new Date().toLocaleDateString() });
                 r.sort((a, b) => b.score - a.score);
                 r = r.slice(0, 10);
-                localStorage.setItem('midway_v17', JSON.stringify(r));
+                localStorage.setItem('midway_v18', JSON.stringify(r));
                 let h = '<h3>🏆 MEJORES ARTILLEROS</h3>';
                 r.forEach((x, i) => h +=
                     `<div>${i+1}. ${x.score} pts - ${x.time}s (${x.date})</div>`);
@@ -973,7 +962,7 @@
                 this.fireCooldown = this.fireRate;
                 this.muzzleFlash = 0.05;
                 this.audio.playGunshot();
-                this.vibration.gunshotVibrate();
+                vibrate([12, 8, 12]);
             }
 
             createExplosion(pos, size = 1) {
@@ -1014,7 +1003,7 @@
                 this.explosionParticles.push({ particles: parts, age: 0, life: 1.2 });
                 setTimeout(() => this.createSmoke(pos, size), 150);
                 this.audio.playExplosion();
-                this.vibration.explosionVibrate();
+                vibrate([60, 30, 60, 30, 100]);
             }
 
             createSmoke(pos, size = 1) {
@@ -1070,7 +1059,7 @@
                 this.createSmoke(ip, 0.8);
                 this.createDeckFire(ip);
                 this.audio.playHit();
-                this.vibration.hitVibrate();
+                vibrate([100, 50, 100, 50, 200]);
                 this.showMessage('¡IMPACTO! -' + amount, 1200, '#ff4444');
                 this.updateHUD();
                 this.hitEffects.push({ timer: 0.5, intensity: amount / 20 });
@@ -1175,7 +1164,6 @@
                         this.removePlane(i);
                 }
 
-                // Radar
                 this.radar.draw(this.planes);
 
                 if (Math.floor(this.gameTime) > Math.floor(this.gameTime - delta)) this.score += 10;
@@ -1284,7 +1272,7 @@
             self.addEventListener('fetch',e=>e.respondWith(fetch(e.request)));
           `], { type: 'application/javascript' }))).catch(() => {});
         }
-        console.log('⚓ Midway v17 - Radar táctico añadido');
+        console.log('⚓ Midway v18 - Vibración directa (sin enabled)');
     </script>
 </body>
 </html>
