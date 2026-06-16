@@ -622,8 +622,6 @@
                     }
                     thumb.style.left = `calc(50% + ${dx}px)`;
                     thumb.style.top = `calc(50% + ${dy}px)`;
-                    // INVERTIR EJE HORIZONTAL: arrastrar izquierda -> negativo, pero queremos que gire izquierda (negativo)
-                    // joystickVector.x positivo = gira derecha, así que invertimos el signo
                     this.joystickVector.x = -dx / maxDist;
                     this.joystickVector.y = -dy / maxDist;
                 };
@@ -712,6 +710,7 @@
                 this.turretPitch = 0;
                 this.gameRunning = true;
                 this.gameOverScreen.style.display = 'none';
+                this.joystickContainer.style.display = 'block'; // Mostrar joystick al reiniciar
                 this.updateHUD();
                 this.showMessage('¡DEFIENDE EL BUQUE!', 2000);
                 this.audio.playAlarm();
@@ -964,7 +963,6 @@
                     this.spawnPlane(); if (this.difficulty >= 3 && Math.random() < 0.5) setTimeout(() => { if (this.gameRunning)
                             this.spawnPlane(); }, Math.random() * 800); }
 
-                // Aplicar joystick (ahora con eje horizontal corregido)
                 const speedMultiplier = 2.5;
                 if (this.joystickVector.x !== 0) {
                     this.turretYaw += this.joystickVector.x * delta * speedMultiplier * (0.5 + Math.abs(this.joystickVector
@@ -1145,7 +1143,7 @@
             self.addEventListener('fetch',e=>e.respondWith(fetch(e.request)));
           `], { type: 'application/javascript' }))).catch(() => {});
         }
-        console.log('⚓ Midway v14 - Joystick eje horizontal corregido definitivamente');
+        console.log('⚓ Midway v15 - Joystick reaparece al reiniciar');
     </script>
 </body>
 </html>
