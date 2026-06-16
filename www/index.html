@@ -574,10 +574,8 @@ async loadPlaneModel() {
                     this.planeModel = group;
                   //  this.planeModel.scale.set(0.5, 0.5, 0.5);
                     this.planeModel.scale.set(0.01, 0.01, 0.01);
-                    this.planeModel.children.forEach(child => {
-    child.rotation.y = Math.PI; // Gira las piezas internas 180 grados en Y
-    // child.rotation.x = Math.PI / 2; // Descomenta si necesitas acostarlo en X
-});
+                    //this.planeModel.rotation.y = Math.PI; // Gira las piezas internas 180 grados en Y
+
                     this.modelLoaded = true;
                     console.log(`✅ Modelo 3D (${count} piezas)`);
                 }
@@ -860,6 +858,7 @@ async loadPlaneModel() {
                 plane.group = this.createPlaneMesh(type);
                 plane.group.position.copy(plane.position);
                 plane.group.lookAt(new THREE.Vector3().addVectors(plane.position, plane.velocity));
+                plane.group.rotateY(Math.PI); 
                 this.scene.add(plane.group);
                 this.planes.push(plane);
                 this.planeMeshes.push(plane);
@@ -1043,6 +1042,7 @@ async loadPlaneModel() {
                     p.position.add(p.velocity.clone().multiplyScalar(delta));
                     p.group.position.copy(p.position);
                     p.group.lookAt(new THREE.Vector3().addVectors(p.position, p.velocity));
+                    p.group.rotateY(Math.PI); 
                     if (p.group.userData.propeller) p.group.userData.propeller.rotation.z += delta * 45;
                     p.attackCooldown = Math.max(0, p.attackCooldown - delta);
                     const dist = p.position.length();
