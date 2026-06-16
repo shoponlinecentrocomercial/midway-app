@@ -517,17 +517,22 @@
                 }
 if (count >= 4) {
     this.planeModel = group;
+    this.planeModel.scale.set(0.01, 0.01, 0.01); // Tu escala corregida
 
-    // --- CÓDIGO DE DEPURACIÓN (Mide el tamaño real del modelo) ---
-    const box = new THREE.Box3().setFromObject(group);
-    const size = new THREE.Vector3();
-    box.getSize(size);
-    console.log(`Tamaño real del avión (Ancho, Alto, Profundo):`, size);
-    // -------------------------------------------------------------
-
-    // Si mide demasiado, prueba con una escala mucho menor, por ejemplo 0.01 o 0.05
-    this.planeModel.scale.set(0.01, 0.01, 0.01); 
+    // --- CORRECCIÓN DE ROTACIÓN ---
     
+    // 1. Para ponerlo horizontal (corregir eje X o Z):
+    // Si está vertical, necesitamos rotarlo 90 grados en el eje X.
+    // Prueba con Math.PI / 2. Si se queda boca abajo, cámbialo a -Math.PI / 2.
+    this.planeModel.rotation.x = Math.PI / 2; 
+
+    // 2. Para que mire al frente (corregir eje Y):
+    // Si se ve desde el lateral, necesitamos rotarlo 90 grados en el eje Y.
+    // Prueba con Math.PI / 2. Si mira hacia el lado contrario, cámbialo a -Math.PI / 2 o a Math.PI.
+    this.planeModel.rotation.y = Math.PI / 2; 
+
+    // ------------------------------
+
     this.modelLoaded = true;
     console.log(`✅ Modelo 3D (${count} piezas)`);
 }
