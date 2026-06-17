@@ -537,13 +537,7 @@ async loadPlaneModel() {
                 c.receiveShadow = true;
             }
         });
-        this.planeModel.scale.set(0.01, 0.01, 0.01);
-        
-        const contenedor = new THREE.Group();
-        contenedor.add(this.planeModel);
-        contenedor.rotate.y = Math.PI;
-        this.planeModel = contenedor;
-        
+        this.planeModel.scale.set(0.01, 0.01, 0.01);     
         this.modelLoaded = true;
         console.log('✅ Avión completo cargado (FullAC.glb)');
     } catch (e) {
@@ -1011,7 +1005,7 @@ async loadPlaneModel() {
                     p.position.add(p.velocity.clone().multiplyScalar(delta));
                     p.group.position.copy(p.position);
                     p.group.lookAt(new THREE.Vector3().addVectors(p.position, p.velocity));
-                    p.group.rotateY(Math.PI);                 
+                    //p.group.rotateY(Math.PI);                 
                     if (p.group.userData.propeller) p.group.userData.propeller.rotation.z += delta * 45;
                     p.attackCooldown = Math.max(0, p.attackCooldown - delta);
                     const dist = p.position.length();
