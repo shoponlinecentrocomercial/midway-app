@@ -499,62 +499,7 @@
                 this.resourcesReady = true;
                 console.log('✅ Recursos listos');
             }
-/*
-            async loadPlaneModel() {
-    try {
-        // 1. Cargamos el modelo único del avión
-        const url = MODEL_BASE + 'avion.glb'; // El nombre de tu archivo único convertido
-        const gltf = await this.gltfLoader.loadAsync(url);
-        
-        // gltf.scene ya actúa como tu grupo principal
-        this.planeModel = gltf.scene; 
 
-        // 2. Activamos sombras en todas sus piezas
-        this.planeModel.traverse((c) => { 
-            if (c.isMesh) { 
-                c.castShadow = true;
-                c.receiveShadow = true; 
-            } 
-        });
-
-        // 3. HACK del ala derecha (espejo)
-        const wingLeft = this.planeModel.getObjectByName('WingLeft');
-        if (wingLeft) {
-            const wingRight = wingLeft.clone();
-            wingRight.name = 'WingRight';
-            wingRight.position.x = -wingLeft.position.x;
-            wingRight.scale.x = -wingLeft.scale.x;
-            wingRight.rotation.y = -wingLeft.rotation.y;
-            wingRight.rotation.z = -wingLeft.rotation.z;
-
-            // Evitamos que el ala derecha se vea negra por invertir la escala
-            wingRight.traverse((child) => {
-                if (child.isMesh && child.material) {
-                    if (Array.isArray(child.material)) {
-                        child.material.forEach(mat => mat.side = THREE.DoubleSide);
-                    } else {
-                        child.material.side = THREE.DoubleSide;
-                    }
-                }
-            });
-
-            this.planeModel.add(wingRight);
-        }
-
-        // 4. Ajustes globales del avión (escala, posición y rotación inicial)
-        this.planeModel.scale.set(0.01, 0.01, 0.01); // Tu escala corregida
-        
-        // Ajustamos la rotación para que apunte al frente y no vuele marcha atrás
-        this.planeModel.rotation.y = Math.PI; // Ve probando si necesitas Math.PI, Math.PI / 2, etc.
-
-        this.modelLoaded = true;
-        console.log("✅ Modelo 3D único cargado y configurado correctamente");
-
-    } catch (e) {
-        console.error("Error al cargar el avión:", e);
-    }
-}
-*/
 async loadPlaneModel() {
                 //const parts = ['Fuselage', 'WingLeft', 'WingRight', 'HtpLeft', 'HtpRight', 'Nose', 'Engine', 'Propeller', 'Shaft'];
                 const parts = ['FullAC'];
@@ -576,6 +521,21 @@ async loadPlaneModel() {
                     this.planeModel = group;
                   //  this.planeModel.scale.set(0.5, 0.5, 0.5);
                     this.planeModel.scale.set(0.01, 0.01, 0.01);
+                    
+              // 2. SOLUCIÓN AL TIMÓN INVISIBLE (Hacemos TODO el avión de doble cara)
+        this.planeModel.traverse((child) => {
+            if (child.isMesh) {
+                child.castShadow = true;
+                child.receiveShadow = true;
+                if (child.material) {
+                    if (Array.isArray(child.material)) {
+                        child.material.forEach(mat => mat.side = THREE.DoubleSide);
+                    } else {
+                        child.material.side = THREE.DoubleSide;
+                    }
+                }
+            }
+        });              
                     this.modelLoaded = true;
                     console.log(`✅ Modelo 3D (${count} piezas)`);
                 }
