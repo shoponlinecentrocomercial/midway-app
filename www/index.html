@@ -518,44 +518,6 @@ async loadPlaneModel() {
                 }
                 if (count >= 4) {
                     group.rotate.y = Math.PI;
-                                                // 2. SOLUCIÓN AL TIMÓN INVISIBLE (Hacemos TODO el avión de doble cara)
-        group.traverse((child) => {
-            if (child.isMesh) {
-                child.castShadow = true;
-                child.receiveShadow = true;
-                if (child.material) {
-                    if (Array.isArray(child.material)) {
-                        child.material.forEach(mat => mat.side = THREE.DoubleSide);
-                    } else {
-                        child.material.side = THREE.DoubleSide;
-                    }
-                }
-            }
-        });
-
-        // 3. SOLUCIÓN AL ESPEJO (Clonamos Ala y Estabilizador trasero si faltan)
-        const piezasAClonar = [
-            { leftName: 'WingLeft', rightName: 'WingRight' },
-            { leftName: 'HtpLeft', rightName: 'HtpRight' } // El timón horizontal trasero
-        ];
-
-        piezasAClonar.forEach(piezas => {
-            const piezaIzquierda = group.getObjectByName(piezas.leftName);
-            // Si existe la izquierda pero no la derecha en el GLB, la creamos
-            if (piezaIzquierda && !group.getObjectByName(piezas.rightName)) {
-                const piezaDerecha = piezaIzquierda.clone();
-                piezaDerecha.name = piezas.rightName;
-                
-                // Reflejamos posición y escala
-                piezaDerecha.position.x = -piezaIzquierda.position.x;
-                piezaDerecha.scale.x = -piezaIzquierda.scale.x;
-                piezaDerecha.rotation.y = -piezaIzquierda.rotation.y;
-                piezaDerecha.rotation.z = -piezaIzquierda.rotation.z;
-
-                group.add(piezaDerecha);
-                console.log(`✨ Creado espejo automático para: ${piezas.rightName}`);
-            }
-        });
                     this.planeModel = group;
                   //  this.planeModel.scale.set(0.5, 0.5, 0.5);
                     this.planeModel.scale.set(0.01, 0.01, 0.01);                 
