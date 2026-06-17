@@ -499,7 +499,7 @@
                 this.resourcesReady = true;
                 console.log('✅ Recursos listos');
             }
-
+/*
 async loadPlaneModel() {
                 //const parts = ['Fuselage', 'WingLeft', 'WingRight', 'HtpLeft', 'HtpRight', 'Nose', 'Engine', 'Propeller', 'Shaft'];
                 const parts = ['FullAC'];
@@ -525,7 +525,25 @@ async loadPlaneModel() {
                     console.log(`✅ Modelo 3D (${count} piezas)`);
                 }
             }
-            
+ */
+async loadPlaneModel() {
+    try {
+        const url = MODEL_BASE + 'FullAC.glb';
+        const gltf = await this.gltfLoader.loadAsync(url);
+        this.planeModel = gltf.scene;
+        this.planeModel.traverse((c) => {
+            if (c.isMesh) {
+                c.castShadow = true;
+                c.receiveShadow = true;
+            }
+        });
+        this.planeModel.scale.set(0.5, 0.5, 0.5);
+        this.modelLoaded = true;
+        console.log('✅ Avión completo cargado (FullAC.glb)');
+    } catch (e) {
+        console.warn('⚠️ FullAC.glb no disponible, usando geometría básica');
+    }
+} 
             createOcean() {
                 const g = new THREE.PlaneGeometry(500, 500, 150, 150);
                 this.ocean = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ color: 0x1a3a5c, roughness: 0.2, metalness: 0.75 }));
