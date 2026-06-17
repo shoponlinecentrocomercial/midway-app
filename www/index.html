@@ -1044,7 +1044,7 @@ clone.userData.propeller = propeller; // Guardarla para el update
                     p.position.add(p.velocity.clone().multiplyScalar(delta));
                     p.group.position.copy(p.position);
                     p.group.lookAt(new THREE.Vector3().addVectors(p.position, p.velocity));
-                    // p.group.rotateY(Math.PI);                 
+                    p.group.rotateY(Math.PI / 2);                 
                     if (p.group.userData.propeller) p.group.userData.propeller.rotation.z += delta * 45;
                     p.attackCooldown = Math.max(0, p.attackCooldown - delta);
                     const dist = p.position.length();
