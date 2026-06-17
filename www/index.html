@@ -521,21 +521,6 @@ async loadPlaneModel() {
                     this.planeModel = group;
                   //  this.planeModel.scale.set(0.5, 0.5, 0.5);
                     this.planeModel.scale.set(0.01, 0.01, 0.01);
-                    
-              // 2. SOLUCIÓN AL TIMÓN INVISIBLE (Hacemos TODO el avión de doble cara)
-        this.planeModel.traverse((child) => {
-            if (child.isMesh) {
-                child.castShadow = true;
-                child.receiveShadow = true;
-                if (child.material) {
-                    if (Array.isArray(child.material)) {
-                        child.material.forEach(mat => mat.side = THREE.DoubleSide);
-                    } else {
-                        child.material.side = THREE.DoubleSide;
-                    }
-                }
-            }
-        });              
                     this.modelLoaded = true;
                     console.log(`✅ Modelo 3D (${count} piezas)`);
                 }
