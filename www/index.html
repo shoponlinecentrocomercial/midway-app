@@ -775,6 +775,45 @@ async loadPlaneModel() {
                 const group = new THREE.Group();
                 if (this.modelLoaded && this.planeModel) {
                     const clone = this.planeModel.clone();
+                    // Corregir orientación: que el morro apunte hacia adelante (-Z en Three.js)
+                    clone.rotation.set(0, Math.PI / 2, 0);
+                    // Crear círculos rojos (Hinomaru) para fuselaje y alas
+const circleGeom = new THREE.CircleGeometry(0.3, 32);
+const circleMat = new THREE.MeshBasicMaterial({ color: 0xff0000, side: THREE.DoubleSide });
+
+// Hinomaru en el fuselaje (lado izquierdo)
+const circleFuselage = new THREE.Mesh(circleGeom, circleMat);
+circleFuselage.position.set(0.25, 0.05, 0);
+circleFuselage.rotation.y = Math.PI / 2;
+clone.add(circleFuselage);
+
+// Hinomaru en el fuselaje (lado derecho)
+const circleFuselage2 = new THREE.Mesh(circleGeom, circleMat);
+circleFuselage2.position.set(-0.25, 0.05, 0);
+circleFuselage2.rotation.y = -Math.PI / 2;
+clone.add(circleFuselage2);
+
+// Hinomaru en ala izquierda (arriba)
+const circleWingL = new THREE.Mesh(circleGeom, circleMat);
+circleWingL.position.set(0.6, 0.02, -0.3);
+circleWingL.rotation.x = -Math.PI / 2;
+clone.add(circleWingL);
+
+// Hinomaru en ala derecha (arriba)
+const circleWingR = new THREE.Mesh(circleGeom, circleMat);
+circleWingR.position.set(-0.6, 0.02, -0.3);
+circleWingR.rotation.x = -Math.PI / 2;
+clone.add(circleWingR);
+        
+            // Buscar la hélice en el modelo y guardarla para rotarla después
+let propeller = null;
+clone.traverse((child) => {
+    if (child.name && child.name.toLowerCase().includes('propeller')) {
+        propeller = child;
+    }
+});
+clone.userData.propeller = propeller; // Guardarla para el update
+
                     const colors = { fighter: 0x7a8a6a, dive_bomber: 0x6a5a4a, torpedo_bomber: 0x5a6a3a };
                     clone.traverse((c) => { if (c.isMesh && c.material) { c.material = c.material.clone();
                             c.material.color.set(colors[type] || 0x6a7a5a); } });
